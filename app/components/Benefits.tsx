@@ -60,7 +60,11 @@ export default function Benefits() {
         </Reveal>
 
         <Reveal delay={150} className="relative order-1 lg:order-2">
-          <div className="relative h-[420px] bg-[#211d19] md:h-[620px]">
+          <span
+            aria-hidden
+            className="absolute -left-3 -top-3 h-full w-full border border-accent/30"
+          />
+          <div className="relative h-[420px] overflow-hidden bg-[#211d19] shadow-(--shadow-card) md:h-[620px]">
             <Image
               src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&w=900&q=80&fit=crop"
               alt="Barbero trabajando"
@@ -69,7 +73,7 @@ export default function Benefits() {
               className="object-cover"
             />
           </div>
-          <div className="absolute bottom-5 left-5 bg-bg/80 px-4 py-2 font-mono text-[10px] tracking-[0.28em] text-cream backdrop-blur-sm">
+          <div className="absolute bottom-5 left-5 border border-hair bg-bg/80 px-4 py-2 font-mono text-[10px] tracking-[0.28em] text-cream backdrop-blur-sm">
             DESDE 2020 · CARACAS
           </div>
         </Reveal>

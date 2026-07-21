@@ -1,7 +1,7 @@
 import Reveal from "./Reveal";
 
 const fieldClasses =
-  "w-full border-b border-[#171412]/45 bg-transparent py-3 text-[16px] outline-none transition-colors placeholder:text-[#171412]/50 focus:border-accent";
+  "w-full border border-[#171412]/15 bg-[#171412]/[0.03] px-4 py-3.5 text-[16px] text-[#171412] outline-none transition-all duration-300 placeholder:text-[#171412]/40 hover:border-[#171412]/30 focus:border-accent focus:bg-[#171412]/[0.05] focus:shadow-[0_0_0_3px_rgba(212,145,110,0.15)]";
 
 export default function Contact() {
   return (
@@ -25,7 +25,7 @@ export default function Contact() {
         </Reveal>
 
         <Reveal delay={150}>
-          <form className="space-y-5" action="#">
+          <form className="space-y-6" action="#">
             <div>
               <label
                 htmlFor="contact-name"

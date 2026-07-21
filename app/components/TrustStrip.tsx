@@ -20,7 +20,7 @@ function MarqueeRun({ ariaHidden = false }: { ariaHidden?: boolean }) {
 
 export default function TrustStrip() {
   return (
-    <div className="overflow-hidden bg-accent py-4 text-[#171412]">
+    <div className="marquee-mask overflow-hidden bg-accent py-4 text-[#171412]">
       <div className="animate-marquee inline-flex whitespace-nowrap font-mono text-[13px] font-medium tracking-[0.25em]">
         <MarqueeRun />
         <MarqueeRun ariaHidden />

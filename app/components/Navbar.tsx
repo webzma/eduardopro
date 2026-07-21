@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 const links = [
   { href: "#oficio", label: "EL OFICIO" },
   { href: "#coleccion", label: "COLECCIÓN" },
@@ -5,12 +9,32 @@ const links = [
 ];
 
 export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <nav className="absolute inset-x-0 top-0 z-50">
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-6 md:px-10">
+    <nav
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "border-b border-hair bg-bg/80 backdrop-blur-md"
+          : "border-b border-transparent bg-transparent"
+      }`}
+    >
+      <div
+        className={`mx-auto flex max-w-[1280px] items-center justify-between px-6 transition-all duration-500 md:px-10 ${
+          scrolled ? "py-4" : "py-6"
+        }`}
+      >
         <a
           href="#"
-          className="font-display text-[26px] font-bold tracking-tight text-cream md:text-[30px]"
+          className="font-display font-bold tracking-tight text-cream transition-all duration-500"
+          style={{ fontSize: scrolled ? "24px" : "30px" }}
         >
           EduardoPro
         </a>

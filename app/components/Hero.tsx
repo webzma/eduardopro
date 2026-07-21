@@ -31,12 +31,25 @@ export default function Hero() {
         <span aria-hidden className="h-px w-6 bg-accent" />
       </div>
 
+      <div
+        aria-hidden
+        className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
+      >
+        <span className="font-mono text-[9px] tracking-[0.3em] text-ink">
+          SCROLL
+        </span>
+        <span className="scroll-cue h-8 w-px bg-linear-to-b from-accent to-transparent" />
+      </div>
+
       <div className="relative z-10 mx-auto w-full max-w-[1280px] px-6 pb-24 md:px-10 md:pb-32">
         <Reveal>
           <p className="mb-6 font-mono text-[11px] tracking-[0.32em] text-accent md:text-[12px]">
             HERRAMIENTAS · CUIDADO · RITUAL
           </p>
-          <h1 className="max-w-[16ch] font-display text-[15vw] font-bold leading-[0.95] tracking-tight md:text-[8.5vw]">
+          <h1
+            className="max-w-[16ch] font-display font-bold leading-[0.95] tracking-tight"
+            style={{ fontSize: "clamp(3rem, 9vw, 8.5rem)" }}
+          >
             El ritual del <span className="italic text-accent">caballero</span>
           </h1>
           <p className="mt-8 max-w-xl text-[18px] leading-relaxed text-ink md:text-[21px]">

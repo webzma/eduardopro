@@ -1,6 +1,7 @@
 import Reveal from "./Reveal";
 import { whatsappOrderUrl } from "../lib/site";
 import { getActiveProducts } from "../lib/products";
+import { ScissorsIcon } from "./icons";
 
 export default async function Products() {
   const products = await getActiveProducts();
@@ -27,16 +28,29 @@ export default async function Products() {
         </Reveal>
 
         {products.length === 0 ? (
-          <p className="border border-hair bg-bg p-10 text-center font-mono text-[12px] tracking-[0.16em] text-ink">
-            PRÓXIMAMENTE NUEVOS PRODUCTOS
-          </p>
+          <div className="flex flex-col items-center border border-hair bg-bg px-6 py-20 text-center">
+            <span className="mb-6 flex size-16 items-center justify-center rounded-full border border-accent/30 bg-(--accent-soft) text-accent">
+              <ScissorsIcon className="size-7" />
+            </span>
+            <p className="font-display text-[28px] leading-tight text-cream md:text-[34px]">
+              Afilando la colección
+            </p>
+            <p className="mt-3 max-w-xs font-mono text-[11px] tracking-[0.16em] text-ink">
+              PRÓXIMAMENTE NUEVOS PRODUCTOS
+            </p>
+            <span aria-hidden className="mt-8 h-px w-10 bg-accent" />
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product, index) => {
               const soldOut = product.stock <= 0;
               return (
                 <Reveal key={product.id} delay={(index % 4) * 90}>
-                  <div className="prod-card group flex h-full flex-col border border-hair bg-bg transition-colors duration-500">
+                  <div
+                    className={`prod-card group flex h-full flex-col border border-hair bg-bg ${
+                      soldOut ? "prod-card--sold" : ""
+                    }`}
+                  >
                     <div className="relative overflow-hidden bg-[#211d19]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -45,11 +59,11 @@ export default async function Products() {
                         className="prod-img h-56 w-full object-cover"
                       />
                       {soldOut ? (
-                        <span className="absolute left-4 top-4 bg-bg/85 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-[#e08a8a] backdrop-blur-sm">
+                        <span className="absolute left-4 top-4 border border-[#e08a8a]/40 bg-bg/85 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-[#e08a8a] backdrop-blur-sm">
                           AGOTADO
                         </span>
                       ) : product.stock <= 3 ? (
-                        <span className="absolute left-4 top-4 bg-bg/85 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-accent backdrop-blur-sm">
+                        <span className="absolute left-4 top-4 border border-accent/40 bg-bg/85 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-accent backdrop-blur-sm">
                           ÚLTIMAS {product.stock}
                         </span>
                       ) : null}
@@ -76,9 +90,12 @@ export default async function Products() {
                             )}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="wa-link font-mono text-[12px] tracking-[0.16em] text-cream transition-colors"
+                            className="wa-link group/cta inline-flex items-center gap-2 font-mono text-[12px] tracking-[0.16em] text-cream transition-colors"
                           >
-                            PEDIR →
+                            PEDIR
+                            <span className="transition-transform duration-300 group-hover/cta:translate-x-1">
+                              →
+                            </span>
                           </a>
                         )}
                       </div>
