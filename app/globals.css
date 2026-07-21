@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #171412;
+  --bg2: #1a1a1a;
+  --cream: #f3ebe2;
+  --ink: #b8aea4;
+  --accent: #d4916e;
+  --accent-hover: #e0a17f;
+  --hair: rgba(245, 235, 226, 0.2);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg2: var(--bg2);
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
+  --color-hair: var(--hair);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
+  --font-mono: var(--font-caption);
+}
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scroll reveal (driven by Reveal.tsx) */
+.reveal {
+  opacity: 0;
+  transform: translateY(2.125rem);
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Marquee */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 26s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+/* Interactive hovers */
+.btn-accent:hover {
+  background: var(--accent-hover);
+}
+
+.btn-outline:hover {
+  background: var(--cream);
+  color: var(--bg);
+}
+
+.wa-link:hover {
+  color: var(--accent);
+}
+
+.navlink {
+  position: relative;
+}
+
+.navlink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  height: 1px;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.navlink:hover::after {
+  width: 100%;
+}
+
+.prod-card:hover {
+  border-color: var(--accent);
+}
+
+.prod-card:hover .prod-img {
+  transform: scale(1.06);
+}
+
+.prod-img {
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}

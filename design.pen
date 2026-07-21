@@ -1,0 +1,2388 @@
+{
+  "version": "2.14",
+  "children": [
+    {
+      "type": "frame",
+      "id": "ANAhm",
+      "x": 0,
+      "y": 0,
+      "name": "Landing EduardoPro",
+      "clip": true,
+      "width": 1440,
+      "fill": "$surface",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "cATqD",
+          "name": "Navbar",
+          "width": "fill_container",
+          "fill": "$accent",
+          "padding": [
+            18,
+            64
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "T44EZm",
+              "name": "Logo",
+              "fill": "$ink",
+              "content": "EduardoPro",
+              "fontFamily": "$font-heading",
+              "fontSize": 26,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "TCBzu",
+              "name": "Nav Links",
+              "gap": 36,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "y7z5M",
+                  "name": "Link EL OFICIO",
+                  "fill": "$ink",
+                  "content": "EL OFICIO",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 1.5
+                },
+                {
+                  "type": "text",
+                  "id": "OkB6I",
+                  "name": "Link COLECCIÓN",
+                  "fill": "$ink",
+                  "content": "COLECCIÓN",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 1.5
+                },
+                {
+                  "type": "text",
+                  "id": "r2Ajo",
+                  "name": "Link TESTIMONIOS",
+                  "fill": "$ink",
+                  "content": "TESTIMONIOS",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 1.5
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "PSJYn",
+              "name": "Nav CTA",
+              "fill": "$ink",
+              "cornerRadius": 4,
+              "padding": [
+                12,
+                24
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "a0NIG",
+                  "name": "Nav CTA Label",
+                  "fill": "$inverse",
+                  "content": "CONTACTO",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 1.5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "j1dt6",
+          "name": "Hero",
+          "metadata": {
+            "type": "unsplash",
+            "username": "manorospo_studio",
+            "link": "https://unsplash.com/@manorospo_studio",
+            "author": "Julien Orliac"
+          },
+          "clip": true,
+          "width": "fill_container",
+          "height": 760,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1633121050918-ab208f1508b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc1MjR8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "fill"
+          },
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "u2351",
+              "name": "Hero Scrim",
+              "width": "fill_container",
+              "height": "fill_container",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#1A1A1A14",
+                    "position": 0
+                  },
+                  {
+                    "color": "#1A1A1AC7",
+                    "position": 1
+                  }
+                ]
+              },
+              "layout": "vertical",
+              "padding": [
+                40,
+                64,
+                72,
+                64
+              ],
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "aGwRq",
+                  "name": "Hero Labels",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ZJcqY",
+                      "name": "Label Left",
+                      "fill": "$inverse",
+                      "content": "EST. 2020 — SUMINISTROS DE BARBERÍA",
+                      "fontFamily": "$font-caption",
+                      "fontSize": 12,
+                      "fontWeight": "normal",
+                      "letterSpacing": 2
+                    },
+                    {
+                      "type": "text",
+                      "id": "ypziB",
+                      "name": "Label Right",
+                      "fill": "$inverse",
+                      "content": "ENVÍOS A TODO EL PAÍS",
+                      "fontFamily": "$font-caption",
+                      "fontSize": 12,
+                      "fontWeight": "normal",
+                      "letterSpacing": 2
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "u2Wop4",
+                  "name": "Hero Content",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 28,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "uT9K1",
+                      "name": "Hero Eyebrow",
+                      "fill": "$accent",
+                      "content": "HERRAMIENTAS · CUIDADO · RITUAL",
+                      "fontFamily": "$font-caption",
+                      "fontSize": 13,
+                      "fontWeight": "normal",
+                      "letterSpacing": 3
+                    },
+                    {
+                      "type": "text",
+                      "id": "QPydm",
+                      "name": "Hero Title",
+                      "fill": "$inverse",
+                      "content": "EduardoPro",
+                      "lineHeight": 1,
+                      "fontFamily": "$font-heading",
+                      "fontSize": 130,
+                      "fontWeight": "300"
+                    },
+                    {
+                      "type": "text",
+                      "id": "h6G5bw",
+                      "name": "Hero Sub",
+                      "fill": "#FFFFFFD9",
+                      "textGrowth": "fixed-width",
+                      "width": 520,
+                      "content": "Herramientas profesionales y cuidado premium para el ritual diario del caballero. Directo del distribuidor a tu silla.",
+                      "lineHeight": 1.6,
+                      "fontFamily": "$font-body",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "fjgcd",
+                      "name": "Hero CTAs",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "PwiR1",
+                          "name": "CTA Primary",
+                          "fill": "$accent",
+                          "cornerRadius": 4,
+                          "padding": [
+                            16,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "C1c1E",
+                              "name": "CTA Primary Label",
+                              "fill": "$ink",
+                              "content": "EXPLORAR COLECCIÓN",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 13,
+                              "fontWeight": "normal",
+                              "letterSpacing": 2
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "z2O5g",
+                          "name": "CTA Secondary",
+                          "cornerRadius": 4,
+                          "stroke": "#FFFFFF66",
+                          "strokeWidth": 1,
+                          "padding": [
+                            16,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "C3YA5",
+                              "name": "CTA Secondary Label",
+                              "fill": "$inverse",
+                              "content": "HABLAR CON NOSOTROS",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 13,
+                              "fontWeight": "normal",
+                              "letterSpacing": 2
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "fACS9",
+          "name": "Label Row",
+          "width": "fill_container",
+          "padding": [
+            26,
+            64
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "CVMIY",
+              "name": "Label Cell 1",
+              "width": "fill_container",
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "U8bhpF",
+                  "name": "Label 1",
+                  "fill": "$ink-soft",
+                  "content": "CALIDAD GARANTIZADA",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 1.8
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "W6pzjZ",
+              "name": "Divider 1",
+              "fill": "$line",
+              "width": 1,
+              "height": 18
+            },
+            {
+              "type": "frame",
+              "id": "lce2B",
+              "name": "Label Cell 2",
+              "width": "fill_container",
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "J3T2ij",
+                  "name": "Label 2",
+                  "fill": "$ink-soft",
+                  "content": "ENVÍO EN 24 HORAS",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 1.8
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "ScR38",
+              "name": "Divider 2",
+              "fill": "$line",
+              "width": 1,
+              "height": 18
+            },
+            {
+              "type": "frame",
+              "id": "JeTDj",
+              "name": "Label Cell 3",
+              "width": "fill_container",
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "hnGj8",
+                  "name": "Label 3",
+                  "fill": "$ink-soft",
+                  "content": "ASESORÍA EXPERTA",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 1.8
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "QaZgB",
+              "name": "Divider 3",
+              "fill": "$line",
+              "width": 1,
+              "height": 18
+            },
+            {
+              "type": "frame",
+              "id": "jTMhU",
+              "name": "Label Cell 4",
+              "width": "fill_container",
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "MXf4j",
+                  "name": "Label 4",
+                  "fill": "$ink-soft",
+                  "content": "PAGO SEGURO",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 1.8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "nLBzK",
+          "name": "Rule Top",
+          "fill": "$line",
+          "width": "fill_container",
+          "height": 1
+        },
+        {
+          "type": "frame",
+          "id": "iF4Hx",
+          "name": "El Oficio",
+          "width": "fill_container",
+          "gap": 88,
+          "padding": [
+            110,
+            64
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Egr4U",
+              "name": "Oficio Text",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zm7ja",
+                  "name": "Oficio Eyebrow",
+                  "fill": "$accent",
+                  "content": "EL OFICIO",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 3
+                },
+                {
+                  "type": "text",
+                  "id": "uBiqK",
+                  "name": "Oficio Title",
+                  "fill": "$ink",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "El oficio, bien hecho",
+                  "lineHeight": 1.15,
+                  "fontFamily": "$font-heading",
+                  "fontSize": 52,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "u4oP5",
+                  "name": "Oficio Body",
+                  "fill": "$ink-soft",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Compramos directo a distribuidores. Tú recibes precio de barbería y productos que aguantan el día a día en la silla. Sin intermediarios, sin ruido, con criterio.",
+                  "lineHeight": 1.7,
+                  "fontFamily": "$font-body",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "et5Y0",
+                  "name": "Benefit List",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "LdVOd",
+                      "name": "Benefit 01",
+                      "width": "fill_container",
+                      "gap": 24,
+                      "padding": [
+                        20,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "FNAEo",
+                          "name": "Benefit Num 01",
+                          "fill": "$accent",
+                          "content": "01",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "YydAV",
+                          "name": "Benefit Text 01",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "qUxju",
+                              "name": "Benefit Title 01",
+                              "fill": "$ink",
+                              "content": "Calidad garantizada",
+                              "fontFamily": "$font-heading",
+                              "fontSize": 22,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "u3i6nz",
+                              "name": "Benefit Desc 01",
+                              "fill": "$ink-soft",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Solo marcas probadas en silla de barbero. Si no cumple, te devolvemos el dinero.",
+                              "lineHeight": 1.6,
+                              "fontFamily": "$font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "i2iw7",
+                      "name": "Benefit Rule 01",
+                      "fill": "$line",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "n6i0YP",
+                      "name": "Benefit 02",
+                      "width": "fill_container",
+                      "gap": 24,
+                      "padding": [
+                        20,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "AcLrj",
+                          "name": "Benefit Num 02",
+                          "fill": "$accent",
+                          "content": "02",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "jifpO",
+                          "name": "Benefit Text 02",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "lPTBV",
+                              "name": "Benefit Title 02",
+                              "fill": "$ink",
+                              "content": "Envío en 24 horas",
+                              "fontFamily": "$font-heading",
+                              "fontSize": 22,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "cDlIj",
+                              "name": "Benefit Desc 02",
+                              "fill": "$ink-soft",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Despacho rápido con empaque protegido. Tus herramientas llegan impecables.",
+                              "lineHeight": 1.6,
+                              "fontFamily": "$font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "zwUTk",
+                      "name": "Benefit Rule 02",
+                      "fill": "$line",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "R2ruFE",
+                      "name": "Benefit 03",
+                      "width": "fill_container",
+                      "gap": 24,
+                      "padding": [
+                        20,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "m7LIoX",
+                          "name": "Benefit Num 03",
+                          "fill": "$accent",
+                          "content": "03",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "UkbcB",
+                          "name": "Benefit Text 03",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "E0VkcH",
+                              "name": "Benefit Title 03",
+                              "fill": "$ink",
+                              "content": "Asesoría experta",
+                              "fontFamily": "$font-heading",
+                              "fontSize": 22,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "z8Ii3",
+                              "name": "Benefit Desc 03",
+                              "fill": "$ink-soft",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Te guiamos según tu cabello, barba y estilo. Sin ruido, con criterio.",
+                              "lineHeight": 1.6,
+                              "fontFamily": "$font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "Y2gr8x",
+                      "name": "Benefit Rule 03",
+                      "fill": "$line",
+                      "width": "fill_container",
+                      "height": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bKNdZ",
+              "name": "Oficio Image",
+              "metadata": {
+                "type": "unsplash",
+                "username": "jaym30",
+                "link": "https://unsplash.com/@jaym30",
+                "author": "Josh Marty"
+              },
+              "width": 520,
+              "height": 580,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "https://images.unsplash.com/photo-1761931403807-f33fc582b1f5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc0NDV8&ixlib=rb-4.1.0&q=80&w=1080",
+                "mode": "fill"
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vhzYl",
+          "name": "Ornament",
+          "width": "fill_container",
+          "padding": [
+            0,
+            0,
+            20,
+            0
+          ],
+          "justifyContent": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "lh9Ey",
+              "name": "Ornament Icon",
+              "width": 28,
+              "height": 28,
+              "icon": "scissors",
+              "library": "lucide",
+              "fill": "$accent"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "tFFeU",
+          "name": "Coleccion",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 56,
+          "padding": [
+            40,
+            64,
+            110,
+            64
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "bRciQ",
+              "name": "Coleccion Header",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "end",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "rPIhW",
+                  "name": "Header Left",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Q6gtGS",
+                      "name": "Coleccion Eyebrow",
+                      "fill": "$accent",
+                      "content": "LA TIENDA",
+                      "fontFamily": "$font-caption",
+                      "fontSize": 12,
+                      "fontWeight": "normal",
+                      "letterSpacing": 3
+                    },
+                    {
+                      "type": "text",
+                      "id": "LjaCU",
+                      "name": "Coleccion Title",
+                      "fill": "$ink",
+                      "content": "La colección",
+                      "fontFamily": "$font-heading",
+                      "fontSize": 52,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "UhsiJ",
+                  "name": "Coleccion Sub",
+                  "fill": "$ink-soft",
+                  "textGrowth": "fixed-width",
+                  "width": 380,
+                  "content": "Selección curada para barberos profesionales y rituales de cuidado diario.",
+                  "lineHeight": 1.6,
+                  "fontFamily": "$font-body",
+                  "fontSize": 15,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "UQ5nG",
+              "name": "Product Grid",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 48,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "G6tytf",
+                  "name": "Product Row 1",
+                  "width": "fill_container",
+                  "gap": 32,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "rPAqp",
+                      "name": "Card Pomada Clásica Mate",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "e4zMe7",
+                          "name": "Card Image Pomada Clásica Mate",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "apothecary87",
+                            "link": "https://unsplash.com/@apothecary87",
+                            "author": "Apothecary 87"
+                          },
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 300,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1775126251009-45be1acaf903?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc0NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          },
+                          "layout": "vertical",
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "TkLgg",
+                              "name": "Card Tag Pomada Clásica Mate",
+                              "fill": "#F3EBE2E6",
+                              "padding": [
+                                6,
+                                12
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "z5uo5",
+                                  "name": "Tag Label Pomada Clásica Mate",
+                                  "fill": "$ink",
+                                  "content": "ESTILIZADO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 10,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "jxMnZ",
+                          "name": "Card Meta Pomada Clásica Mate",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "justifyContent": "space_between",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "DYStE",
+                              "name": "Card Text Pomada Clásica Mate",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 8,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "X0aGr",
+                                  "name": "Card Name Pomada Clásica Mate",
+                                  "fill": "$ink",
+                                  "content": "Pomada Clásica Mate",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": 24,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "ueyTv",
+                                  "name": "Card Desc Pomada Clásica Mate",
+                                  "fill": "$ink-soft",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Fijación firme, acabado natural. Sin brillo, sin residuos.",
+                                  "lineHeight": 1.6,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "CZD4c",
+                              "name": "Card Price Pomada Clásica Mate",
+                              "fill": "$accent",
+                              "content": "$12.99",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "q0grMW",
+                          "name": "Card CTA Pomada Clásica Mate",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "id": "e61Jo",
+                              "name": "Card Rule Pomada Clásica Mate",
+                              "fill": "$line",
+                              "width": "fill_container",
+                              "height": 1
+                            },
+                            {
+                              "type": "frame",
+                              "id": "MOqXR",
+                              "name": "Card CTA Row Pomada Clásica Mate",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "ux45c",
+                                  "name": "Card CTA Label Pomada Clásica Mate",
+                                  "fill": "$ink",
+                                  "content": "AÑADIR AL CARRITO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "v301Z",
+                                  "name": "Card CTA Arrow Pomada Clásica Mate",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "arrow-right",
+                                  "library": "lucide",
+                                  "fill": "$ink"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "L1MLW",
+                      "name": "Card Aceite para Barba",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "O2dWk",
+                          "name": "Card Image Aceite para Barba",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "lancereis",
+                            "link": "https://unsplash.com/@lancereis",
+                            "author": "Lance Reis"
+                          },
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 300,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1655394009184-070a81a69cbd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc0NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          },
+                          "layout": "vertical",
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "vwftV",
+                              "name": "Card Tag Aceite para Barba",
+                              "fill": "#F3EBE2E6",
+                              "padding": [
+                                6,
+                                12
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "CDqdG",
+                                  "name": "Tag Label Aceite para Barba",
+                                  "fill": "$ink",
+                                  "content": "CUIDADO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 10,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "U2jDs4",
+                          "name": "Card Meta Aceite para Barba",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "justifyContent": "space_between",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "RW8Ha",
+                              "name": "Card Text Aceite para Barba",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 8,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "gsYIG",
+                                  "name": "Card Name Aceite para Barba",
+                                  "fill": "$ink",
+                                  "content": "Aceite para Barba",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": 24,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "XB9Yw",
+                                  "name": "Card Desc Aceite para Barba",
+                                  "fill": "$ink-soft",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Argán y jojoba. Suaviza, hidrata y deja aroma a madera.",
+                                  "lineHeight": 1.6,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "d40Yq",
+                              "name": "Card Price Aceite para Barba",
+                              "fill": "$accent",
+                              "content": "$15.99",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "V3M1ru",
+                          "name": "Card CTA Aceite para Barba",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "id": "IkXxH",
+                              "name": "Card Rule Aceite para Barba",
+                              "fill": "$line",
+                              "width": "fill_container",
+                              "height": 1
+                            },
+                            {
+                              "type": "frame",
+                              "id": "vpSE8",
+                              "name": "Card CTA Row Aceite para Barba",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "SNnbM",
+                                  "name": "Card CTA Label Aceite para Barba",
+                                  "fill": "$ink",
+                                  "content": "AÑADIR AL CARRITO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "UY1qV",
+                                  "name": "Card CTA Arrow Aceite para Barba",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "arrow-right",
+                                  "library": "lucide",
+                                  "fill": "$ink"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "dxsmQ",
+                      "name": "Card Máquina Pro-X",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "P4UHlE",
+                          "name": "Card Image Máquina Pro-X",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "victorsirbu04",
+                            "link": "https://unsplash.com/@victorsirbu04",
+                            "author": "Victor Sirbu"
+                          },
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 300,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1735150949874-ec9c9c82b2c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc0NDd8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          },
+                          "layout": "vertical",
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "hsrwT",
+                              "name": "Card Tag Máquina Pro-X",
+                              "fill": "#F3EBE2E6",
+                              "padding": [
+                                6,
+                                12
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "O9PA4",
+                                  "name": "Tag Label Máquina Pro-X",
+                                  "fill": "$ink",
+                                  "content": "HERRAMIENTAS",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 10,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "I5Qwd",
+                          "name": "Card Meta Máquina Pro-X",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "justifyContent": "space_between",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "T7SlB",
+                              "name": "Card Text Máquina Pro-X",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 8,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Tk5iA",
+                                  "name": "Card Name Máquina Pro-X",
+                                  "fill": "$ink",
+                                  "content": "Máquina Pro-X",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": 24,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "BZc0k",
+                                  "name": "Card Desc Máquina Pro-X",
+                                  "fill": "$ink-soft",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Motor de alto torque y cuchillas de titanio.",
+                                  "lineHeight": 1.6,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "v7qiT",
+                              "name": "Card Price Máquina Pro-X",
+                              "fill": "$accent",
+                              "content": "$89.99",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "r8jJl",
+                          "name": "Card CTA Máquina Pro-X",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "id": "v3VJ6M",
+                              "name": "Card Rule Máquina Pro-X",
+                              "fill": "$line",
+                              "width": "fill_container",
+                              "height": 1
+                            },
+                            {
+                              "type": "frame",
+                              "id": "iCRZu",
+                              "name": "Card CTA Row Máquina Pro-X",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "DWJCW",
+                                  "name": "Card CTA Label Máquina Pro-X",
+                                  "fill": "$ink",
+                                  "content": "AÑADIR AL CARRITO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "eCFKe",
+                                  "name": "Card CTA Arrow Máquina Pro-X",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "arrow-right",
+                                  "library": "lucide",
+                                  "fill": "$ink"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "BRrFe",
+                  "name": "Product Row 2",
+                  "width": "fill_container",
+                  "gap": 32,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "TM6ld",
+                      "name": "Card Navaja Barbera",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "cSUp1",
+                          "name": "Card Image Navaja Barbera",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "introspectivedsgn",
+                            "link": "https://unsplash.com/@introspectivedsgn",
+                            "author": "Erik Mclean"
+                          },
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 300,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1553981474-3df84eab7103?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc0NDh8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          },
+                          "layout": "vertical",
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Y6tpN",
+                              "name": "Card Tag Navaja Barbera",
+                              "fill": "#F3EBE2E6",
+                              "padding": [
+                                6,
+                                12
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "c1uAaI",
+                                  "name": "Tag Label Navaja Barbera",
+                                  "fill": "$ink",
+                                  "content": "HERRAMIENTAS",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 10,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "hixN8",
+                          "name": "Card Meta Navaja Barbera",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "justifyContent": "space_between",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "UkYbF",
+                              "name": "Card Text Navaja Barbera",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 8,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "IDeuA",
+                                  "name": "Card Name Navaja Barbera",
+                                  "fill": "$ink",
+                                  "content": "Navaja Barbera",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": 24,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "m4ppG",
+                                  "name": "Card Desc Navaja Barbera",
+                                  "fill": "$ink-soft",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Acero inoxidable. Perfilados limpios y precisos.",
+                                  "lineHeight": 1.6,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "jZMFg",
+                              "name": "Card Price Navaja Barbera",
+                              "fill": "$accent",
+                              "content": "$24.99",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "qd32U",
+                          "name": "Card CTA Navaja Barbera",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "id": "WPOmQ",
+                              "name": "Card Rule Navaja Barbera",
+                              "fill": "$line",
+                              "width": "fill_container",
+                              "height": 1
+                            },
+                            {
+                              "type": "frame",
+                              "id": "TDb1E",
+                              "name": "Card CTA Row Navaja Barbera",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "DGeg8",
+                                  "name": "Card CTA Label Navaja Barbera",
+                                  "fill": "$ink",
+                                  "content": "AÑADIR AL CARRITO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "TZmAZ",
+                                  "name": "Card CTA Arrow Navaja Barbera",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "arrow-right",
+                                  "library": "lucide",
+                                  "fill": "$ink"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "vNVrd",
+                      "name": "Card Shampoo de Barba",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "w9LLx",
+                          "name": "Card Image Shampoo de Barba",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "mockupfreenet",
+                            "link": "https://unsplash.com/@mockupfreenet",
+                            "author": "Mockup Free"
+                          },
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 300,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1695634327105-b29151a8d14d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc0NDl8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          },
+                          "layout": "vertical",
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "JUyua",
+                              "name": "Card Tag Shampoo de Barba",
+                              "fill": "#F3EBE2E6",
+                              "padding": [
+                                6,
+                                12
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Earmc",
+                                  "name": "Tag Label Shampoo de Barba",
+                                  "fill": "$ink",
+                                  "content": "CUIDADO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 10,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Ud4ys",
+                          "name": "Card Meta Shampoo de Barba",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "justifyContent": "space_between",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "VdUSY",
+                              "name": "Card Text Shampoo de Barba",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 8,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "B2mWZb",
+                                  "name": "Card Name Shampoo de Barba",
+                                  "fill": "$ink",
+                                  "content": "Shampoo de Barba",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": 24,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "PIA2F",
+                                  "name": "Card Desc Shampoo de Barba",
+                                  "fill": "$ink-soft",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Limpieza profunda sin resecar. Notas cítricas.",
+                                  "lineHeight": 1.6,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "JX9Va",
+                              "name": "Card Price Shampoo de Barba",
+                              "fill": "$accent",
+                              "content": "$10.99",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "m0DqRC",
+                          "name": "Card CTA Shampoo de Barba",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "id": "F9ZFm9",
+                              "name": "Card Rule Shampoo de Barba",
+                              "fill": "$line",
+                              "width": "fill_container",
+                              "height": 1
+                            },
+                            {
+                              "type": "frame",
+                              "id": "W4pyD",
+                              "name": "Card CTA Row Shampoo de Barba",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "xTDLy",
+                                  "name": "Card CTA Label Shampoo de Barba",
+                                  "fill": "$ink",
+                                  "content": "AÑADIR AL CARRITO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "S7hmou",
+                                  "name": "Card CTA Arrow Shampoo de Barba",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "arrow-right",
+                                  "library": "lucide",
+                                  "fill": "$ink"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xMvUE",
+                      "name": "Card Kit Barbero",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "TWhka",
+                          "name": "Card Image Kit Barbero",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "jaym30",
+                            "link": "https://unsplash.com/@jaym30",
+                            "author": "Josh Marty"
+                          },
+                          "clip": true,
+                          "width": "fill_container",
+                          "height": 300,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1761931403807-f33fc582b1f5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc0NTB8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          },
+                          "layout": "vertical",
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "X4hYKa",
+                              "name": "Card Tag Kit Barbero",
+                              "fill": "#F3EBE2E6",
+                              "padding": [
+                                6,
+                                12
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "lqIqa",
+                                  "name": "Tag Label Kit Barbero",
+                                  "fill": "$ink",
+                                  "content": "KITS",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 10,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "JhSri",
+                          "name": "Card Meta Kit Barbero",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "justifyContent": "space_between",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "u2NkX",
+                              "name": "Card Text Kit Barbero",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 8,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "YbZ7s",
+                                  "name": "Card Name Kit Barbero",
+                                  "fill": "$ink",
+                                  "content": "Kit Barbero",
+                                  "fontFamily": "$font-heading",
+                                  "fontSize": 24,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "JbBRR",
+                                  "name": "Card Desc Kit Barbero",
+                                  "fill": "$ink-soft",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Lo esencial en un estuche. Ideal para empezar.",
+                                  "lineHeight": 1.6,
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "IPnyX",
+                              "name": "Card Price Kit Barbero",
+                              "fill": "$accent",
+                              "content": "$129.99",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "o4Ekbm",
+                          "name": "Card CTA Kit Barbero",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 10,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "id": "Z0Hl1K",
+                              "name": "Card Rule Kit Barbero",
+                              "fill": "$line",
+                              "width": "fill_container",
+                              "height": 1
+                            },
+                            {
+                              "type": "frame",
+                              "id": "R0ywe",
+                              "name": "Card CTA Row Kit Barbero",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Ri5ZK",
+                                  "name": "Card CTA Label Kit Barbero",
+                                  "fill": "$ink",
+                                  "content": "AÑADIR AL CARRITO",
+                                  "fontFamily": "$font-caption",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal",
+                                  "letterSpacing": 1.8
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "CAihm",
+                                  "name": "Card CTA Arrow Kit Barbero",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "arrow-right",
+                                  "library": "lucide",
+                                  "fill": "$ink"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "icSB3",
+          "name": "Rule Mid",
+          "fill": "$line",
+          "width": "fill_container",
+          "height": 1
+        },
+        {
+          "type": "frame",
+          "id": "UmOYo",
+          "name": "Testimonio",
+          "width": "fill_container",
+          "gap": 88,
+          "padding": [
+            110,
+            64
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "lYkLW",
+              "name": "Testimonio Image",
+              "metadata": {
+                "type": "unsplash",
+                "username": "kawerodriguess",
+                "link": "https://unsplash.com/@kawerodriguess",
+                "author": "Kawê Rodrigues"
+              },
+              "width": 520,
+              "height": 520,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "https://images.unsplash.com/photo-1703792686667-7486746389a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODQ0Mjc0Nzl8&ixlib=rb-4.1.0&q=80&w=1080",
+                "mode": "fill"
+              }
+            },
+            {
+              "type": "frame",
+              "id": "B3Vp7",
+              "name": "Testimonio Text",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 28,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "xVpNr",
+                  "name": "Testimonio Eyebrow",
+                  "fill": "$accent",
+                  "content": "TESTIMONIOS",
+                  "fontFamily": "$font-caption",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "letterSpacing": 3
+                },
+                {
+                  "type": "text",
+                  "id": "stL7U",
+                  "name": "Quote Body",
+                  "fill": "$ink",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "“Desde que compro aquí, mis herramientas duran el doble y mis clientes lo notan. El envío llegó al día siguiente.”",
+                  "lineHeight": 1.4,
+                  "fontFamily": "$font-heading",
+                  "fontSize": 34,
+                  "fontWeight": "normal",
+                  "fontStyle": "italic"
+                },
+                {
+                  "type": "frame",
+                  "id": "Sl9Z6",
+                  "name": "Quote Author",
+                  "gap": 16,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "IymWE",
+                      "name": "Author Rule",
+                      "fill": "$accent",
+                      "width": 40,
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "FZ808",
+                      "name": "Author Text",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "T5DhFN",
+                          "name": "Author Name",
+                          "fill": "$ink",
+                          "content": "Carlos Mendoza",
+                          "fontFamily": "$font-body",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "xO36J",
+                          "name": "Author Role",
+                          "fill": "$ink-soft",
+                          "content": "BARBERÍA EL PATRÓN — CARACAS",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 11,
+                          "fontWeight": "normal",
+                          "letterSpacing": 1.5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Y4kn4Z",
+                  "name": "Stats Row",
+                  "width": "fill_container",
+                  "gap": 48,
+                  "padding": [
+                    24,
+                    0,
+                    0,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "xKFpk",
+                      "name": "Stat PEDIDOS ENTREGADOS",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "gadCU",
+                          "name": "Stat Value PEDIDOS ENTREGADOS",
+                          "fill": "$ink",
+                          "content": "+1.200",
+                          "fontFamily": "$font-heading",
+                          "fontSize": 32,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Bh2ex",
+                          "name": "Stat Label PEDIDOS ENTREGADOS",
+                          "fill": "$ink-soft",
+                          "content": "PEDIDOS ENTREGADOS",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 10,
+                          "fontWeight": "normal",
+                          "letterSpacing": 1.5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "CN65Z",
+                      "name": "Stat VALORACIÓN MEDIA",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "MaXCe",
+                          "name": "Stat Value VALORACIÓN MEDIA",
+                          "fill": "$ink",
+                          "content": "4.9/5",
+                          "fontFamily": "$font-heading",
+                          "fontSize": 32,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "jvoqL",
+                          "name": "Stat Label VALORACIÓN MEDIA",
+                          "fill": "$ink-soft",
+                          "content": "VALORACIÓN MEDIA",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 10,
+                          "fontWeight": "normal",
+                          "letterSpacing": 1.5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "e4EArA",
+                      "name": "Stat TIEMPO DE DESPACHO",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Hfhek",
+                          "name": "Stat Value TIEMPO DE DESPACHO",
+                          "fill": "$ink",
+                          "content": "24h",
+                          "fontFamily": "$font-heading",
+                          "fontSize": 32,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "xxuLo",
+                          "name": "Stat Label TIEMPO DE DESPACHO",
+                          "fill": "$ink-soft",
+                          "content": "TIEMPO DE DESPACHO",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 10,
+                          "fontWeight": "normal",
+                          "letterSpacing": 1.5
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "M8pS2",
+          "name": "Contacto",
+          "width": "fill_container",
+          "fill": "$ink",
+          "layout": "vertical",
+          "gap": 80,
+          "padding": [
+            100,
+            64,
+            48,
+            64
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "x5uer",
+              "name": "Contacto Cols",
+              "width": "fill_container",
+              "gap": 96,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "lKbMW",
+                  "name": "Contacto Left",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "VdxJ3",
+                      "name": "Contacto Eyebrow",
+                      "fill": "$accent",
+                      "content": "CONTACTO",
+                      "fontFamily": "$font-caption",
+                      "fontSize": 12,
+                      "fontWeight": "normal",
+                      "letterSpacing": 3
+                    },
+                    {
+                      "type": "text",
+                      "id": "FDHqv",
+                      "name": "Contacto Title",
+                      "fill": "$inverse",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Hablemos de tu próximo pedido",
+                      "lineHeight": 1.15,
+                      "fontFamily": "$font-heading",
+                      "fontSize": 56,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "CclaB",
+                      "name": "Contacto Sub",
+                      "fill": "#FFFFFFB3",
+                      "textGrowth": "fixed-width",
+                      "width": 440,
+                      "content": "Cuéntanos qué necesitas y te respondemos el mismo día con precios de barbería y disponibilidad.",
+                      "lineHeight": 1.7,
+                      "fontFamily": "$font-body",
+                      "fontSize": 15,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "s2qDp",
+                      "name": "Contact Info",
+                      "layout": "vertical",
+                      "gap": 14,
+                      "padding": [
+                        16,
+                        0,
+                        0,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "AdJFt",
+                          "name": "Info phone",
+                          "gap": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "SWbpx",
+                              "name": "Info Icon phone",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "phone",
+                              "library": "lucide",
+                              "fill": "$accent"
+                            },
+                            {
+                              "type": "text",
+                              "id": "RfaWP",
+                              "name": "Info Text phone",
+                              "fill": "$inverse",
+                              "content": "+58 412 000 0000",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 13,
+                              "fontWeight": "normal",
+                              "letterSpacing": 1
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "dXTxM",
+                          "name": "Info mail",
+                          "gap": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "pUcrT",
+                              "name": "Info Icon mail",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "mail",
+                              "library": "lucide",
+                              "fill": "$accent"
+                            },
+                            {
+                              "type": "text",
+                              "id": "ftXBA",
+                              "name": "Info Text mail",
+                              "fill": "$inverse",
+                              "content": "hola@eduardopro.com",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 13,
+                              "fontWeight": "normal",
+                              "letterSpacing": 1
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Q9LrIR",
+                          "name": "Info instagram",
+                          "gap": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "H465w",
+                              "name": "Info Icon instagram",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "instagram",
+                              "library": "lucide",
+                              "fill": "$accent"
+                            },
+                            {
+                              "type": "text",
+                              "id": "a1b6m",
+                              "name": "Info Text instagram",
+                              "fill": "$inverse",
+                              "content": "@eduardopro",
+                              "fontFamily": "$font-caption",
+                              "fontSize": 13,
+                              "fontWeight": "normal",
+                              "letterSpacing": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "YRD0F",
+                  "name": "Contact Form",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Kd32L",
+                      "name": "Field NOMBRE",
+                      "width": "fill_container",
+                      "height": 56,
+                      "cornerRadius": 4,
+                      "stroke": "#FFFFFF33",
+                      "strokeWidth": 1,
+                      "padding": [
+                        18,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Vx2BF",
+                          "name": "Field Label NOMBRE",
+                          "fill": "#FFFFFF80",
+                          "content": "NOMBRE",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 11,
+                          "fontWeight": "normal",
+                          "letterSpacing": 1.5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "n6Jqn",
+                      "name": "Field CORREO O WHATSAPP",
+                      "width": "fill_container",
+                      "height": 56,
+                      "cornerRadius": 4,
+                      "stroke": "#FFFFFF33",
+                      "strokeWidth": 1,
+                      "padding": [
+                        18,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "aVqKC",
+                          "name": "Field Label CORREO O WHATSAPP",
+                          "fill": "#FFFFFF80",
+                          "content": "CORREO O WHATSAPP",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 11,
+                          "fontWeight": "normal",
+                          "letterSpacing": 1.5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GqwnI",
+                      "name": "Field ¿QUÉ NECESITAS?",
+                      "width": "fill_container",
+                      "height": 120,
+                      "cornerRadius": 4,
+                      "stroke": "#FFFFFF33",
+                      "strokeWidth": 1,
+                      "padding": [
+                        18,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "x98YVh",
+                          "name": "Field Label ¿QUÉ NECESITAS?",
+                          "fill": "#FFFFFF80",
+                          "content": "¿QUÉ NECESITAS?",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 11,
+                          "fontWeight": "normal",
+                          "letterSpacing": 1.5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "lsPxi",
+                      "name": "Submit",
+                      "width": "fill_container",
+                      "fill": "$accent",
+                      "cornerRadius": 4,
+                      "padding": [
+                        18,
+                        32
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "E1CyS",
+                          "name": "Submit Label",
+                          "fill": "$ink",
+                          "content": "ENVIAR MENSAJE",
+                          "fontFamily": "$font-caption",
+                          "fontSize": 13,
+                          "fontWeight": "normal",
+                          "letterSpacing": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FW9eN",
+              "name": "Footer",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "E8mFx",
+                  "name": "Footer Rule",
+                  "fill": "#FFFFFF26",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "A5GLA",
+                  "name": "Footer Row",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RdANF",
+                      "name": "Footer Brand",
+                      "fill": "$inverse",
+                      "content": "EduardoPro",
+                      "fontFamily": "$font-heading",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "I5t6pw",
+                      "name": "Footer Copy",
+                      "fill": "#FFFFFF66",
+                      "content": "© 2026 EDUARDOPRO — TODOS LOS DERECHOS RESERVADOS",
+                      "fontFamily": "$font-caption",
+                      "fontSize": 11,
+                      "fontWeight": "normal",
+                      "letterSpacing": 1.5
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "surface": {
+      "type": "color",
+      "value": "#F3EBE2"
+    },
+    "ink": {
+      "type": "color",
+      "value": "#1A1A1A"
+    },
+    "ink-soft": {
+      "type": "color",
+      "value": "#3D3D3D"
+    },
+    "inverse": {
+      "type": "color",
+      "value": "#FFFFFF"
+    },
+    "line": {
+      "type": "color",
+      "value": "#C5BEB6"
+    },
+    "accent": {
+      "type": "color",
+      "value": "#D4916E"
+    },
+    "font-heading": {
+      "type": "string",
+      "value": "Playfair Display"
+    },
+    "font-body": {
+      "type": "string",
+      "value": "Inter"
+    },
+    "font-caption": {
+      "type": "string",
+      "value": "IBM Plex Mono"
+    }
+  },
+  "fileToken": "aa60922d-4a0a-4b97-a87a-4225b9190d34"
+}
