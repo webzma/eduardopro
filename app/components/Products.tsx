@@ -1,107 +1,97 @@
-import Reveal from "./Reveal";
 import { whatsappOrderUrl } from "../lib/site";
 import { getActiveProducts } from "../lib/products";
 import { ScissorsIcon } from "./icons";
 
+// F6 · Product card grid — uniform on purpose. The rhythm comes from the
+// products, not from varying the tiles.
 export default async function Products() {
   const products = await getActiveProducts();
 
   return (
-    <section
-      id="coleccion"
-      className="border-t border-hair bg-bg2 py-24 md:py-32"
-    >
-      <div className="mx-auto max-w-[1280px] px-6 md:px-10">
-        <Reveal className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <p className="mb-5 font-mono text-[11px] tracking-[0.3em] text-accent">
-              COLECCIÓN
+    <section id="coleccion" className="bg-paper py-(--space-2xl) md:py-(--space-3xl)">
+      <div className="mx-auto max-w-7xl px-(--page-gutter)">
+        <header className="flex flex-col justify-between gap-(--space-sm) md:flex-row md:items-end">
+          <h2 className="t-head">El catálogo.</h2>
+          {products.length > 0 ? (
+            <p className="t-label tnum text-navy">
+              {products.length}{" "}
+              {products.length === 1 ? "producto" : "productos"} · pide por
+              WhatsApp
             </p>
-            <h2 className="font-display text-[46px] font-bold leading-none tracking-tight md:text-[68px]">
-              La colección
-            </h2>
-          </div>
-          <p className="max-w-sm text-[15px] text-ink md:text-right">
-            Esenciales que no pueden faltar. Elige, pide por WhatsApp y recíbelo
-            en casa.
-          </p>
-        </Reveal>
+          ) : null}
+        </header>
 
         {products.length === 0 ? (
-          <div className="flex flex-col items-center border border-hair bg-bg px-6 py-20 text-center">
-            <span className="mb-6 flex size-16 items-center justify-center rounded-full border border-accent/30 bg-(--accent-soft) text-accent">
+          <div className="mt-(--space-xl) flex flex-col items-center border-2 border-coal bg-paper2 px-(--page-gutter) py-(--space-3xl) text-center shadow-(--shadow-hard)">
+            <span className="flex size-16 items-center justify-center border-2 border-coal bg-signal text-coal">
               <ScissorsIcon className="size-7" />
             </span>
-            <p className="font-display text-[28px] leading-tight text-cream md:text-[34px]">
-              Afilando la colección
+            <p className="t-head mt-(--space-md)" style={{ fontSize: "2rem" }}>
+              Afilando el catálogo.
             </p>
-            <p className="mt-3 max-w-xs font-mono text-[11px] tracking-[0.16em] text-ink">
-              PRÓXIMAMENTE NUEVOS PRODUCTOS
+            <p className="t-label mt-(--space-2xs) text-coal2">
+              Próximamente nuevos productos
             </p>
-            <span aria-hidden className="mt-8 h-px w-10 bg-accent" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((product, index) => {
+          // Tailwind's grid-cols-N expands to repeat(N, minmax(0,1fr)), so the
+          // image-bearing tracks can't blow out on a long product name.
+          <div className="mt-(--space-xl) grid grid-cols-1 gap-(--space-md) sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((product) => {
               const soldOut = product.stock <= 0;
               return (
-                <Reveal key={product.id} delay={(index % 4) * 90}>
-                  <div
-                    className={`prod-card group flex h-full flex-col border border-hair bg-bg ${
-                      soldOut ? "prod-card--sold" : ""
-                    }`}
-                  >
-                    <div className="relative overflow-hidden bg-[#211d19]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="prod-img h-56 w-full object-cover"
-                      />
+                <article
+                  key={product.id}
+                  className={`card flex flex-col ${soldOut ? "card--sold" : ""}`}
+                >
+                  <div className="halftone relative aspect-square overflow-hidden border-b-2 border-coal bg-paper2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      loading="lazy"
+                      className="card__img size-full object-cover"
+                    />
+                    {soldOut ? (
+                      <span className="t-label absolute top-0 left-0 border-r-2 border-b-2 border-coal bg-navy px-(--space-2xs) py-1 text-paper">
+                        Agotado
+                      </span>
+                    ) : product.stock <= 3 ? (
+                      <span className="t-label tnum absolute top-0 left-0 border-r-2 border-b-2 border-coal bg-signal px-(--space-2xs) py-1 text-coal">
+                        Últimas {product.stock}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="flex flex-1 flex-col p-(--space-sm)">
+                    <p className="t-label text-navy">{product.category}</p>
+                    <h3 className="mt-(--space-3xs) font-display text-2xl leading-tight font-extrabold uppercase">
+                      {product.name}
+                    </h3>
+                    <div className="mt-(--space-md) flex flex-wrap items-center justify-between gap-(--space-2xs) border-t-2 border-navy pt-(--space-2xs)">
+                      <span className="tnum font-display text-3xl leading-none font-extrabold text-signaldeep">
+                        ${product.price}
+                      </span>
                       {soldOut ? (
-                        <span className="absolute left-4 top-4 border border-[#e08a8a]/40 bg-bg/85 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-[#e08a8a] backdrop-blur-sm">
-                          AGOTADO
-                        </span>
-                      ) : product.stock <= 3 ? (
-                        <span className="absolute left-4 top-4 border border-accent/40 bg-bg/85 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-accent backdrop-blur-sm">
-                          ÚLTIMAS {product.stock}
-                        </span>
-                      ) : null}
-                    </div>
-                    <div className="flex flex-1 flex-col p-6">
-                      <p className="mb-2 font-mono text-[10px] tracking-[0.24em] text-ink">
-                        {product.category}
-                      </p>
-                      <h3 className="mb-3 font-display text-[24px]">
-                        {product.name}
-                      </h3>
-                      <div className="mt-auto flex items-center justify-between border-t border-hair pt-4">
-                        <span className="font-display text-[26px] text-accent">
-                          ${product.price}
-                        </span>
-                        {soldOut ? (
-                          <span className="font-mono text-[12px] tracking-[0.16em] text-ink">
-                            AGOTADO
+                        <span className="t-label text-ash">Sin stock</span>
+                      ) : (
+                        <a
+                          href={whatsappOrderUrl(
+                            `Hola, quiero pedir: ${product.name}`,
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="tlink text-base"
+                        >
+                          Pedir
+                          <span aria-hidden className="tlink__arrow">
+                            →
                           </span>
-                        ) : (
-                          <a
-                            href={whatsappOrderUrl(
-                              `Hola, quiero pedir: ${product.name}`,
-                            )}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="wa-link group/cta inline-flex items-center gap-2 font-mono text-[12px] tracking-[0.16em] text-cream transition-colors"
-                          >
-                            PEDIR
-                            <span className="transition-transform duration-300 group-hover/cta:translate-x-1">
-                              →
-                            </span>
-                          </a>
-                        )}
-                      </div>
+                        </a>
+                      )}
                     </div>
                   </div>
-                </Reveal>
+                </article>
               );
             })}
           </div>

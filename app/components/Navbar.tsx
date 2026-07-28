@@ -1,61 +1,49 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 const links = [
-  { href: "#oficio", label: "EL OFICIO" },
-  { href: "#coleccion", label: "COLECCIÓN" },
-  { href: "#testimonios", label: "TESTIMONIOS" },
+  { href: "#oficio", label: "El oficio" },
+  { href: "#coleccion", label: "Catálogo" },
+  { href: "#testimonios", label: "Testimonios" },
+  { href: "#ubicacion", label: "Ubicación" },
+  { href: "#contacto", label: "Contacto" },
 ];
 
+// N6 · Newspaper masthead. Static, in flow — the shop sign at the top of the
+// page, not a bar that follows you down it. Replaces the fixed wordmark +
+// link-row + button-right bar, which is the most-recognised generated nav.
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <nav
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "border-b border-hair bg-bg/80 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent"
-      }`}
-    >
-      <div
-        className={`mx-auto flex max-w-[1280px] items-center justify-between px-6 transition-all duration-500 md:px-10 ${
-          scrolled ? "py-4" : "py-6"
-        }`}
-      >
+    <header className="border-b-2 border-coal bg-paper">
+      <div className="mx-auto max-w-7xl px-(--page-gutter) pt-(--space-md) pb-(--space-sm) text-center">
         <a
           href="#"
-          className="font-display font-bold tracking-tight text-cream transition-all duration-500"
-          style={{ fontSize: scrolled ? "24px" : "30px" }}
+          className="t-display block leading-none"
+          style={{ fontSize: "clamp(2.75rem, 9vw, 5.5rem)" }}
         >
           EduardoPro
         </a>
-        <div className="hidden items-center gap-9 font-mono text-[11px] tracking-[0.22em] text-ink md:flex">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="navlink transition-colors hover:text-cream"
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
-        <a
-          href="#contacto"
-          className="btn-accent bg-accent px-6 py-3 font-mono text-[11px] font-medium tracking-[0.2em] text-[#171412] transition-colors"
-        >
-          CONTACTO
-        </a>
+        <p className="t-label mt-(--space-2xs) text-coal2">
+          Suministros de barbería · Aroa, Yaracuy · Desde 2020
+        </p>
+
+        <nav aria-label="Principal" className="mt-(--space-sm)">
+          <ul className="flex flex-wrap items-center justify-center gap-x-(--space-md) gap-y-(--space-2xs)">
+            {links.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  className="mastlink block whitespace-nowrap py-1 text-sm font-semibold tracking-widest uppercase"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
-    </nav>
+
+      {/* Double rule — the broadsheet close under a masthead. */}
+      <div aria-hidden className="border-t-2 border-coal">
+        <div className="h-0.75 border-t-2 border-coal" />
+      </div>
+    </header>
   );
 }

@@ -1,0 +1,16 @@
+[
+  {
+    "date": "2026-07-27",
+    "scope": "page",
+    "macrostructure": "Marquee Hero",
+    "genre": "editorial",
+    "theme": "carnival",
+    "drop": "diner-sign",
+    "theme_axes": "light / display-heavy / warm-red + cool-navy duo-tone",
+    "nav": "N6 Newspaper masthead",
+    "footer": "Ft4 Dense colophon",
+    "components": ["H1 Marquee", "S2 Hanging", "F3 Tabular spec sheet", "F6 Product card grid", "T1 Pull-quote with marginalia"],
+    "enrichment": "none — Tier-A pure CSS (barber-pole stripe + halftone)",
+    "brief": "EduardoPro · suministros de barbería, Caracas — redesign for visual impact + authenticity"
+  }
+]

@@ -4,6 +4,7 @@ import TrustStrip from "./components/TrustStrip";
 import Benefits from "./components/Benefits";
 import Products from "./components/Products";
 import Testimonials from "./components/Testimonials";
+import Location from "./components/Location";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 
@@ -12,7 +13,9 @@ export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
-    <div className="relative overflow-x-clip">
+    // overflow-x is clipped on html/body in globals.css, so nothing here needs
+    // a wrapper that would trap position: sticky.
+    <>
       <Navbar />
       <main>
         <Hero />
@@ -20,9 +23,10 @@ export default function Home() {
         <Benefits />
         <Products />
         <Testimonials />
+        <Location />
         <Contact />
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

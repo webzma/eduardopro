@@ -1,79 +1,60 @@
-import Image from "next/image";
-import Reveal from "./Reveal";
 import { WHATSAPP_URL } from "../lib/site";
 
+// H1 · Marquee — the display fills the fold, hard left. No photograph: the
+// type is the visual, and a stock image of someone else's barbershop was the
+// least authentic thing on the old page.
 export default function Hero() {
   return (
-    <header className="relative flex min-h-screen items-end overflow-hidden">
-      <Image
-        src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&w=1600&q=80&fit=crop"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(15,12,10,0.78) 0%, rgba(15,12,10,0.55) 40%, rgba(15,12,10,0.94) 100%)",
-        }}
-      />
-
-      <div className="absolute bottom-8 left-6 z-10 flex items-center gap-3 font-mono text-[10px] tracking-[0.28em] text-ink md:left-10">
-        <span aria-hidden className="h-px w-6 bg-accent" />
-        EST. 2020
-      </div>
-      <div className="absolute bottom-8 right-6 z-10 flex items-center gap-3 font-mono text-[10px] tracking-[0.28em] text-ink md:right-10">
-        ENVÍOS A TODO EL PAÍS
-        <span aria-hidden className="h-px w-6 bg-accent" />
-      </div>
-
-      <div
-        aria-hidden
-        className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
-      >
-        <span className="font-mono text-[9px] tracking-[0.3em] text-ink">
-          SCROLL
-        </span>
-        <span className="scroll-cue h-8 w-px bg-linear-to-b from-accent to-transparent" />
-      </div>
-
-      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-6 pb-24 md:px-10 md:pb-32">
-        <Reveal>
-          <p className="mb-6 font-mono text-[11px] tracking-[0.32em] text-accent md:text-[12px]">
-            HERRAMIENTAS · CUIDADO · RITUAL
-          </p>
-          <h1
-            className="max-w-[16ch] font-display font-bold leading-[0.95] tracking-tight"
-            style={{ fontSize: "clamp(3rem, 9vw, 8.5rem)" }}
-          >
-            El ritual del <span className="italic text-accent">caballero</span>
+    <section className="border-b-2 border-coal bg-paper">
+      {/* Bottom padding runs ~1.5x the top so the hero sits into the page
+          instead of floating above it. */}
+      <div className="mx-auto grid max-w-7xl items-end gap-(--space-xl) px-(--page-gutter) pt-(--space-xl) pb-(--space-2xl) lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:pt-(--space-2xl) lg:pb-(--space-3xl)">
+        <div className="hero-in">
+          <h1 className="t-display">
+            Herramienta de gremio.
+            <br />
+            Precio de{" "}
+            <span className="box-decoration-clone bg-signal px-[0.12em] text-coal">
+              gremio.
+            </span>
           </h1>
-          <p className="mt-8 max-w-xl text-[18px] leading-relaxed text-ink md:text-[21px]">
-            Herramientas y productos de grado profesional para quienes toman el
-            cuidado en serio. Precio de barbería, calidad que aguanta la silla.
+
+          <p className="mt-(--space-md) max-w-[46ch] text-(length:--text-md) leading-relaxed text-coal2">
+            Máquinas, navajas, ceras y repuestos comprados directo al
+            distribuidor. La tienda está en Aroa — y si estás fuera, enviamos a
+            donde estés.
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-            <a
-              href="#coleccion"
-              className="btn-accent bg-accent px-9 py-4 text-center font-mono text-[12px] font-medium tracking-[0.2em] text-[#171412] transition-colors"
-            >
-              EXPLORAR COLECCIÓN
+
+          <div className="mt-(--space-lg) flex flex-wrap items-center gap-(--space-sm)">
+            <a href="#coleccion" className="btn btn--signal">
+              Ver catálogo
             </a>
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-outline border border-cream/60 px-9 py-4 text-center font-mono text-[12px] font-medium tracking-[0.2em] text-cream transition-colors"
+              className="btn btn--ghost"
             >
-              HABLAR POR WHATSAPP
+              Pedir por WhatsApp
             </a>
           </div>
-        </Reveal>
+        </div>
+
+        {/* Pinned-poster sticker. Pure CSS — halftone stands in for the photo. */}
+        <div aria-hidden className="hidden lg:block">
+          <div className="halftone relative border-2 border-coal p-(--space-md) shadow-(--shadow-hard)">
+            <div className="-rotate-2 border-2 border-coal bg-navy px-(--space-md) py-(--space-lg) text-center text-paper shadow-(--shadow-hard-sm)">
+              <p className="t-head text-paper" style={{ fontSize: "2.5rem" }}>
+                Al mayor
+                <br />y al detal
+              </p>
+              <p className="mt-(--space-2xs) font-mono text-xs tracking-widest uppercase">
+                Aroa, Yaracuy · Est. 2020
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-    </header>
+    </section>
   );
 }

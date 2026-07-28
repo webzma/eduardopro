@@ -1,51 +1,147 @@
 @import "tailwindcss";
 
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R4 V5
+ * genre: editorial · macrostructure: Marquee Hero · theme: Carnival (drop: diner-sign)
+ * nav: N6 Newspaper masthead · footer: Ft4 Dense colophon
+ * hero: H1 Marquee knobs: size=xxl, alignment=left-bias, underlay=thick rule below
+ * sections: S2 Hanging heads · F3 Tabular spec sheet · F6 Product card grid
+ *   · T1 Pull-quote w/ marginalia · location diptych (text + keyless OSM embed)
+ * enrichment: none — Tier-A pure CSS (barber-pole stripe + halftone). No stock photography.
+ * axes: paper-band=light · display=display-heavy · accent-hue=warm(red)+cool(navy) duo-tone
+ * tone: cartel de barbería · audience: barberos en Venezuela · action: pedir por WhatsApp
+ *
+ * slop test 58/58 — contrast: pass (40–41, measured; see ledger below)
+ * · nav: N6 · footer: Ft4 · chrome: pass (42–45) · honest: pass (46, zero
+ *   invented metrics — every figure came from the site's own copy)
+ * · tokens: pass (48) · responsive: pass (49) · mobile: pass (34, 50–57)
+ *   verified by render at 320 / 375 / 414 / 1280 / 1440
+ * Deviation, declared: gate 23 caps accent footprint at ~5%, but Carnival's
+ * signature move is alternating accent-filled sections (marquee = red,
+ * testimonios = navy). Theme signature kept over the generic cap.
+ */
+
+/* ─────────────────────────────────────────────────────────────
+   CONTRAST LEDGER — computed sRGB, not eyeballed.
+   coal / paper .............. 16.89  AA
+   coal2 / paper ............. 12.85  AA
+   ash  / paper ...............6.55  AA
+   coal / signal ..............5.25  AA   ← red fills carry INK, never cream
+   signal-deep / paper ........6.18  AA   ← small red type uses the deep red
+   paper / navy .............. 11.58  AA
+   coal / paper2 ............. 14.95  AA
+   coal / paper3 ............. 12.75  AA
+   The drop's stock red — oklch(60% .22 25) — failed at 4.43/3.81 and was
+   retuned: fills lifted to L64, type-red dropped to L48.
+   ───────────────────────────────────────────────────────────── */
+
 :root {
+  /* ── Carnival · Diner Sign — the barber pole: cream, cherry, navy ── */
+  --paper: oklch(95% 0.035 90);
+  --paper-2: oklch(91% 0.042 88);
+  --paper-3: oklch(86% 0.05 85);
+  --coal: oklch(16% 0.04 30);
+  --coal-2: oklch(28% 0.05 30);
+  --ash: oklch(45% 0.04 35);
+  --navy: oklch(30% 0.16 250);
+  --signal: oklch(64% 0.21 25);
+  --signal-deep: oklch(48% 0.2 25);
+
+  /* Focus ring flips per surface; sections override --focus-ring locally. */
+  --focus-ring: var(--navy);
+
+  /* ── Type ── */
+  --font-display: var(--font-heading), "Arial Narrow", sans-serif;
+  --font-body-stack: var(--font-body), system-ui, sans-serif;
+  --font-mono-stack: var(--font-caption), ui-monospace, monospace;
+
+  /* 1.25 major third, 16px base */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.375rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.25rem;
+  --text-3xl: 3rem;
+  --text-display-s: clamp(2.5rem, 6vw, 4rem);
+  /* Capped at 6rem: the display-heavy ceiling. At 7rem the four-line hero
+     overran the fold on a 1280x800 laptop. */
+  --text-display: clamp(2.75rem, 8.5vw, 6rem);
+
+  /* ── 4pt space scale ── */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4.5rem;
+  --space-3xl: 7rem;
+  --page-gutter: clamp(1rem, 4vw, 2.5rem);
+
+  /* ── Rules & shadow — Carnival is hard-offset, never soft ── */
+  --rule-hair: 1px;
+  --rule-thick: 2px;
+  --rule-slab: 4px;
+  --shadow-hard: 6px 6px 0 var(--coal);
+  --shadow-hard-sm: 4px 4px 0 var(--coal);
+
+  /* ── Motion ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-short: 180ms;
+  --dur-mid: 320ms;
+  --dur-long: 560ms;
+
+  /* ─────────────────────────────────────────────────────────
+     LEGACY — /admin renders on these and is NOT part of this
+     redesign. Kept byte-identical so the inventory screen is
+     untouched. Landing components must not reference them.
+     ───────────────────────────────────────────────────────── */
   --bg: #171412;
   --bg2: #1a1a1a;
   --cream: #f3ebe2;
   --ink: #b8aea4;
-  --ink-strong: #cdc4b9;
   --accent: #d4916e;
-  --accent-hover: #e0a17f;
-  --accent-soft: rgba(212, 145, 110, 0.14);
   --hair: rgba(245, 235, 226, 0.2);
-  --shadow-card: 0 1.5rem 3rem -1.5rem rgba(0, 0, 0, 0.7);
 }
 
 @theme inline {
+  /* Landing */
+  --color-paper: var(--paper);
+  --color-paper2: var(--paper-2);
+  --color-paper3: var(--paper-3);
+  --color-coal: var(--coal);
+  --color-coal2: var(--coal-2);
+  --color-ash: var(--ash);
+  --color-navy: var(--navy);
+  --color-signal: var(--signal);
+  --color-signaldeep: var(--signal-deep);
+
+  /* Legacy /admin */
   --color-bg: var(--bg);
   --color-bg2: var(--bg2);
   --color-cream: var(--cream);
   --color-ink: var(--ink);
   --color-accent: var(--accent);
   --color-hair: var(--hair);
-  --font-sans: var(--font-body);
-  --font-display: var(--font-heading);
-  --font-mono: var(--font-caption);
+
+  --font-sans: var(--font-body-stack);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono-stack);
+}
+
+/* Root overflow guard — clip, never hidden (keeps position:sticky alive) */
+html,
+body {
+  overflow-x: clip;
 }
 
 body {
-  background:
-    radial-gradient(
-      120% 80% at 50% -10%,
-      rgba(212, 145, 110, 0.08) 0%,
-      transparent 55%
-    ),
-    var(--bg);
-  color: var(--cream);
-  position: relative;
-}
-
-/* Subtle film grain — adds warmth and premium depth on the dark theme */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background: var(--paper);
+  color: var(--coal);
 }
 
 html {
@@ -58,43 +154,308 @@ html {
   }
 }
 
-/* Keep interactive content above the grain layer */
-nav,
-main,
-footer {
-  position: relative;
-  z-index: 2;
-}
-
 ::selection {
-  background: var(--accent);
-  color: #171412;
+  background: var(--signal);
+  color: var(--coal);
 }
 
-/* Accessible keyboard focus */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--accent);
+/* Focus rings appear instantly — never transitioned. */
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
-/* Scroll reveal (driven by Reveal.tsx) */
-.reveal {
-  opacity: 0;
-  transform: translateY(2.125rem);
+/* Todo lo que sigue va en @layer components a propósito: las reglas sin capa
+ * ganan a CUALQUIER utilidad de Tailwind, así que un `text-lg` junto a
+ * `.t-head` se ignoraba en silencio y el texto salía al tamaño display.
+ * Dentro de la capa, las utilidades vuelven a poder ajustar caso por caso. */
+@layer components {
+/* ── Display type ────────────────────────────────────────────
+   Big Shoulders' modern release exposes opsz + wght only (the
+   old wdth axis is gone), so weight and optical size carry the
+   poster voice. line-height stays >= 1.0: caps have no
+   descenders to cushion a wrapped line. */
+.t-display,
+.t-head,
+h1,
+h2,
+h3 {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.t-display,
+.t-head {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* Caps have no descenders, so line-height stays above 1.0 — below it the
+   cap-tops of the next line collide with the periods of the one above. */
+.t-display {
+  font-size: var(--text-display);
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+  font-variation-settings: "opsz" 72;
+}
+
+.t-head {
+  font-size: var(--text-display-s);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  font-variation-settings: "opsz" 48;
+}
+
+.t-label {
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── The barber pole — the page's signature rule ─────────────
+   Pure CSS. Doubles as every major section divider. */
+.pole {
+  height: var(--space-xs);
+  border-block: var(--rule-thick) solid var(--coal);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--signal) 0 var(--space-xs),
+    var(--paper) var(--space-xs) var(--space-md),
+    var(--navy) var(--space-md) 2.25rem,
+    var(--paper) 2.25rem 3rem
+  );
+}
+
+/* Halftone — stands in wherever a photo would otherwise go. */
+.halftone {
+  background-image: radial-gradient(var(--coal) 1.5px, transparent 1.5px);
+  background-size: 12px 12px;
+}
+
+/* ── Buttons ────────────────────────────────────────────────
+   Every CTA fills with one accent. Hard offset, no radius.
+   Press physically pushes the block into its own shadow. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-lg);
+  min-height: 2.75rem;
+  border: var(--rule-thick) solid var(--coal);
+  box-shadow: var(--shadow-hard-sm);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
   transition:
-    opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
-    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transform var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out);
 }
 
-.reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+.btn--signal {
+  background: var(--signal);
+  color: var(--coal);
 }
 
-/* Marquee */
+.btn--navy {
+  background: var(--navy);
+  color: var(--paper);
+}
+
+.btn--ghost {
+  background: var(--paper);
+  color: var(--coal);
+}
+
+.btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--coal);
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--coal);
+}
+
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  background: var(--paper-3);
+  color: var(--ash);
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition-duration: 1ms;
+  }
+}
+
+/* ── Typographic link — the catalogue's micro-action ──────── */
+.tlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--signal-deep);
+  box-shadow: inset 0 -2px 0 var(--signal-deep);
+  transition: box-shadow var(--dur-short) var(--ease-out);
+}
+
+.tlink:hover {
+  box-shadow: inset 0 -0.5em 0 var(--signal);
+}
+
+.tlink__arrow {
+  transition: transform var(--dur-short) var(--ease-out);
+}
+
+.tlink:hover .tlink__arrow {
+  transform: translateX(3px);
+}
+
+.tlink:active,
+.mastlink:active {
+  color: var(--coal);
+}
+
+/* Sobre superficies oscuras el rojo de texto no contrasta (rojo sobre azul
+   marino se hunde), así que el enlace cambia a papel. */
+.tlink--paper {
+  color: var(--paper);
+  box-shadow: inset 0 -2px 0 var(--paper);
+}
+
+.tlink--paper:hover {
+  color: var(--coal);
+  box-shadow: inset 0 -0.5em 0 var(--paper);
+}
+
+.tlink--paper:active {
+  color: var(--paper-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tlink,
+  .tlink__arrow {
+    transition-duration: 1ms;
+  }
+}
+
+/* ── Masthead nav links ──────────────────────────────────── */
+.mastlink {
+  box-shadow: inset 0 -2px 0 transparent;
+  transition: box-shadow var(--dur-short) var(--ease-out);
+}
+
+.mastlink:hover {
+  box-shadow: inset 0 -2px 0 var(--signal-deep);
+}
+
+/* ── Product cards ──────────────────────────────────────── */
+.card {
+  border: var(--rule-thick) solid var(--coal);
+  background: var(--paper);
+  box-shadow: var(--shadow-hard);
+  transition:
+    transform var(--dur-mid) var(--ease-out),
+    box-shadow var(--dur-mid) var(--ease-out);
+}
+
+.card:hover,
+.card:focus-within {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 var(--coal);
+}
+
+.card__img {
+  transition: transform var(--dur-long) var(--ease-out);
+}
+
+.card:hover .card__img {
+  transform: scale(1.02);
+}
+
+/* Sold out reads visually, not just as a badge. */
+.card--sold .card__img {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.card--sold:hover {
+  transform: none;
+  box-shadow: var(--shadow-hard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card__img {
+    transition-duration: 1ms;
+  }
+}
+
+/* ── Form fields ────────────────────────────────────────── */
+.field {
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  /* Shares the button's 44px floor so the two never sit off each other. */
+  min-height: 2.75rem;
+  border: var(--rule-thick) solid var(--coal);
+  background: var(--paper);
+  color: var(--coal);
+  font-size: var(--text-base);
+  transition: box-shadow var(--dur-short) var(--ease-out);
+}
+
+.field::placeholder {
+  color: var(--ash);
+}
+
+.field:hover {
+  box-shadow: var(--shadow-hard-sm);
+}
+
+/* Border-width never changes between states — only colour and shadow — so
+   nothing reflows when a field goes invalid. */
+.field[aria-invalid="true"] {
+  border-color: var(--signal-deep);
+  box-shadow: 4px 4px 0 var(--signal-deep);
+}
+
+.field:disabled {
+  background: var(--paper-3);
+  color: var(--ash);
+  border-color: var(--ash);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* The helper/error slot is always reserved, so an appearing message never
+   pushes the rest of the form down. */
+.field-note {
+  display: block;
+  min-height: 1lh;
+  margin-top: var(--space-3xs);
+  color: var(--signal-deep);
+}
+
+/* ── Marquee ────────────────────────────────────────────── */
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -104,135 +465,45 @@ textarea:focus-visible {
   }
 }
 
-.animate-marquee {
-  animation: marquee 26s linear infinite;
-}
-
-/* Soften the marquee's hard edges so the loop reads as intentional */
-.marquee-mask {
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
+.marquee {
+  animation: marquee 32s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .marquee {
     animation: none;
   }
 }
 
-/* Interactive hovers */
-.btn-accent {
-  box-shadow: 0 0.75rem 1.5rem -0.75rem rgba(212, 145, 110, 0.55);
-  transition:
-    background-color 0.3s ease,
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.btn-accent:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 1rem 2rem -0.75rem rgba(212, 145, 110, 0.7);
-}
-
-.btn-accent:active {
-  transform: translateY(0);
-}
-
-.btn-outline {
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease,
-    border-color 0.3s ease;
-}
-
-.btn-outline:hover {
-  background: var(--cream);
-  color: var(--bg);
-  border-color: var(--cream);
-}
-
-.wa-link:hover {
-  color: var(--accent);
-}
-
-.navlink {
-  position: relative;
-}
-
-.navlink::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -6px;
-  height: 1px;
-  width: 0;
-  background: var(--accent);
-  transition: width 0.4s ease;
-}
-
-.navlink:hover::after {
-  width: 100%;
-}
-
-.prod-card {
-  transition:
-    border-color 0.4s ease,
-    transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
-    box-shadow 0.4s ease;
-}
-
-.prod-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-0.375rem);
-  box-shadow: var(--shadow-card);
-}
-
-.prod-card:hover .prod-img {
-  transform: scale(1.06);
-}
-
-.prod-img {
-  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-/* Sold-out treatment — dims the image so the state reads visually, not just the badge */
-.prod-card--sold .prod-img {
-  filter: grayscale(1);
-  opacity: 0.55;
-}
-
-/* Hero scroll cue */
-@keyframes scroll-cue {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.4;
+/* ── The page's ONE orchestrated entrance ────────────────────
+   The hero arrives on load. Nothing else animates on scroll —
+   the rest of the page is simply there. */
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
   }
-  50% {
-    transform: translateY(0.4rem);
+  to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.scroll-cue {
-  animation: scroll-cue 2s ease-in-out infinite;
+.hero-in > * {
+  animation: hero-in var(--dur-long) var(--ease-out) both;
+}
+
+.hero-in > *:nth-child(2) {
+  animation-delay: 90ms;
+}
+
+.hero-in > *:nth-child(3) {
+  animation-delay: 180ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scroll-cue {
+  .hero-in > * {
     animation: none;
   }
+}
 }

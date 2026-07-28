@@ -1,33 +1,70 @@
+import { WHATSAPP_URL } from "../lib/site";
+
 const links = [
-  { href: "#oficio", label: "EL OFICIO" },
-  { href: "#coleccion", label: "COLECCIÓN" },
-  { href: "#contacto", label: "CONTACTO" },
+  { href: "#oficio", label: "El oficio" },
+  { href: "#coleccion", label: "Catálogo" },
+  { href: "#testimonios", label: "Testimonios" },
+  { href: "#ubicacion", label: "Ubicación" },
+  { href: "#contacto", label: "Contacto" },
 ];
 
+// Ft4 · Dense typographic colophon. Closes the page like a printed sign-off
+// instead of cataloguing a sitemap this shop doesn't have.
 export default function Footer() {
   return (
-    <footer className="bg-bg pb-10 pt-16">
-      <div className="mx-auto max-w-[1280px] px-6 md:px-10">
-        <div className="flex flex-col items-start justify-between gap-6 border-t border-hair pt-10 md:flex-row md:items-center">
-          <a href="#" className="font-display text-[34px] font-bold text-cream">
+    <>
+      <div aria-hidden className="pole" />
+      <footer
+        className="bg-coal py-(--space-xl) text-paper"
+        style={{ ["--focus-ring" as string]: "var(--paper)" }}
+      >
+        <div className="mx-auto max-w-7xl px-(--page-gutter)">
+          <p
+            className="t-display"
+            style={{ fontSize: "clamp(2.25rem, 7vw, 4.5rem)" }}
+          >
             EduardoPro
-          </a>
-          <div className="flex flex-col gap-4 font-mono text-[11px] tracking-[0.22em] text-ink md:flex-row md:items-center md:gap-9">
-            {links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="transition-colors hover:text-accent"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
+          </p>
+
+          <p className="mt-(--space-md) max-w-[62ch] font-mono text-sm leading-relaxed">
+            Suministros de barbería · Máquinas, navajas, ceras y repuestos
+            comprados directo al distribuidor · Precio de gremio, al mayor y al
+            detal · Tienda en Aroa, Yaracuy · Enviamos a donde estés · En el
+            oficio desde 2020 · Pedidos por{" "}
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-signal"
+            >
+              WhatsApp
+            </a>
+            .
+          </p>
+
+          <nav
+            aria-label="Secundaria"
+            className="mt-(--space-lg) border-t-2 border-paper/30 pt-(--space-sm)"
+          >
+            <ul className="flex flex-wrap gap-x-(--space-md) gap-y-(--space-2xs)">
+              {links.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="block whitespace-nowrap py-1 text-sm font-semibold tracking-widest uppercase hover:text-signal"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <p className="tnum mt-(--space-md) font-mono text-xs tracking-widest uppercase opacity-70">
+            © 2026 EduardoPro — Todos los derechos reservados
+          </p>
         </div>
-        <p className="mt-10 font-mono text-[10px] tracking-[0.24em] text-ink">
-          © 2026 EDUARDOPRO — TODOS LOS DERECHOS RESERVADOS
-        </p>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }
