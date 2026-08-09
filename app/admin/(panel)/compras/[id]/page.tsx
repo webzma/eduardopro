@@ -89,7 +89,10 @@ export default async function PurchaseDetailPage({
                   label="Fecha"
                   value={DATE.format(new Date(purchase.boughtAt))}
                 />
-                <Field label="Proveedor" value={purchase.supplier ?? "—"} />
+                <Field
+                  label="Proveedor"
+                  value={purchase.supplier ?? "Sin proveedor"}
+                />
                 <Field
                   label="Tasa aplicada"
                   value={`Bs ${formatRate(purchase.rate)}`}
@@ -105,7 +108,10 @@ export default async function PurchaseDetailPage({
             </div>
           </div>
 
-          <section className="rounded-lg border bg-card shadow-sm overflow-hidden" aria-labelledby="renglones">
+          <section
+            className="rounded-lg border bg-card shadow-sm overflow-hidden"
+            aria-labelledby="renglones"
+          >
             <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
               <h2 id="renglones" className="text-base font-semibold">
                 Renglones
@@ -148,10 +154,10 @@ export default async function PurchaseDetailPage({
                         : marginPct(line.salePriceUsd, line.unitCostUsd);
                     return (
                       <TableRow key={line.id}>
-                      <th
-                        scope="row"
-                        className="p-2 text-left align-middle font-normal"
-                      >
+                        <th
+                          scope="row"
+                          className="p-2 text-left align-middle font-normal"
+                        >
                           <div className="flex items-center gap-3">
                             <Image
                               src={imageSrc(line.productImage ?? "")}
@@ -179,7 +185,9 @@ export default async function PurchaseDetailPage({
                             </span>
                           </div>
                         </th>
-                        <TableCell className="text-right tabular-nums whitespace-nowrap">{line.qty}</TableCell>
+                        <TableCell className="text-right tabular-nums whitespace-nowrap">
+                          {line.qty}
+                        </TableCell>
                         <TableCell className="text-right tabular-nums whitespace-nowrap">
                           {formatUsd(line.unitCostUsd)}
                         </TableCell>
