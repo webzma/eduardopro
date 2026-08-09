@@ -1,9 +1,30 @@
 import Link from "next/link";
 import { IconShoppingCartPlus, IconReceiptOff } from "@tabler/icons-react";
-import { requireStaff } from "../../../lib/auth";
-import { getSales } from "../../../lib/sales";
-import { formatUsd, PAYMENT_LABELS, ROLE_LABELS } from "../../../lib/money";
-import { EmptyState, Field, PageHeader, Record, Thumbs } from "../ui";
+import { requireStaff } from "@/app/lib/auth";
+import { getSales } from "@/app/lib/sales";
+import {
+  formatBs,
+  formatUsd,
+  PAYMENT_LABELS,
+  ROLE_LABELS,
+} from "@/app/lib/money";
+import { imageSrc } from "@/app/lib/images";
+import { buttonVariants } from "@/app/components/ui/button";
+import { Badge } from "@/app/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/ui/table";
+import PeriodFilter from "../PeriodFilter";
+import { isPeriod, periodStart, type Period } from "@/app/lib/period";
+import { EmptyState, Field, PageHeader } from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -26,17 +47,25 @@ const FULL = new Intl.DateTimeFormat("es-VE", {
   timeZone: "America/Caracas",
 });
 
-export default async function SalesPage() {
+export default async function SalesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ periodo?: string }>;
+}) {
   const { role } = await requireStaff();
   // Sin filtro por vendedor: RLS ya lo hace. El admin recibe todo y el
   // vendedor solo lo suyo, venga de donde venga la consulta.
-  const sales = await getSales();
+  const { periodo } = await searchParams;
+  const period: Period = isPeriod(periodo) ? periodo : "mes";
+  const sales = await getSales(200, periodStart(period));
   const isAdmin = role === "admin";
   const totalUsd = sales.reduce((sum, s) => sum + s.totalUsd, 0);
   const totalUnits = sales.reduce(
     (n, s) => n + s.lines.reduce((m, l) => m + l.qty, 0),
     0,
   );
+  // Columnas que preceden a la del total, para el colSpan del pie.
+  const leading = isAdmin ? 6 : 5;
 
   return (
     <>
@@ -48,34 +77,38 @@ export default async function SalesPage() {
             : "Tus ventas. El histórico completo lo ve el administrador."
         }
         action={
-          <Link href="/admin/ventas/nueva" className="crm-btn crm-btn--primary">
+          <Link href="/admin/ventas/nueva" className={buttonVariants()}>
             <IconShoppingCartPlus size={16} stroke={1.75} aria-hidden />
             Registrar venta
           </Link>
         }
       />
 
+      <div className="mb-4">
+        <PeriodFilter base="/admin/ventas" active={period} />
+      </div>
+
       {sales.length > 0 ? (
-        <dl className="crm-facts mb-(--space-md)">
+        <dl className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-4">
           <Field
-            label="Ventas registradas"
+            label="Ventas del periodo"
             value={String(sales.length)}
-            className="crm-card crm-card__body"
+            className="rounded-lg border bg-card p-4 shadow-sm"
           />
           <Field
             label="Unidades vendidas"
             value={String(totalUnits)}
-            className="crm-card crm-card__body"
+            className="rounded-lg border bg-card p-4 shadow-sm"
           />
           <Field
             label="Total facturado"
             value={formatUsd(totalUsd)}
-            className="crm-card crm-card__body"
+            className="rounded-lg border bg-card p-4 shadow-sm"
           />
         </dl>
       ) : null}
 
-      <div className="crm-card">
+      <div className="rounded-lg border bg-card shadow-sm">
         {sales.length === 0 ? (
           <EmptyState icon={IconReceiptOff} title="Todavía no hay ventas">
             <Link href="/admin/ventas/nueva" className="underline">
@@ -83,63 +116,144 @@ export default async function SalesPage() {
             </Link>
           </EmptyState>
         ) : (
-          <ul className="crm-list">
-            {sales.map((sale) => {
-              const units = sale.lines.reduce((n, l) => n + l.qty, 0);
-              const fecha = new Date(sale.soldAt);
-              const productos =
-                sale.lines.map((l) => l.productName).join(", ") ||
-                "Sin renglones";
-              return (
-                <Record
-                  key={sale.id}
-                  href={`/admin/ventas/${sale.id}`}
-                  reference={`#${sale.id.slice(0, 6).toUpperCase()}`}
-                  media={
-                    <Thumbs images={sale.lines.map((l) => l.productImage)} />
-                  }
-                  title={productos}
-                  label={`Venta ${sale.id.slice(0, 6)} del ${FULL.format(fecha)}, ${formatUsd(sale.totalUsd)}`}
-                  amountLabel="Total cobrado"
-                  amountUsd={sale.totalUsd}
-                  // La tasa guardada con la venta, no la de hoy: el histórico
-                  // no debe moverse cuando cambia el dólar.
-                  rate={sale.rate}
-                  fields={
-                    <>
-                      <Field
-                        label="Fecha"
-                        value={DAY.format(fecha)}
-                        hint={TIME.format(fecha)}
-                      />
-                      <Field
-                        label="Forma de pago"
-                        value={
-                          PAYMENT_LABELS[sale.paymentMethod] ??
-                          sale.paymentMethod
-                        }
-                      />
-                      <Field
-                        label="Unidades"
-                        value={units}
-                        hint={`${sale.lines.length} ${sale.lines.length === 1 ? "renglón" : "renglones"}`}
-                      />
+          // La región con scroll es focusable: una zona que se desplaza en
+          // horizontal tiene que poder recorrerse con el teclado.
+          <div
+            className="overflow-x-auto"
+            role="region"
+            aria-labelledby="tabla-ventas"
+            tabIndex={0}
+          >
+            <Table>
+              <TableCaption id="tabla-ventas" className="sr-only">
+                Ventas registradas, con su fecha, forma de pago y total
+              </TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-20">
+                    <span className="sr-only">Foto</span>
+                  </TableHead>
+                  <TableHead>Producto / ID</TableHead>
+                  <TableHead>Fecha y hora</TableHead>
+                  <TableHead>Forma de pago</TableHead>
+                  <TableHead className="text-right">Unidades</TableHead>
+                  {isAdmin ? <TableHead>Registrada por</TableHead> : null}
+                  <TableHead className="text-right">Total cobrado</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {sales.map((sale) => {
+                  const units = sale.lines.reduce((n, l) => n + l.qty, 0);
+                  const fecha = new Date(sale.soldAt);
+                  const ref = `#${sale.id.slice(0, 6).toUpperCase()}`;
+                  const extra = sale.lines.length - 1;
+                  return (
+                    <TableRow key={sale.id}>
+                      <TableCell className="py-3">
+                        <span className="relative block size-14">
+                          <Avatar className="size-14 rounded-md border">
+                            <AvatarImage
+                              src={imageSrc(sale.lines[0]?.productImage ?? "")}
+                              alt=""
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="rounded-md text-xs">
+                              {(sale.lines[0]?.productName ?? "?")
+                                .slice(0, 2)
+                                .toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          {/* Una venta puede llevar varios productos: se
+                              muestra el primero y se cuenta el resto. */}
+                          {extra > 0 ? (
+                            <span
+                              aria-hidden
+                              className="absolute -right-1 -bottom-1 rounded-full bg-secondary px-1.5 text-[0.6875rem] font-semibold text-secondary-foreground ring-2 ring-card"
+                            >
+                              +{extra}
+                            </span>
+                          ) : null}
+                        </span>
+                      </TableCell>
+
+                      {/* th, no td: el nombre es la cabecera de su fila, así un
+                          lector de pantalla lo repite al leer cada celda. Y es
+                          el único enlace de la fila. */}
+                      <th
+                        scope="row"
+                        className="p-2 text-left align-middle font-normal"
+                      >
+                        <Link
+                          href={`/admin/ventas/${sale.id}`}
+                          aria-label={`Venta ${ref} del ${FULL.format(fecha)}, ${formatUsd(sale.totalUsd)}`}
+                          className="block max-w-64 rounded-sm hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                        >
+                          <span className="block truncate font-medium">
+                            {sale.lines.map((l) => l.productName).join(", ") ||
+                              "Sin renglones"}
+                          </span>
+                          <span className="mt-0.5 block text-xs font-semibold tracking-[0.04em] text-muted-foreground">
+                            {ref}
+                          </span>
+                        </Link>
+                      </th>
+
+                      <TableCell className="whitespace-nowrap">
+                        <span className="block">{DAY.format(fecha)}</span>
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {TIME.format(fecha)}
+                        </span>
+                      </TableCell>
+
+                      <TableCell>
+                        <Badge variant="secondary" className="whitespace-nowrap">
+                          {PAYMENT_LABELS[sale.paymentMethod] ??
+                            sale.paymentMethod}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell className="text-right tabular-nums whitespace-nowrap">
+                        {units}
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {sale.lines.length}{" "}
+                          {sale.lines.length === 1 ? "renglón" : "renglones"}
+                        </span>
+                      </TableCell>
+
                       {isAdmin ? (
-                        <Field
-                          label="Registrada por"
-                          value={
-                            sale.sellerRole
-                              ? ROLE_LABELS[sale.sellerRole]
-                              : "—"
-                          }
-                        />
+                        <TableCell className="whitespace-nowrap">
+                          {sale.sellerRole ? ROLE_LABELS[sale.sellerRole] : "—"}
+                        </TableCell>
                       ) : null}
-                    </>
-                  }
-                />
-              );
-            })}
-          </ul>
+
+                      <TableCell className="text-right whitespace-nowrap">
+                        <span className="block font-semibold tabular-nums">
+                          {formatUsd(sale.totalUsd)}
+                        </span>
+                        {/* A la tasa guardada con la venta, no a la de hoy: el
+                            histórico no se mueve cuando cambia el dólar. */}
+                        <span className="mt-0.5 block text-xs tabular-nums text-muted-foreground">
+                          {formatBs(sale.totalUsd, sale.rate)}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={leading} className="font-medium">
+                    Total en pantalla
+                  </TableCell>
+                  <TableCell className="text-right font-semibold tabular-nums">
+                    {formatUsd(totalUsd)}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </div>
         )}
       </div>
     </>

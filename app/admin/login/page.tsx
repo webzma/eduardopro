@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { loginAction } from "../actions";
+import { buttonVariants } from "@/app/components/ui/button";
+import { cn } from "@/app/lib/utils";
+import { Label } from "@/app/components/ui/label";
+import { Input } from "@/app/components/ui/input";
 
 export const dynamic = "force-dynamic";
 
@@ -20,17 +24,17 @@ export default async function LoginPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center p-(--page-gutter)">
-      <div className="crm-card w-full max-w-sm">
-        <div className="crm-card__body">
+      <div className="rounded-lg border bg-card shadow-sm w-full max-w-sm">
+        <div className="p-4">
           <p className="font-display text-lg uppercase">EduardoPro</p>
-          <h1 className="crm-h1 mt-(--space-sm)">Entrar al panel</h1>
-          <p className="crm-muted mt-0.5">Inventario y ventas.</p>
+          <h1 className="text-xl font-semibold tracking-tight mt-4">Entrar al panel</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Inventario y ventas.</p>
 
-          <form action={loginAction} className="mt-(--space-md)">
-            <label htmlFor="email" className="crm-label">
+          <form action={loginAction} className="mt-6">
+            <Label htmlFor="email" className="mb-1 block">
               Correo
-            </label>
-            <input
+            </Label>
+            <Input
               id="email"
               name="email"
               type="email"
@@ -38,13 +42,13 @@ export default async function LoginPage({
               required
               autoFocus
               placeholder="tu@correo.com"
-              className="crm-field"
+              
             />
 
-            <label htmlFor="password" className="crm-label mt-(--space-sm)">
+            <Label htmlFor="password" className="mb-1 block text-sm font-medium text-secondary-foreground mt-4">
               Contraseña
-            </label>
-            <input
+            </Label>
+            <Input
               id="password"
               name="password"
               type="password"
@@ -53,14 +57,14 @@ export default async function LoginPage({
               placeholder="••••••••"
               aria-invalid={error === "credenciales" || undefined}
               aria-describedby={message ? "login-error" : undefined}
-              className="crm-field"
+              
             />
 
             {message ? (
               <p
                 id="login-error"
                 role="status"
-                className="crm-note crm-note--bad mt-(--space-sm)"
+                className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive mt-3"
               >
                 {message}
               </p>
@@ -68,7 +72,7 @@ export default async function LoginPage({
 
             <button
               type="submit"
-              className="crm-btn crm-btn--primary mt-(--space-md) w-full"
+              className={cn(buttonVariants(), "mt-6 w-full")}
             >
               Entrar
             </button>
@@ -76,7 +80,7 @@ export default async function LoginPage({
 
           <Link
             href="/"
-            className="crm-muted mt-(--space-md) inline-block text-sm underline"
+            className="text-sm text-muted-foreground mt-6 inline-block text-sm underline"
           >
             ← Volver al sitio
           </Link>

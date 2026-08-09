@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "./crm.css";
 
 export const metadata: Metadata = {
   title: "Panel — EduardoPro",
@@ -14,5 +13,5 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="crm">{children}</div>;
+  return <>{children}</>;
 }

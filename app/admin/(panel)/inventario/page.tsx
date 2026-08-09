@@ -1,10 +1,6 @@
-import Link from "next/link";
-import Image from "next/image";
 import {
   IconPlus,
-  IconPencil,
-  IconEye,
-  IconEyeOff,
+  IconMinus,
   IconAlertTriangle,
   IconCircleCheck,
   IconPackages,
@@ -13,11 +9,25 @@ import { requireStaff } from "../../../lib/auth";
 import { getProducts, SupabaseSetupError, type Product } from "../../../lib/products";
 import { getRate } from "../../../lib/rate";
 import { formatBs, formatPct, formatUsd, marginPct } from "../../../lib/money";
-import { adjustStockAction, toggleActiveAction, createProductAction } from "../../actions";
-import DeleteButton from "./DeleteButton";
+import { adjustStockAction, createProductAction } from "../../actions";
+import RowActions from "./RowActions";
 import ImagePicker from "./ImagePicker";
 import { imageSrc } from "../../../lib/images";
 import { EmptyState, Notice, PageHeader } from "../ui";
+import { Button, buttonVariants } from "@/app/components/ui/button";
+import { Badge } from "@/app/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/ui/table";
+import { Label } from "@/app/components/ui/label";
+import { Input } from "@/app/components/ui/input";
 
 export const dynamic = "force-dynamic";
 
@@ -49,8 +59,8 @@ export default async function InventoryPage({
     if (err instanceof SupabaseSetupError) {
       return (
         <>
-          <h1 className="crm-h1">Falta configurar la base</h1>
-          <div className="mt-(--space-sm)">
+          <h1 className="text-xl font-semibold tracking-tight">Falta configurar la base</h1>
+          <div className="mt-4">
             <Notice kind="bad" icon={IconAlertTriangle}>
               {err.message}
             </Notice>
@@ -79,21 +89,21 @@ export default async function InventoryPage({
       />
 
       {params.ok && OK_MESSAGES[params.ok] ? (
-        <div className="mb-(--space-md)">
+        <div className="mb-6">
           <Notice kind="ok" icon={IconCircleCheck}>
             {OK_MESSAGES[params.ok]}
           </Notice>
         </div>
       ) : null}
       {params.error && ERROR_MESSAGES[params.error] ? (
-        <div className="mb-(--space-md)">
+        <div className="mb-6">
           <Notice kind="bad" icon={IconAlertTriangle}>
             {params.detalle ?? ERROR_MESSAGES[params.error]}
           </Notice>
         </div>
       ) : null}
 
-      <div className="crm-card">
+      <div className="rounded-lg border bg-card shadow-sm">
         {products.length === 0 ? (
           <EmptyState icon={IconPackages} title="No hay productos todavía">
             {isAdmin ? "Agrega el primero en el formulario de abajo." : null}
@@ -104,260 +114,267 @@ export default async function InventoryPage({
           // desplaza en horizontal, la región es focusable — una zona con
           // scroll tiene que poder recorrerse con el teclado.
           <div
-            className="crm-scroll"
+            className="overflow-x-auto"
             role="region"
             aria-labelledby="tabla-inventario"
             tabIndex={0}
           >
-            <table className="crm-table">
-              <caption id="tabla-inventario" className="sr-only">
+            <Table>
+              <TableCaption id="tabla-inventario" className="sr-only">
                 Productos del catálogo con su stock, precio y estado
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">Producto</th>
-                  {isAdmin ? <th scope="col" className="crm-num">Costo</th> : null}
-                  <th scope="col" className="crm-num">Precio</th>
-                  {isAdmin ? <th scope="col" className="crm-num">Margen</th> : null}
-                  <th scope="col" className="crm-num">Stock</th>
-                  <th scope="col">Estado</th>
-                  {isAdmin ? <th scope="col"><span className="sr-only">Acciones</span></th> : null}
-                </tr>
-              </thead>
-              <tbody>
+              </TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-20">
+                    <span className="sr-only">Foto</span>
+                  </TableHead>
+                  <TableHead>Producto</TableHead>
+                  {isAdmin ? (
+                    <TableHead className="text-right">Costo</TableHead>
+                  ) : null}
+                  <TableHead className="text-right">Precio</TableHead>
+                  {isAdmin ? (
+                    <TableHead className="text-right">Margen</TableHead>
+                  ) : null}
+                  <TableHead className="text-center">Stock</TableHead>
+                  <TableHead>Estado</TableHead>
+                  {isAdmin ? (
+                    <TableHead className="text-right">Acciones</TableHead>
+                  ) : null}
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
                 {products.map((product) => (
-                  <tr key={product.id}>
-                    <th scope="row" className="text-left font-normal">
-                      <div className="flex items-center gap-(--space-2xs)">
-                        <Image
+                  <TableRow key={product.id}>
+                    <TableCell className="py-3">
+                      <Avatar className="size-14 rounded-md border">
+                        <AvatarImage
                           src={imageSrc(product.image)}
                           alt=""
-                          width={36}
-                          height={36}
-                          className="size-9 shrink-0 rounded border border-(--crm-line) object-cover"
+                          className="object-cover"
                         />
-                        <div className="min-w-0">
-                          <p className="truncate font-medium">{product.name}</p>
-                          <p className="crm-muted truncate text-xs">
-                            {product.category || "Sin categoría"}
-                          </p>
-                        </div>
-                      </div>
+                        {/* Si la foto no carga, las iniciales antes que un
+                            hueco roto. */}
+                        <AvatarFallback className="rounded-md text-xs">
+                          {product.name.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TableCell>
+
+                    {/* th, no td: el nombre es la cabecera de su fila, así un
+                        lector de pantalla lo repite al leer cada celda. */}
+                    <th
+                      scope="row"
+                      className="max-w-56 p-2 text-left align-middle font-normal"
+                    >
+                      <span className="block truncate font-medium">
+                        {product.name}
+                      </span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {product.category || "Sin categoría"}
+                      </span>
                     </th>
+
                     {isAdmin ? (
-                      <td className="crm-num">
+                      <TableCell className="text-right tabular-nums whitespace-nowrap">
                         {product.cost > 0 ? (
                           formatUsd(product.cost)
                         ) : (
-                          <span className="crm-muted">—</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
-                      </td>
+                      </TableCell>
                     ) : null}
-                    <td className="crm-num">
-                      {formatUsd(product.price)}
+
+                    <TableCell className="text-right whitespace-nowrap">
+                      <span className="block font-medium tabular-nums">
+                        {formatUsd(product.price)}
+                      </span>
                       {rate ? (
-                        <span className="crm-muted block text-xs">
+                        <span className="block text-xs tabular-nums text-muted-foreground">
                           {formatBs(product.price, rate.value)}
                         </span>
                       ) : null}
-                    </td>
+                    </TableCell>
+
                     {isAdmin ? (
-                      <td className="crm-num">
+                      <TableCell className="text-right tabular-nums whitespace-nowrap">
                         {(() => {
                           const m = marginPct(product.price, product.cost);
                           if (m === null) {
-                            return <span className="crm-muted">—</span>;
+                            return <span className="text-muted-foreground">—</span>;
                           }
                           // Por debajo del 15 % el producto casi no deja nada.
                           // Se marca con color Y con palabra: el color solo no
                           // se ve con daltonismo ni en una impresión.
                           return m < 15 ? (
-                            <span className="text-signal">
+                            <span className="text-destructive">
                               {formatPct(m)}
                               <span className="block text-xs">bajo</span>
                             </span>
                           ) : (
-                            <span>{formatPct(m)}</span>
+                            formatPct(m)
                           );
                         })()}
-                      </td>
+                      </TableCell>
                     ) : null}
-                    <td>
+
+                    <TableCell>
                       {/* Corregir existencias a mano: recepción de mercancía,
                           mermas, conteo. Las ventas descuentan solas. */}
-                      <div className="flex items-center justify-end gap-(--space-3xs)">
+                      <div className="flex items-center justify-center gap-1">
                         <form action={adjustStockAction}>
                           <input type="hidden" name="id" value={product.id} />
                           <input type="hidden" name="delta" value="-1" />
-                          <button
+                          <Button
                             type="submit"
+                            variant="outline"
+                            size="icon-sm"
                             aria-label={`Restar una unidad de ${product.name}`}
-                            className="crm-step"
                           >
-                            −
-                          </button>
+                            <IconMinus size={15} stroke={2} aria-hidden />
+                          </Button>
                         </form>
-                        <span className="w-8 text-center tabular-nums">
+                        <span className="w-8 text-center font-medium tabular-nums">
                           {product.stock}
                         </span>
                         <form action={adjustStockAction}>
                           <input type="hidden" name="id" value={product.id} />
                           <input type="hidden" name="delta" value="1" />
-                          <button
+                          <Button
                             type="submit"
+                            variant="outline"
+                            size="icon-sm"
                             aria-label={`Sumar una unidad de ${product.name}`}
-                            className="crm-step"
                           >
-                            +
-                          </button>
+                            <IconPlus size={15} stroke={2} aria-hidden />
+                          </Button>
                         </form>
                       </div>
-                    </td>
-                    <td>
-                      <div className="flex flex-wrap gap-(--space-3xs)">
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
                         {product.stock === 0 ? (
-                          <span className="crm-badge crm-badge--signal">
-                            Agotado
-                          </span>
+                          <Badge>Agotado</Badge>
                         ) : product.stock <= 3 ? (
-                          <span className="crm-badge crm-badge--warn">
+                          <Badge className="bg-primary/15 text-primary">
                             Quedan {product.stock}
-                          </span>
+                          </Badge>
                         ) : null}
                         {!product.active ? (
-                          <span className="crm-badge crm-badge--navy">
-                            Oculto
+                          <Badge className="bg-navy text-paper">Oculto</Badge>
+                        ) : null}
+                        {product.stock > 3 && product.active ? (
+                          <span className="text-xs text-muted-foreground">
+                            En venta
                           </span>
                         ) : null}
                       </div>
-                    </td>
+                    </TableCell>
+
                     {isAdmin ? (
-                      <td className="crm-num">
-                        <div className="flex items-center justify-end gap-(--space-3xs)">
-                          <form action={toggleActiveAction}>
-                            <input type="hidden" name="id" value={product.id} />
-                            <input
-                              type="hidden"
-                              name="active"
-                              value={(!product.active).toString()}
-                            />
-                            <button
-                              type="submit"
-                              className="crm-btn crm-btn--quiet"
-                              title={product.active ? "Ocultar del sitio" : "Mostrar en el sitio"}
-                            >
-                              {product.active ? (
-                                <IconEyeOff size={16} stroke={1.75} />
-                              ) : (
-                                <IconEye size={16} stroke={1.75} />
-                              )}
-                              {product.active ? "Ocultar" : "Mostrar"}
-                            </button>
-                          </form>
-                          <Link
-                            href={`/admin/inventario/${product.id}`}
-                            className="crm-btn crm-btn--quiet"
-                          >
-                            <IconPencil size={16} stroke={1.75} />
-                            Editar
-                          </Link>
-                          <DeleteButton id={product.id} name={product.name} />
-                        </div>
-                      </td>
+                      <TableCell className="text-right">
+                        <RowActions
+                          id={product.id}
+                          name={product.name}
+                          active={product.active}
+                        />
+                      </TableCell>
                     ) : null}
-                  </tr>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         )}
       </div>
 
       {isAdmin ? (
-        <div className="crm-card mt-(--space-md)">
-          <div className="crm-card__head">
-            <h2 className="crm-h2">Nuevo producto</h2>
+        <div className="rounded-lg border bg-card shadow-sm mt-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+            <h2 className="text-base font-semibold">Nuevo producto</h2>
           </div>
-          <div className="crm-card__body">
+          <div className="p-4">
             <form
               action={createProductAction}
-              className="grid gap-(--space-sm) sm:grid-cols-2"
+              className="grid gap-4 sm:grid-cols-2"
             >
               <div className="sm:col-span-2">
-                <label htmlFor="new-name" className="crm-label">
+                <Label htmlFor="new-name" className="mb-1 block">
                   Nombre
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-name"
                   name="name"
                   type="text"
                   required
                   placeholder="Ej. Tijera de corte"
-                  className="crm-field"
+                  
                 />
               </div>
               <div>
-                <label htmlFor="new-category" className="crm-label">
+                <Label htmlFor="new-category" className="mb-1 block">
                   Categoría
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-category"
                   name="category"
                   type="text"
                   placeholder="Ej. Tijera profesional"
-                  className="crm-field"
+                  
                 />
               </div>
               <fieldset className="sm:col-span-2">
-                <legend className="crm-label">Foto</legend>
+                <legend className="mb-1 block">Foto</legend>
                 <ImagePicker />
               </fieldset>
               <div>
-                <label htmlFor="new-cost" className="crm-label">
+                <Label htmlFor="new-cost" className="mb-1 block">
                   Costo en USD
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-cost"
                   name="cost"
                   type="number"
                   min="0"
                   step="0.01"
                   defaultValue={0}
-                  className="crm-field"
+                  
                 />
-                <p className="crm-muted mt-1 text-xs">
+                <p className="text-sm text-muted-foreground mt-1 text-xs">
                   Lo actualiza cada compra que registres.
                 </p>
               </div>
               <div>
-                <label htmlFor="new-price" className="crm-label">
+                <Label htmlFor="new-price" className="mb-1 block">
                   Precio de venta en USD
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-price"
                   name="price"
                   type="number"
                   min="0"
                   step="0.01"
                   defaultValue={0}
-                  className="crm-field"
+                  
                 />
               </div>
               <div>
-                <label htmlFor="new-stock" className="crm-label">
+                <Label htmlFor="new-stock" className="mb-1 block">
                   Stock inicial
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-stock"
                   name="stock"
                   type="number"
                   min="0"
                   step="1"
                   defaultValue={0}
-                  className="crm-field"
+                  
                 />
               </div>
-              <label className="flex items-center gap-(--space-2xs) text-sm sm:col-span-2">
+              <Label className="flex items-center gap-2 text-sm sm:col-span-2">
                 <input
                   type="checkbox"
                   name="active"
@@ -365,9 +382,9 @@ export default async function InventoryPage({
                   className="size-4 accent-signal"
                 />
                 Mostrar en el sitio público
-              </label>
+              </Label>
               <div className="sm:col-span-2">
-                <button type="submit" className="crm-btn crm-btn--primary">
+                <button type="submit" className={buttonVariants()}>
                   <IconPlus size={16} stroke={1.75} />
                   Agregar producto
                 </button>

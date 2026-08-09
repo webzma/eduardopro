@@ -5,8 +5,8 @@ import {
   IconBuildingWarehouse,
   IconAlertTriangle,
   IconShoppingCartPlus,
+  IconCashRegister,
   IconReceiptOff,
-  IconCircleCheck,
   IconTruckDelivery,
   IconTrendingUp,
   type Icon,
@@ -18,6 +18,9 @@ import { getMonthSpend } from "../../lib/purchases";
 import { getRate } from "../../lib/rate";
 import { formatBs, formatUsd, PAYMENT_LABELS } from "../../lib/money";
 import { EmptyState, Field, Notice, PageHeader, Record, Thumbs } from "./ui";
+import { buttonVariants } from "@/app/components/ui/button";
+import { getSettings } from "../../lib/settings";
+import Pending from "./Pending";
 
 export const dynamic = "force-dynamic";
 
@@ -46,21 +49,23 @@ function Kpi({
   alert?: boolean;
 }) {
   return (
-    <div className="crm-card">
-      <div className="crm-card__body flex items-start gap-(--space-sm)">
+    <div className="rounded-lg border bg-card shadow-sm">
+      <div className="p-4 flex items-start gap-4">
         <span
-          className={`flex size-9 shrink-0 items-center justify-center rounded-(--crm-radius) ${
-            alert ? "bg-signal text-paper" : "bg-paper2 text-coal2"
+          className={`flex size-9 shrink-0 items-center justify-center rounded-md ${
+            alert
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-secondary-foreground"
           }`}
         >
           <Glyph size={20} stroke={1.75} aria-hidden />
         </span>
         <div className="min-w-0">
-          <p className="crm-kpi__label">{label}</p>
-          <p className={`crm-kpi__value ${alert ? "text-signal" : ""}`}>
+          <p className="mb-1 text-sm text-muted-foreground">{label}</p>
+          <p className={`text-xl leading-tight font-semibold tracking-tight tabular-nums ${alert ? "text-primary" : ""}`}>
             {value}
           </p>
-          {sub ? <p className="crm-kpi__sub">{sub}</p> : null}
+          {sub ? <p className="mt-0.5 text-sm tabular-nums text-muted-foreground">{sub}</p> : null}
         </div>
       </div>
     </div>
@@ -82,8 +87,8 @@ export default async function DashboardPage() {
     if (err instanceof SupabaseSetupError) {
       return (
         <>
-          <h1 className="crm-h1">Falta configurar la base</h1>
-          <div className="mt-(--space-sm)">
+          <h1 className="text-xl font-semibold tracking-tight">Falta configurar la base</h1>
+          <div className="mt-4">
             <Notice kind="bad" icon={IconAlertTriangle}>
               {err.message}
             </Notice>
@@ -97,6 +102,8 @@ export default async function DashboardPage() {
   const rate = await getRate();
   // RLS deja esto en 0 para el vendedor, pero la tarjeta tampoco se le pinta.
   const monthSpend = isAdmin ? await getMonthSpend(summary.monthStartIso) : 0;
+  // Solo el admin puede leer settings (RLS), y solo a él le sirve el aviso.
+  const settings = isAdmin ? await getSettings() : null;
   const lowStock = products.filter((p) => p.stock <= LOW_STOCK);
   const stockValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
 
@@ -110,14 +117,32 @@ export default async function DashboardPage() {
             : "Tus cifras. Los totales del negocio los ve el administrador."
         }
         action={
-          <Link href="/admin/ventas/nueva" className="crm-btn crm-btn--primary">
-            <IconShoppingCartPlus size={16} stroke={1.75} aria-hidden />
-            Registrar venta
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/admin/caja"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <IconCashRegister size={16} stroke={1.75} aria-hidden />
+              Cierre de caja
+            </Link>
+            <Link href="/admin/ventas/nueva" className={buttonVariants()}>
+              <IconShoppingCartPlus size={16} stroke={1.75} aria-hidden />
+              Registrar venta
+            </Link>
+          </div>
         }
       />
 
-      <div className="grid gap-(--space-sm) sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6">
+        <Pending
+          products={products}
+          rate={rate}
+          fallbackAgeDays={settings?.fallbackAgeDays ?? null}
+          isAdmin={isAdmin}
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi
           label="Vendido hoy"
           icon={IconCashBanknote}
@@ -169,7 +194,7 @@ export default async function DashboardPage() {
       </div>
 
       {isAdmin ? (
-        <div className="mt-(--space-sm) grid gap-(--space-sm) sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Kpi
             label="Comprado este mes"
             icon={IconTruckDelivery}
@@ -193,18 +218,18 @@ export default async function DashboardPage() {
         </div>
       ) : null}
 
-      <div className="mt-(--space-md) grid gap-(--space-md) lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-        <div className="crm-card">
-          <div className="crm-card__head">
-            <h2 className="crm-h2">Últimas ventas</h2>
-            <Link href="/admin/ventas" className="crm-btn crm-btn--quiet">
+      <div className="mt-6">
+        <div className="rounded-lg border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+            <h2 className="text-base font-semibold">Últimas ventas</h2>
+            <Link href="/admin/ventas" className={buttonVariants({ variant: "ghost", size: "sm" })}>
               Ver todas
             </Link>
           </div>
           {sales.length === 0 ? (
             <EmptyState icon={IconReceiptOff} title="Aún no hay ventas registradas" />
           ) : (
-            <ul className="crm-list">
+            <ul>
               {sales.map((sale) => {
                 const productos =
                   sale.lines.map((l) => l.productName).join(", ") ||
@@ -244,45 +269,6 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        <div className="crm-card">
-          <div className="crm-card__head">
-            <h2 className="crm-h2">Reponer pronto</h2>
-            <Link href="/admin/inventario" className="crm-btn crm-btn--quiet">
-              Inventario
-            </Link>
-          </div>
-          {lowStock.length === 0 ? (
-            <EmptyState
-              icon={IconCircleCheck}
-              title="Todo con existencias suficientes"
-            />
-          ) : (
-            <ul className="divide-y divide-(--crm-line-soft)">
-              {lowStock.map((product) => (
-                <li
-                  key={product.id}
-                  className="flex items-center justify-between gap-(--space-sm) px-(--space-sm) py-(--space-xs)"
-                >
-                  <dl className="min-w-0 flex-1">
-                    <Field
-                      label={product.category || "Sin categoría"}
-                      value={
-                        <span className="block truncate">{product.name}</span>
-                      }
-                    />
-                  </dl>
-                  <span
-                    className={`crm-badge shrink-0 ${product.stock === 0 ? "crm-badge--signal" : "crm-badge--warn"}`}
-                  >
-                    {product.stock === 0
-                      ? "Agotado"
-                      : `Quedan ${product.stock}`}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
     </>
   );

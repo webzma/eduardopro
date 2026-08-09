@@ -13,6 +13,18 @@ import {
 } from "../../../../lib/money";
 import { imageSrc } from "../../../../lib/images";
 import { Facts, Field, GrandTotal, Notice } from "../../ui";
+import { cn } from "@/app/lib/utils";
+import { buttonVariants } from "@/app/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/ui/table";
 
 export const dynamic = "force-dynamic";
 
@@ -48,31 +60,31 @@ export default async function SaleDetailPage({
 
   return (
     <>
-      <Link href="/admin/ventas" className="crm-btn crm-btn--quiet mb-(--space-sm)">
+      <Link href="/admin/ventas" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "mb-3")}>
         <IconArrowLeft size={16} stroke={1.75} aria-hidden />
         Ventas
       </Link>
 
       {ok ? (
-        <div className="mb-(--space-md)">
+        <div className="mb-6">
           <Notice kind="ok" icon={IconCircleCheck}>
             Venta registrada. El stock ya quedó descontado.
           </Notice>
         </div>
       ) : null}
 
-      <header className="mb-(--space-md) flex flex-wrap items-center gap-(--space-2xs)">
-        <h1 className="crm-h1">Venta</h1>
-        <span className="crm-rec__ref">
+      <header className="mb-6 flex flex-wrap items-center gap-2">
+        <h1 className="text-xl font-semibold tracking-tight">Venta</h1>
+        <span className="rounded-sm bg-muted px-1 py-px text-[0.6875rem] font-semibold tracking-[0.04em] text-secondary-foreground">
           #{sale.id.slice(0, 6).toUpperCase()}
         </span>
       </header>
 
-      <div className="grid gap-(--space-md) lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-        <div className="flex flex-col gap-(--space-md)">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+        <div className="flex flex-col gap-6">
           {/* Los datos de cabecera, cada uno con su nombre. */}
-          <div className="crm-card">
-            <div className="crm-card__body">
+          <div className="rounded-lg border bg-card shadow-sm">
+            <div className="p-4">
               <Facts>
                 <Field label="Fecha" value={DATE.format(new Date(sale.soldAt))} />
                 <Field
@@ -99,53 +111,53 @@ export default async function SaleDetailPage({
 
           {/* Aquí la tabla SÍ es lo correcto: pocas filas, columnas fijas, y
               la cabecera es la etiqueta de cada dato. */}
-          <section className="crm-card overflow-hidden" aria-labelledby="renglones">
-            <div className="crm-card__head">
-              <h2 id="renglones" className="crm-h2">
+          <section className="rounded-lg border bg-card shadow-sm overflow-hidden" aria-labelledby="renglones">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+              <h2 id="renglones" className="text-base font-semibold">
                 Renglones
               </h2>
-              <span className="crm-muted text-xs">
+              <span className="text-sm text-muted-foreground text-xs">
                 {units} {units === 1 ? "unidad" : "unidades"}
               </span>
             </div>
-            <div className="crm-scroll">
-              <table className="crm-doc">
-                <caption className="sr-only">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableCaption className="sr-only">
                   Productos incluidos en esta venta
-                </caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Producto</th>
-                    <th scope="col" className="crm-doc__num">
+                </TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Producto</TableHead>
+                    <TableHead className="text-right tabular-nums whitespace-nowrap">
                       Cantidad
-                    </th>
-                    <th scope="col" className="crm-doc__num">
+                    </TableHead>
+                    <TableHead className="text-right tabular-nums whitespace-nowrap">
                       Precio unit.
-                    </th>
+                    </TableHead>
                     {isAdmin ? (
-                      <th scope="col" className="crm-doc__num">
+                      <TableHead className="text-right tabular-nums whitespace-nowrap">
                         Costo unit.
-                      </th>
+                      </TableHead>
                     ) : null}
-                    <th scope="col" className="crm-doc__num">
+                    <TableHead className="text-right tabular-nums whitespace-nowrap">
                       Subtotal
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {sale.lines.map((line) => (
-                    <tr key={line.id}>
-<th
-                          scope="row"
-                          className="p-(--space-sm) text-left font-medium"
-                        >
-                          <div className="flex items-center gap-(--space-2xs)">
+                    <TableRow key={line.id}>
+                      <th
+                        scope="row"
+                        className="p-2 text-left align-middle font-normal"
+                      >
+                          <div className="flex items-center gap-2">
                             <Image
                               src={imageSrc(line.productImage ?? "")}
                               alt=""
                               width={40}
                               height={40}
-                              className="size-10 shrink-0 rounded border border-(--crm-line) bg-paper2 object-cover"
+                              className="size-10 shrink-0 rounded border border-border bg-muted object-cover"
                             />
                             <span className="min-w-0">
                               {line.productName}
@@ -153,44 +165,44 @@ export default async function SaleDetailPage({
                                   borró: el nombre se copió al vender para que
                                   esto sobreviva. */}
                               {line.productId === null ? (
-                                <span className="crm-muted block text-xs font-normal">
+                                <span className="text-sm text-muted-foreground block text-xs font-normal">
                                   Ya no está en el catálogo
                                 </span>
                               ) : null}
                             </span>
                           </div>
                         </th>
-                      <td className="crm-doc__num">{line.qty}</td>
-                      <td className="crm-doc__num">
+                      <TableCell className="text-right tabular-nums whitespace-nowrap">{line.qty}</TableCell>
+                      <TableCell className="text-right tabular-nums whitespace-nowrap">
                         {formatUsd(line.unitPriceUsd)}
-                      </td>
+                      </TableCell>
                       {isAdmin ? (
-                        <td className="crm-doc__num">
+                        <TableCell className="text-right tabular-nums whitespace-nowrap">
                           {line.unitCostUsd > 0 ? (
                             formatUsd(line.unitCostUsd)
                           ) : (
-                            <span className="crm-muted">Sin registrar</span>
+                            <span className="text-sm text-muted-foreground">Sin registrar</span>
                           )}
-                        </td>
+                        </TableCell>
                       ) : null}
-                      <td className="crm-doc__num font-medium">
+                      <TableCell className="text-right tabular-nums whitespace-nowrap font-medium">
                         {formatUsd(line.unitPriceUsd * line.qty)}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={isAdmin ? 4 : 3}>Total</td>
-                    <td className="crm-doc__num">{formatUsd(sale.totalUsd)}</td>
-                  </tr>
-                </tfoot>
-              </table>
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell colSpan={isAdmin ? 4 : 3}>Total</TableCell>
+                    <TableCell className="text-right tabular-nums whitespace-nowrap">{formatUsd(sale.totalUsd)}</TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
             </div>
           </section>
         </div>
 
-        <section className="flex flex-col gap-(--space-sm)" aria-labelledby="cobro">
+        <section className="flex flex-col gap-4" aria-labelledby="cobro">
           <h2 id="cobro" className="sr-only">
             Cobro
           </h2>
@@ -202,8 +214,8 @@ export default async function SaleDetailPage({
           />
 
           {isAdmin ? (
-            <div className="crm-card">
-              <div className="crm-card__body">
+            <div className="rounded-lg border bg-card shadow-sm">
+              <div className="p-4">
                 <Facts stack>
                   <Field
                     label="Ganancia"

@@ -4,6 +4,11 @@ import { fail } from "./supabase/config";
 export type Settings = {
   fallbackRate: number;
   updatedAt: string | null;
+  /** Días desde que se fijó la tasa de respaldo; null si nunca se fijó.
+   *  Se calcula aquí y no en el componente: leer el reloj durante el render
+   *  hace que el mismo componente devuelva cosas distintas con las mismas
+   *  props. */
+  fallbackAgeDays: number | null;
 };
 
 export async function getSettings(): Promise<Settings> {
@@ -18,9 +23,13 @@ export async function getSettings(): Promise<Settings> {
     usd_to_bs_fallback: number | string;
     updated_at: string | null;
   } | null;
+  const updatedAt = row?.updated_at ?? null;
   return {
     fallbackRate: Number(row?.usd_to_bs_fallback ?? 0),
-    updatedAt: row?.updated_at ?? null,
+    updatedAt,
+    fallbackAgeDays: updatedAt
+      ? Math.floor((Date.now() - new Date(updatedAt).getTime()) / 86400000)
+      : null,
   };
 }
 

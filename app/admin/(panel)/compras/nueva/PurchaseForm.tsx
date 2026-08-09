@@ -11,6 +11,7 @@ import {
   IconLoader2,
   IconCheck,
   IconSparkles,
+  IconWand,
 } from "@tabler/icons-react";
 import {
   registerPurchaseAction,
@@ -25,6 +26,10 @@ import {
 } from "../../../../lib/money";
 import type { Product } from "../../../../lib/products";
 import { imageSrc } from "../../../../lib/images";
+import { cn } from "@/app/lib/utils";
+import { buttonVariants } from "@/app/components/ui/button";
+import { Label } from "@/app/components/ui/label";
+import { Input } from "@/app/components/ui/input";
 
 /** Margen por defecto al sugerir precio de venta para algo nuevo. */
 const DEFAULT_MARGIN = 40;
@@ -52,6 +57,16 @@ export default function PurchaseForm({
 }) {
   const [lines, setLines] = useState<Line[]>([]);
   const [query, setQuery] = useState("");
+  /* Un campo solo se marca en rojo DESPUÉS de haberlo visitado. Sin esto, al
+   * añadir un renglón salen tres avisos de error de campos que el usuario
+   * todavía no ha tenido ocasión de rellenar: ruido que enseña a ignorar el
+   * color rojo justo cuando más falta hace que signifique algo. */
+  const [touched, setTouched] = useState<ReadonlySet<string>>(new Set());
+
+  const touch = (key: string, field: string) =>
+    setTouched((prev) => new Set(prev).add(`${key}:${field}`));
+  const touchedAt = (key: string, field: string) =>
+    touched.has(`${key}:${field}`);
   const [state, formAction, pending] = useActionState<
     PurchaseFormState,
     FormData
@@ -146,19 +161,19 @@ export default function PurchaseForm({
     <form action={formAction}>
       <input type="hidden" name="lines" value={JSON.stringify(payload)} />
 
-      <div className="grid gap-(--space-md) lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
-        <div className="flex flex-col gap-(--space-md)">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
+        <div className="flex flex-col gap-6">
           {/* ── Qué llegó ── */}
-          <div className="crm-card">
-            <div className="crm-card__head">
-              <h2 className="crm-h2">Mercancía recibida</h2>
-              <span className="crm-muted text-xs">
+          <div className="rounded-lg border bg-card shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+              <h2 className="text-base font-semibold">Mercancía recibida</h2>
+              <span className="text-sm text-muted-foreground text-xs">
                 {lines.length} {lines.length === 1 ? "renglón" : "renglones"}
               </span>
             </div>
 
             {lines.length === 0 ? (
-              <div className="crm-empty">
+              <div className="px-4 py-12 text-center text-sm text-muted-foreground">
                 <IconPackageImport
                   size={28}
                   stroke={1.5}
@@ -167,160 +182,234 @@ export default function PurchaseForm({
                 Busca abajo lo que compraste, o añádelo como producto nuevo.
               </div>
             ) : (
-              <ul className="divide-y divide-(--crm-line-soft)">
-                {lines.map((line) => {
+              <ul className="divide-y divide-border">
+                {lines.map((line, index) => {
                   const margin = marginPct(line.salePrice, line.unitCost);
                   const priceChanged =
                     line.previousPrice !== undefined &&
                     line.salePrice !== line.previousPrice;
+                  const id = (f: string) => `l-${line.key}-${f}`;
+                  const badName = touchedAt(line.key, "name") && !line.name.trim();
+                  const badCost = touchedAt(line.key, "cost") && line.unitCost <= 0;
                   return (
-                    <li key={line.key} className="p-(--space-sm)">
-                      <div className="flex items-start gap-(--space-2xs)">
-                        {line.isNew ? (
-                          <span className="crm-badge crm-badge--signal mt-1">
-                            <IconSparkles size={13} stroke={1.75} />
-                            Nuevo
+                    <li key={line.key}>
+                      {/* fieldset + legend: sin esto son tres bloques de campos
+                          idénticos y un lector de pantalla no puede decir a
+                          cuál pertenece cada "Cantidad". */}
+                      <fieldset className="min-w-0 border-0 p-4">
+                        <legend className="mb-2 flex w-full items-center gap-2">
+                          <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[0.6875rem] font-semibold tracking-[0.04em] text-secondary-foreground">
+                            {index + 1}
                           </span>
-                        ) : (
-                          <Image
-                            src={imageSrc(line.image ?? "")}
-                            alt=""
-                            width={36}
-                            height={36}
-                            className="size-9 shrink-0 rounded border border-(--crm-line) object-cover"
-                          />
-                        )}
-
-                        <div className="min-w-0 flex-1">
                           {line.isNew ? (
-                            <div className="grid gap-(--space-3xs) sm:grid-cols-2">
-                              <input
+                            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-secondary-foreground whitespace-nowrap shrink-0">
+                              <IconSparkles size={13} stroke={1.75} aria-hidden />
+                              Producto nuevo
+                            </span>
+                          ) : (
+                            <span className="flex min-w-0 items-center gap-2">
+                              <Image
+                                src={imageSrc(line.image ?? "")}
+                                alt=""
+                                width={28}
+                                height={28}
+                                className="size-7 shrink-0 rounded border border-border object-cover"
+                              />
+                              <span className="truncate text-sm font-medium">
+                                {line.name}
+                              </span>
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => remove(line.key)}
+                            className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "ml-auto shrink-0 text-destructive")}
+                          >
+                            <IconTrash size={16} stroke={1.75} aria-hidden />
+                            Quitar
+                            <span className="sr-only">
+                              {" "}
+                              el renglón {index + 1}
+                              {line.name ? `, ${line.name}` : ""}
+                            </span>
+                          </button>
+                        </legend>
+
+                        {line.isNew ? (
+                          <div className="mb-2 grid gap-2 sm:grid-cols-2">
+                            <div>
+                              {/* Etiqueta visible, no solo placeholder: el
+                                  placeholder desaparece al escribir y quien
+                                  vuelve al campo ya no sabe qué iba ahí. */}
+                              <Label htmlFor={id("name")} className="mb-1 block text-xs">
+                                Nombre del producto{" "}
+                                <span className="text-primary" aria-hidden>
+                                  *
+                                </span>
+                              </Label>
+                              <Input
+                                id={id("name")}
                                 value={line.name}
                                 onChange={(e) =>
                                   patch(line.key, { name: e.target.value })
                                 }
-                                placeholder="Nombre del producto"
-                                aria-label="Nombre del producto nuevo"
-                                aria-invalid={!line.name.trim() || undefined}
-                                className="crm-field"
+                                onBlur={() => touch(line.key, "name")}
+                                required
+                                placeholder="Ej. Tijera de corte"
+                                aria-invalid={badName || undefined}
+                                aria-describedby={badName ? id("name-e") : undefined}
+                                
                               />
-                              <input
+                              <p id={id("name-e")} className="mt-0.5 block min-h-[1lh] text-xs tabular-nums text-muted-foreground text-destructive font-medium">
+                                {badName ? "Escribe cómo se llama." : null}
+                              </p>
+                            </div>
+                            <div>
+                              <Label
+                                htmlFor={id("cat")}
+                                className="mb-1 block text-xs"
+                              >
+                                Categoría{" "}
+                                <span className="text-sm text-muted-foreground font-normal">
+                                  (opcional)
+                                </span>
+                              </Label>
+                              <Input
+                                id={id("cat")}
                                 value={line.category}
                                 onChange={(e) =>
                                   patch(line.key, { category: e.target.value })
                                 }
-                                placeholder="Categoría (opcional)"
-                                aria-label="Categoría"
-                                className="crm-field"
+                                placeholder="Ej. Tijera profesional"
+                                
                               />
                             </div>
-                          ) : (
-                            <>
-                              <p className="truncate text-sm font-medium">
-                                {line.name}
-                              </p>
-                              <p className="crm-muted truncate text-xs">
-                                {line.category || "Sin categoría"}
-                              </p>
-                            </>
-                          )}
-                        </div>
+                          </div>
+                        ) : null}
 
-                        <button
-                          type="button"
-                          onClick={() => remove(line.key)}
-                          aria-label={`Quitar ${line.name || "el renglón"}`}
-                          className="crm-btn crm-btn--quiet crm-btn--danger"
-                        >
-                          <IconTrash size={16} stroke={1.75} />
-                        </button>
-                      </div>
+                        <div className="grid gap-2 sm:grid-cols-[6rem_minmax(0,1fr)_minmax(0,1.4fr)]">
+                          <div>
+                            <Label htmlFor={id("qty")} className="mb-1 block text-xs">
+                              Cantidad{" "}
+                              <span className="text-primary" aria-hidden>
+                                *
+                              </span>
+                            </Label>
+                            <Input
+                              id={id("qty")}
+                              type="number"
+                              min="1"
+                              step="1"
+                              value={line.qty}
+                              onChange={(e) =>
+                                patch(line.key, {
+                                  qty: Math.max(1, Math.trunc(+e.target.value || 0)),
+                                })
+                              }
+                              
+                            />
+                          </div>
 
-                      <div className="mt-(--space-2xs) grid gap-(--space-2xs) sm:grid-cols-[6rem_1fr_1fr]">
-                        <div>
-                          <label className="crm-label text-xs">Cantidad</label>
-                          <input
-                            type="number"
-                            min="1"
-                            step="1"
-                            value={line.qty}
-                            onChange={(e) =>
-                              patch(line.key, {
-                                qty: Math.max(1, Math.trunc(+e.target.value || 0)),
-                              })
-                            }
-                            className="crm-field"
-                          />
-                        </div>
-                        <div>
-                          <label className="crm-label text-xs">
-                            Costo unitario
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={line.unitCost || ""}
-                            onChange={(e) =>
-                              patch(line.key, {
-                                unitCost: Math.max(0, +e.target.value || 0),
-                              })
-                            }
-                            placeholder="0.00"
-                            aria-invalid={line.unitCost <= 0 || undefined}
-                            className="crm-field"
-                          />
-                          <p className="crm-muted mt-0.5 text-xs tabular-nums">
-                            {formatBs(line.unitCost, rate)}
-                          </p>
-                        </div>
-                        <div>
-                          <label className="crm-label text-xs">
-                            Precio de venta
-                          </label>
-                          <div className="flex gap-(--space-3xs)">
-                            <input
+                          <div>
+                            <Label htmlFor={id("cost")} className="mb-1 block text-xs">
+                              Costo unitario{" "}
+                              <span className="text-primary" aria-hidden>
+                                *
+                              </span>
+                            </Label>
+                            <Input
+                              id={id("cost")}
                               type="number"
                               min="0"
                               step="0.01"
-                              value={line.salePrice || ""}
+                              value={line.unitCost || ""}
                               onChange={(e) =>
                                 patch(line.key, {
-                                  salePrice: Math.max(0, +e.target.value || 0),
+                                  unitCost: Math.max(0, +e.target.value || 0),
                                 })
                               }
+                              onBlur={() => touch(line.key, "cost")}
                               placeholder="0.00"
-                              className="crm-field"
+                              aria-invalid={badCost || undefined}
+                              aria-describedby={id("cost-h")}
+                              
                             />
-                            <button
-                              type="button"
-                              onClick={() => suggest(line)}
-                              disabled={line.unitCost <= 0}
-                              title={`Sugerir precio con ${DEFAULT_MARGIN} % de margen`}
-                              className="crm-btn crm-btn--ghost shrink-0"
+                            <p
+                              id={id("cost-h")}
+                              className={`mt-0.5 block min-h-[1lh] text-xs tabular-nums text-muted-foreground ${badCost ? "text-destructive font-medium" : ""}`}
                             >
-                              {DEFAULT_MARGIN} %
-                            </button>
-                          </div>
-                          <p className="crm-muted mt-0.5 text-xs tabular-nums">
-                            {margin !== null ? (
-                              <>
-                                Margen {formatPct(margin)} ·{" "}
-                                {formatUsd(line.salePrice - line.unitCost)} por
-                                unidad
-                              </>
-                            ) : (
-                              "Pon costo y precio para ver el margen"
-                            )}
-                          </p>
-                          {priceChanged ? (
-                            <p className="mt-0.5 text-xs text-signal">
-                              Cambia el precio del catálogo (antes{" "}
-                              {formatUsd(line.previousPrice!)})
+                              {badCost
+                                ? "Cuánto pagaste por unidad."
+                                : line.unitCost > 0
+                                  ? formatBs(line.unitCost, rate)
+                                  : null}
                             </p>
-                          ) : null}
+                          </div>
+
+                          <div>
+                            <Label
+                              htmlFor={id("price")}
+                              className="mb-1 block text-xs"
+                            >
+                              Precio de venta
+                            </Label>
+                            <div className="flex gap-1">
+                              <Input
+                                id={id("price")}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={line.salePrice || ""}
+                                onChange={(e) =>
+                                  patch(line.key, {
+                                    salePrice: Math.max(0, +e.target.value || 0),
+                                  })
+                                }
+                                placeholder="0.00"
+                                aria-describedby={id("price-h")}
+                                
+                              />
+                              <button
+                                type="button"
+                                onClick={() => suggest(line)}
+                                disabled={line.unitCost <= 0}
+                                className={cn(buttonVariants({ variant: "outline" }), "shrink-0")}
+                              >
+                                <IconWand size={15} stroke={1.75} aria-hidden />
+                                {DEFAULT_MARGIN} %
+                                <span className="sr-only">
+                                  {" "}
+                                  Calcular precio con {DEFAULT_MARGIN} % de margen
+                                </span>
+                              </button>
+                            </div>
+                            <p id={id("price-h")} className="mt-0.5 block min-h-[1lh] text-xs tabular-nums text-muted-foreground">
+                              {margin !== null ? (
+                                <span
+                                  className={
+                                    margin < 15 ? "text-primary" : "text-secondary-foreground"
+                                  }
+                                >
+                                  Margen {formatPct(margin)} ·{" "}
+                                  {formatUsd(line.salePrice - line.unitCost)} por
+                                  unidad
+                                  {margin < 15 ? " · bajo" : ""}
+                                </span>
+                              ) : line.unitCost > 0 ? (
+                                <span className="text-sm text-muted-foreground">
+                                  Pon el precio o pulsa {DEFAULT_MARGIN} %
+                                </span>
+                              ) : null}
+                            </p>
+                            {priceChanged ? (
+                              <p className="mt-0.5 text-xs text-primary">
+                                Cambia el precio del catálogo (antes{" "}
+                                {formatUsd(line.previousPrice!)})
+                              </p>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
+                      </fieldset>
                     </li>
                   );
                 })}
@@ -329,9 +418,9 @@ export default function PurchaseForm({
           </div>
 
           {/* ── Buscador ── */}
-          <div className="crm-card">
-            <div className="crm-card__head">
-              <h2 className="crm-h2">Añadir al pedido</h2>
+          <div className="rounded-lg border bg-card shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+              <h2 className="text-base font-semibold">Añadir al pedido</h2>
               <div className="relative max-w-64 flex-1">
                 <IconSearch
                   size={16}
@@ -339,22 +428,22 @@ export default function PurchaseForm({
                   aria-hidden
                   className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-ash"
                 />
-                <input
+                <Input
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Buscar en el catálogo…"
                   aria-label="Buscar productos"
-                  className="crm-field pl-7"
+                  className="pl-7"
                 />
               </div>
             </div>
 
-            <div className="crm-card__body">
+            <div className="p-4">
               <button
                 type="button"
                 onClick={addNew}
-                className="crm-btn crm-btn--ghost w-full"
+                className={cn(buttonVariants({ variant: "outline" }), "w-full")}
               >
                 <IconSparkles size={16} stroke={1.75} />
                 {query.trim()
@@ -364,24 +453,24 @@ export default function PurchaseForm({
             </div>
 
             {results.length > 0 ? (
-              <ul className="divide-y divide-(--crm-line-soft)">
+              <ul className="divide-y divide-border">
                 {results.slice(0, 30).map((product) => (
                   <li
                     key={product.id}
-                    className="flex items-center gap-(--space-sm) px-(--space-sm) py-(--space-2xs)"
+                    className="flex items-center gap-4 px-4 py-2"
                   >
                     <Image
                       src={imageSrc(product.image)}
                       alt=""
                       width={32}
                       height={32}
-                      className="size-8 shrink-0 rounded border border-(--crm-line) object-cover"
+                      className="size-8 shrink-0 rounded border border-border object-cover"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">
                         {product.name}
                       </p>
-                      <p className="crm-muted truncate text-xs tabular-nums">
+                      <p className="text-sm text-muted-foreground truncate text-xs tabular-nums">
                         {product.stock} en stock · venta{" "}
                         {formatUsd(product.price)}
                         {product.cost > 0
@@ -392,7 +481,7 @@ export default function PurchaseForm({
                     <button
                       type="button"
                       onClick={() => addExisting(product)}
-                      className="crm-btn crm-btn--ghost"
+                      className={buttonVariants({ variant: "outline" })}
                     >
                       <IconPlus size={16} stroke={1.75} />
                       Añadir
@@ -401,7 +490,7 @@ export default function PurchaseForm({
                 ))}
               </ul>
             ) : (
-              <p className="crm-empty">
+              <p className="px-4 py-12 text-center text-sm text-muted-foreground">
                 {query.trim()
                   ? "Nada coincide. Añádelo como producto nuevo."
                   : "Todo el catálogo está ya en el pedido."}
@@ -411,35 +500,35 @@ export default function PurchaseForm({
         </div>
 
         {/* ── Resumen ── */}
-        <div className="crm-card lg:sticky lg:top-(--space-md)">
-          <div className="crm-card__head">
-            <h2 className="crm-h2">Compra</h2>
+        <div className="rounded-lg border bg-card shadow-sm lg:sticky lg:top-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+            <h2 className="text-base font-semibold">Compra</h2>
           </div>
-          <div className="crm-card__body">
-            <label htmlFor="supplier" className="crm-label">
-              Proveedor <span className="crm-muted">(opcional)</span>
-            </label>
-            <input
+          <div className="p-4">
+            <Label htmlFor="supplier" className="mb-1 block">
+              Proveedor <span className="text-sm text-muted-foreground">(opcional)</span>
+            </Label>
+            <Input
               id="supplier"
               name="supplier"
               type="text"
               placeholder="A quién le compraste"
-              className="crm-field"
+              
             />
 
-            <label htmlFor="note" className="crm-label mt-(--space-xs)">
-              Nota <span className="crm-muted">(opcional)</span>
-            </label>
-            <input
+            <Label htmlFor="note" className="mb-1 block text-sm font-medium text-secondary-foreground mt-3">
+              Nota <span className="text-sm text-muted-foreground">(opcional)</span>
+            </Label>
+            <Input
               id="note"
               name="note"
               type="text"
               placeholder="Nº de factura, forma de pago…"
-              className="crm-field"
+              
             />
 
             <div
-              className="mt-(--space-md) border-t border-(--crm-line) pt-(--space-sm)"
+              className="mt-6 border-t border-border pt-4"
               aria-live="polite"
             >
               <div className="flex items-baseline justify-between">
@@ -449,15 +538,15 @@ export default function PurchaseForm({
                 </span>
               </div>
               <div className="mt-0.5 flex items-baseline justify-between">
-                <span className="crm-muted text-xs">A la tasa del día</span>
-                <span className="text-base font-medium tabular-nums text-signal">
+                <span className="text-sm text-muted-foreground text-xs">A la tasa del día</span>
+                <span className="text-base font-medium tabular-nums text-primary">
                   {formatBs(total, rate)}
                 </span>
               </div>
             </div>
 
             {state.error ? (
-              <p role="alert" className="crm-note crm-note--bad mt-(--space-sm)">
+              <p role="alert" className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive mt-3">
                 <IconAlertTriangle
                   size={16}
                   stroke={1.75}
@@ -470,7 +559,7 @@ export default function PurchaseForm({
             <button
               type="submit"
               disabled={lines.length === 0 || incomplete || pending}
-              className="crm-btn crm-btn--primary mt-(--space-sm) w-full"
+              className={cn(buttonVariants(), "mt-3 w-full")}
             >
               {pending ? (
                 <>
@@ -484,7 +573,7 @@ export default function PurchaseForm({
                 </>
               )}
             </button>
-            <p className="crm-muted mt-(--space-2xs) text-center text-xs">
+            <p className="text-sm text-muted-foreground mt-2 text-center text-xs">
               {incomplete && lines.length > 0
                 ? "Falta nombre, cantidad o costo en algún renglón."
                 : "Se suman las existencias y se actualiza el costo."}

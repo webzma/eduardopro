@@ -3,7 +3,10 @@ import { IconPackageImport, IconShoppingBagX } from "@tabler/icons-react";
 import { requireAdmin } from "../../../lib/auth";
 import { getPurchases } from "../../../lib/purchases";
 import { formatUsd } from "../../../lib/money";
+import PeriodFilter from "../PeriodFilter";
+import { isPeriod, periodStart, type Period } from "@/app/lib/period";
 import { EmptyState, Field, PageHeader, Record, Thumbs } from "../ui";
+import { buttonVariants } from "@/app/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -26,9 +29,15 @@ const FULL = new Intl.DateTimeFormat("es-VE", {
   timeZone: "America/Caracas",
 });
 
-export default async function PurchasesPage() {
+export default async function PurchasesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ periodo?: string }>;
+}) {
   await requireAdmin();
-  const purchases = await getPurchases();
+  const { periodo } = await searchParams;
+  const period: Period = isPeriod(periodo) ? periodo : "mes";
+  const purchases = await getPurchases(200, periodStart(period));
   const totalUsd = purchases.reduce((sum, p) => sum + p.totalUsd, 0);
   const totalUnits = purchases.reduce(
     (n, p) => n + p.lines.reduce((m, l) => m + l.qty, 0),
@@ -41,34 +50,38 @@ export default async function PurchasesPage() {
         title="Compras"
         description="Lo que le pagaste a los proveedores."
         action={
-          <Link href="/admin/compras/nueva" className="crm-btn crm-btn--primary">
+          <Link href="/admin/compras/nueva" className={buttonVariants()}>
             <IconPackageImport size={16} stroke={1.75} aria-hidden />
             Registrar compra
           </Link>
         }
       />
 
+      <div className="mb-4">
+        <PeriodFilter base="/admin/compras" active={period} />
+      </div>
+
       {purchases.length > 0 ? (
-        <dl className="crm-facts mb-(--space-md)">
+        <dl className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-4">
           <Field
-            label="Compras registradas"
+            label="Compras del periodo"
             value={String(purchases.length)}
-            className="crm-card crm-card__body"
+            className="rounded-lg border bg-card shadow-sm p-4"
           />
           <Field
             label="Unidades recibidas"
             value={String(totalUnits)}
-            className="crm-card crm-card__body"
+            className="rounded-lg border bg-card shadow-sm p-4"
           />
           <Field
             label="Total pagado"
             value={formatUsd(totalUsd)}
-            className="crm-card crm-card__body"
+            className="rounded-lg border bg-card shadow-sm p-4"
           />
         </dl>
       ) : null}
 
-      <div className="crm-card">
+      <div className="rounded-lg border bg-card shadow-sm">
         {purchases.length === 0 ? (
           <EmptyState icon={IconShoppingBagX} title="Todavía no hay compras">
             <Link href="/admin/compras/nueva" className="underline">
@@ -76,7 +89,7 @@ export default async function PurchasesPage() {
             </Link>
           </EmptyState>
         ) : (
-          <ul className="crm-list">
+          <ul>
             {purchases.map((purchase) => {
               const units = purchase.lines.reduce((n, l) => n + l.qty, 0);
               const fecha = new Date(purchase.boughtAt);

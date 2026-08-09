@@ -16,6 +16,17 @@ import { registerSaleAction, type SaleFormState } from "../../../actions";
 import { formatBs, formatUsd, PAYMENT_LABELS } from "../../../../lib/money";
 import type { Product } from "../../../../lib/products";
 import { imageSrc } from "../../../../lib/images";
+import { buttonVariants } from "@/app/components/ui/button";
+import { Label } from "@/app/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/components/ui/select";
+import { Input } from "@/app/components/ui/input";
+import { cn } from "@/app/lib/utils";
 
 type Line = { product: Product; qty: number };
 
@@ -28,6 +39,9 @@ export default function SaleForm({
 }) {
   const [lines, setLines] = useState<Line[]>([]);
   const [query, setQuery] = useState("");
+  // El Select de Radix no es un <select> nativo, así que no viaja solo en el
+  // envío: el valor se guarda en estado y se manda por un input oculto.
+  const [payment, setPayment] = useState("usd_efectivo");
   const [state, formAction, pending] = useActionState<
     SaleFormState,
     FormData
@@ -86,11 +100,11 @@ export default function SaleForm({
         )}
       />
 
-      <div className="grid gap-(--space-md) lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
         {/* ── Buscador y catálogo ── */}
-        <div className="crm-card">
-          <div className="crm-card__head">
-            <h2 className="crm-h2">Productos</h2>
+        <div className="rounded-lg border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+            <h2 className="text-base font-semibold">Productos</h2>
             <div className="relative max-w-64 flex-1">
               <IconSearch
                 size={16}
@@ -98,53 +112,53 @@ export default function SaleForm({
                 aria-hidden
                 className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-ash"
               />
-              <input
+              <Input
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar por nombre o categoría…"
                 aria-label="Buscar productos"
-                className="crm-field pl-7"
+                className="pl-7"
               />
             </div>
           </div>
 
           {results.length === 0 ? (
-            <p className="crm-empty">Ningún producto coincide con la búsqueda.</p>
+            <p className="px-4 py-12 text-center text-sm text-muted-foreground">Ningún producto coincide con la búsqueda.</p>
           ) : (
-            <ul className="divide-y divide-(--crm-line-soft)">
+            <ul className="divide-y divide-border">
               {results.map((product) => {
                 const taken = inCart.get(product.id) ?? 0;
                 const left = product.stock - taken;
                 return (
                   <li
                     key={product.id}
-                    className="flex items-center gap-(--space-sm) p-(--space-2xs) px-(--space-sm)"
+                    className="flex items-center gap-4 p-2 px-4"
                   >
                     <Image
                       src={imageSrc(product.image)}
                       alt=""
                       width={36}
                       height={36}
-                      className="size-9 shrink-0 rounded border border-(--crm-line) object-cover"
+                      className="size-9 shrink-0 rounded border border-border object-cover"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">
                         {product.name}
                       </p>
-                      <p className="crm-muted truncate text-xs">
+                      <p className="text-sm text-muted-foreground truncate text-xs">
                         {product.category || "Sin categoría"} ·{" "}
                         {formatUsd(product.price)} ·{" "}
                         {formatBs(product.price, rate)}
                       </p>
                     </div>
                     <span
-                      className={`crm-badge ${
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
                         left <= 0
-                          ? "crm-badge--warn"
+                          ? "bg-primary/15 text-primary"
                           : left <= 3
-                            ? "crm-badge--quiet"
-                            : "crm-badge--quiet"
+                            ? "bg-muted text-secondary-foreground"
+                            : "bg-muted text-secondary-foreground"
                       }`}
                     >
                       {left} disp.
@@ -153,7 +167,7 @@ export default function SaleForm({
                       type="button"
                       onClick={() => add(product)}
                       disabled={left <= 0}
-                      className="crm-btn crm-btn--ghost"
+                      className={buttonVariants({ variant: "outline" })}
                     >
                       <IconPlus size={16} stroke={1.75} />
                       Añadir
@@ -166,14 +180,14 @@ export default function SaleForm({
         </div>
 
         {/* ── Ticket ── */}
-        <div className="crm-card lg:sticky lg:top-(--space-md)">
-          <div className="crm-card__head">
-            <h2 className="crm-h2">Venta</h2>
+        <div className="rounded-lg border bg-card shadow-sm lg:sticky lg:top-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+            <h2 className="text-base font-semibold">Venta</h2>
             {lines.length > 0 ? (
               <button
                 type="button"
                 onClick={() => setLines([])}
-                className="crm-btn crm-btn--quiet"
+                className={buttonVariants({ variant: "ghost", size: "sm" })}
               >
                 <IconTrash size={16} stroke={1.75} />
                 Vaciar
@@ -181,21 +195,21 @@ export default function SaleForm({
             ) : null}
           </div>
 
-          <div className="crm-card__body">
+          <div className="p-4">
             {lines.length === 0 ? (
-              <div className="crm-empty">
+              <div className="px-4 py-12 text-center text-sm text-muted-foreground">
                 <IconShoppingCart size={28} stroke={1.5} className="mx-auto mb-2 opacity-40" />
                 Añade productos para empezar la venta.
               </div>
             ) : (
-              <ul className="flex flex-col gap-(--space-xs)">
+              <ul className="flex flex-col gap-3">
                 {lines.map((line) => (
-                  <li key={line.product.id} className="flex items-center gap-(--space-2xs)">
+                  <li key={line.product.id} className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">
                         {line.product.name}
                       </p>
-                      <p className="crm-muted text-xs tabular-nums">
+                      <p className="text-sm text-muted-foreground text-xs tabular-nums">
                         {formatUsd(line.product.price)} c/u
                       </p>
                     </div>
@@ -203,14 +217,14 @@ export default function SaleForm({
                       type="button"
                       onClick={() => setQty(line.product.id, line.qty - 1)}
                       aria-label={`Quitar una unidad de ${line.product.name}`}
-                      className="crm-step"
+                      className={buttonVariants({ variant: "outline", size: "icon-sm" })}
                     >
                       <IconMinus size={15} stroke={2} />
                     </button>
                     {/* Input, no texto: con solo los botones ± poner 12
                         unidades son doce pulsaciones y no hay forma de
                         teclear la cantidad. */}
-                    <input
+                    <Input
                       type="number"
                       min="1"
                       max={line.product.stock}
@@ -219,14 +233,14 @@ export default function SaleForm({
                         setQty(line.product.id, Math.trunc(+e.target.value || 0))
                       }
                       aria-label={`Cantidad de ${line.product.name}`}
-                      className="crm-field w-14 px-1 text-center"
+                      className="w-14 px-1 text-center"
                     />
                     <button
                       type="button"
                       onClick={() => setQty(line.product.id, line.qty + 1)}
                       disabled={line.qty >= line.product.stock}
                       aria-label={`Añadir una unidad de ${line.product.name}`}
-                      className="crm-step"
+                      className={buttonVariants({ variant: "outline", size: "icon-sm" })}
                     >
                       <IconPlus size={15} stroke={2} />
                     </button>
@@ -238,37 +252,39 @@ export default function SaleForm({
               </ul>
             )}
 
-            <div className="mt-(--space-md) border-t border-(--crm-line) pt-(--space-sm)">
-              <label htmlFor="payment" className="crm-label">
-                Método de pago
-              </label>
-              <select
-                id="payment"
+            <div className="mt-6 border-t border-border pt-4">
+              <Label htmlFor="payment">Método de pago</Label>
+              <Select
                 name="payment"
-                defaultValue="usd_efectivo"
-                className="crm-field"
+                value={payment}
+                onValueChange={setPayment}
               >
-                {Object.entries(PAYMENT_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="payment" className="w-full">
+                  <SelectValue placeholder="Elige cómo se cobró" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(PAYMENT_LABELS).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-              <label htmlFor="note" className="crm-label mt-(--space-xs)">
-                Nota <span className="crm-muted">(opcional)</span>
-              </label>
-              <input
+              <Label htmlFor="note" className="mb-1 block text-sm font-medium text-secondary-foreground mt-3">
+                Nota <span className="text-sm text-muted-foreground">(opcional)</span>
+              </Label>
+              <Input
                 id="note"
                 name="note"
                 type="text"
                 placeholder="Cliente, referencia del pago…"
-                className="crm-field"
+                
               />
             </div>
 
             <div
-              className="mt-(--space-md) border-t border-(--crm-line) pt-(--space-sm)"
+              className="mt-6 border-t border-border pt-4"
               aria-live="polite"
             >
               <div className="flex items-baseline justify-between">
@@ -278,15 +294,15 @@ export default function SaleForm({
                 </span>
               </div>
               <div className="mt-0.5 flex items-baseline justify-between">
-                <span className="crm-muted text-xs">A la tasa del día</span>
-                <span className="text-base font-medium tabular-nums text-signal">
+                <span className="text-sm text-muted-foreground text-xs">A la tasa del día</span>
+                <span className="text-base font-medium tabular-nums text-primary">
                   {formatBs(total, rate)}
                 </span>
               </div>
             </div>
 
             {state.error ? (
-              <p role="alert" className="crm-note crm-note--bad mt-(--space-sm)">
+              <p role="alert" className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive mt-3">
                 <IconAlertTriangle size={16} stroke={1.75} className="inline align-text-bottom" />{" "}
                 {state.error}
               </p>
@@ -295,7 +311,7 @@ export default function SaleForm({
             <button
               type="submit"
               disabled={lines.length === 0 || pending}
-              className="crm-btn crm-btn--primary mt-(--space-sm) w-full"
+              className={cn(buttonVariants(), "mt-3 w-full")}
             >
               {pending ? (
                 <>
@@ -309,7 +325,7 @@ export default function SaleForm({
                 </>
               )}
             </button>
-            <p className="crm-muted mt-(--space-2xs) text-center text-xs">
+            <p className="text-sm text-muted-foreground mt-2 text-center text-xs">
               Al registrarla se descuenta el stock automáticamente.
             </p>
           </div>

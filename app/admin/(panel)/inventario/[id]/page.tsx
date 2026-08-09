@@ -9,6 +9,10 @@ import { formatBs } from "../../../../lib/money";
 import { updateProductAction } from "../../../actions";
 import ImagePicker from "../ImagePicker";
 import { imageSrc } from "../../../../lib/images";
+import { cn } from "@/app/lib/utils";
+import { buttonVariants } from "@/app/components/ui/button";
+import { Label } from "@/app/components/ui/label";
+import { Input } from "@/app/components/ui/input";
 
 export const dynamic = "force-dynamic";
 
@@ -32,23 +36,23 @@ export default async function EditProductPage({
     <>
       <Link
         href="/admin/inventario"
-        className="crm-btn crm-btn--quiet mb-(--space-sm)"
+        className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "mb-3")}
       >
         <IconArrowLeft size={16} stroke={1.75} />
         Inventario
       </Link>
 
-      <header className="mb-(--space-md) flex items-center gap-(--space-sm)">
+      <header className="mb-6 flex items-center gap-4">
         <Image
           src={imageSrc(product.image)}
           alt=""
           width={48}
           height={48}
-          className="size-12 shrink-0 rounded border border-(--crm-line) object-cover"
+          className="size-12 shrink-0 rounded border border-border object-cover"
         />
         <div>
-          <h1 className="crm-h1">{product.name}</h1>
-          <p className="crm-muted mt-0.5">
+          <h1 className="text-xl font-semibold tracking-tight">{product.name}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             {product.category || "Sin categoría"}
             {rate ? ` · ${formatBs(product.price, rate.value)}` : ""}
           </p>
@@ -56,7 +60,7 @@ export default async function EditProductPage({
       </header>
 
       {error ? (
-        <p role="alert" className="crm-note crm-note--bad mb-(--space-md)">
+        <p role="alert" className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive mb-6">
           <IconAlertTriangle size={16} stroke={1.75} className="inline align-text-bottom" />{" "}
           {detalle ??
             (error === "nombre"
@@ -65,93 +69,93 @@ export default async function EditProductPage({
         </p>
       ) : null}
 
-      <div className="crm-card max-w-2xl">
-        <div className="crm-card__body">
+      <div className="rounded-lg border bg-card shadow-sm max-w-2xl">
+        <div className="p-4">
           <form
             action={updateProductAction}
-            className="grid gap-(--space-sm) sm:grid-cols-2"
+            className="grid gap-4 sm:grid-cols-2"
           >
             <input type="hidden" name="id" value={product.id} />
 
             <div className="sm:col-span-2">
-              <label htmlFor="name" className="crm-label">
+              <Label htmlFor="name" className="mb-1 block">
                 Nombre
-              </label>
-              <input
+              </Label>
+              <Input
                 id="name"
                 name="name"
                 type="text"
                 required
                 defaultValue={product.name}
-                className="crm-field"
+                
               />
             </div>
             <div>
-              <label htmlFor="category" className="crm-label">
+              <Label htmlFor="category" className="mb-1 block">
                 Categoría
-              </label>
-              <input
+              </Label>
+              <Input
                 id="category"
                 name="category"
                 type="text"
                 defaultValue={product.category}
-                className="crm-field"
+                
               />
             </div>
             <fieldset className="sm:col-span-2">
-              <legend className="crm-label">Foto</legend>
+              <legend className="mb-1 block">Foto</legend>
               <ImagePicker current={imageSrc(product.image)} />
             </fieldset>
             <div>
-              <label htmlFor="cost" className="crm-label">
+              <Label htmlFor="cost" className="mb-1 block">
                 Costo en USD
-              </label>
-              <input
+              </Label>
+              <Input
                 id="cost"
                 name="cost"
                 type="number"
                 min="0"
                 step="0.01"
                 defaultValue={product.cost}
-                className="crm-field"
+                
               />
-              <p className="crm-muted mt-1 text-xs">
+              <p className="text-sm text-muted-foreground mt-1 text-xs">
                 Lo actualiza cada compra que registres.
               </p>
             </div>
             <div>
-              <label htmlFor="price" className="crm-label">
+              <Label htmlFor="price" className="mb-1 block">
                 Precio de venta en USD
-              </label>
-              <input
+              </Label>
+              <Input
                 id="price"
                 name="price"
                 type="number"
                 min="0"
                 step="0.01"
                 defaultValue={product.price}
-                className="crm-field"
+                
               />
-              <p className="crm-muted mt-1 text-xs">
+              <p className="text-sm text-muted-foreground mt-1 text-xs">
                 Los bolívares se calculan con la tasa del día; no se guardan.
               </p>
             </div>
             <div>
-              <label htmlFor="stock" className="crm-label">
+              <Label htmlFor="stock" className="mb-1 block">
                 Stock
-              </label>
-              <input
+              </Label>
+              <Input
                 id="stock"
                 name="stock"
                 type="number"
                 min="0"
                 step="1"
                 defaultValue={product.stock}
-                className="crm-field"
+                
               />
             </div>
 
-            <label className="flex items-center gap-(--space-2xs) text-sm sm:col-span-2">
+            <Label className="flex items-center gap-2 text-sm sm:col-span-2">
               <input
                 type="checkbox"
                 name="active"
@@ -159,16 +163,16 @@ export default async function EditProductPage({
                 className="size-4 accent-signal"
               />
               Mostrar en el sitio público
-            </label>
+            </Label>
 
-            <div className="flex flex-wrap items-center gap-(--space-2xs) sm:col-span-2">
-              <button type="submit" className="crm-btn crm-btn--primary">
+            <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
+              <button type="submit" className={buttonVariants()}>
                 <IconDeviceFloppy size={16} stroke={1.75} />
                 Guardar cambios
               </button>
               <Link
                 href="/admin/inventario"
-                className="crm-btn crm-btn--ghost"
+                className={buttonVariants({ variant: "outline" })}
               >
                 Cancelar
               </Link>

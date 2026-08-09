@@ -12,6 +12,18 @@ import {
 } from "../../../../lib/money";
 import { imageSrc } from "../../../../lib/images";
 import { Facts, Field, GrandTotal, Notice } from "../../ui";
+import { cn } from "@/app/lib/utils";
+import { buttonVariants } from "@/app/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/ui/table";
 
 export const dynamic = "force-dynamic";
 
@@ -46,14 +58,14 @@ export default async function PurchaseDetailPage({
     <>
       <Link
         href="/admin/compras"
-        className="crm-btn crm-btn--quiet mb-(--space-sm)"
+        className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "mb-3")}
       >
         <IconArrowLeft size={16} stroke={1.75} aria-hidden />
         Compras
       </Link>
 
       {ok ? (
-        <div className="mb-(--space-md)">
+        <div className="mb-6">
           <Notice kind="ok" icon={IconCircleCheck}>
             Compra registrada. Las existencias ya están sumadas y el costo
             actualizado.
@@ -61,17 +73,17 @@ export default async function PurchaseDetailPage({
         </div>
       ) : null}
 
-      <header className="mb-(--space-md) flex flex-wrap items-center gap-(--space-2xs)">
-        <h1 className="crm-h1">Compra</h1>
-        <span className="crm-rec__ref">
+      <header className="mb-6 flex flex-wrap items-center gap-2">
+        <h1 className="text-xl font-semibold tracking-tight">Compra</h1>
+        <span className="rounded-sm bg-muted px-1 py-px text-[0.6875rem] font-semibold tracking-[0.04em] text-secondary-foreground">
           #{purchase.id.slice(0, 6).toUpperCase()}
         </span>
       </header>
 
-      <div className="grid gap-(--space-md) lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-        <div className="flex flex-col gap-(--space-md)">
-          <div className="crm-card">
-            <div className="crm-card__body">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+        <div className="flex flex-col gap-6">
+          <div className="rounded-lg border bg-card shadow-sm">
+            <div className="p-4">
               <Facts>
                 <Field
                   label="Fecha"
@@ -93,60 +105,60 @@ export default async function PurchaseDetailPage({
             </div>
           </div>
 
-          <section className="crm-card overflow-hidden" aria-labelledby="renglones">
-            <div className="crm-card__head">
-              <h2 id="renglones" className="crm-h2">
+          <section className="rounded-lg border bg-card shadow-sm overflow-hidden" aria-labelledby="renglones">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+              <h2 id="renglones" className="text-base font-semibold">
                 Renglones
               </h2>
-              <span className="crm-muted text-xs">
+              <span className="text-sm text-muted-foreground text-xs">
                 {units} {units === 1 ? "unidad" : "unidades"}
               </span>
             </div>
-            <div className="crm-scroll">
-              <table className="crm-doc">
-                <caption className="sr-only">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableCaption className="sr-only">
                   Productos incluidos en esta compra, con su costo y el precio
                   de venta que quedó fijado
-                </caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Producto</th>
-                    <th scope="col" className="crm-doc__num">
+                </TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Producto</TableHead>
+                    <TableHead className="text-right tabular-nums whitespace-nowrap">
                       Cantidad
-                    </th>
-                    <th scope="col" className="crm-doc__num">
+                    </TableHead>
+                    <TableHead className="text-right tabular-nums whitespace-nowrap">
                       Costo unit.
-                    </th>
-                    <th scope="col" className="crm-doc__num">
+                    </TableHead>
+                    <TableHead className="text-right tabular-nums whitespace-nowrap">
                       Precio venta
-                    </th>
-                    <th scope="col" className="crm-doc__num">
+                    </TableHead>
+                    <TableHead className="text-right tabular-nums whitespace-nowrap">
                       Margen
-                    </th>
-                    <th scope="col" className="crm-doc__num">
+                    </TableHead>
+                    <TableHead className="text-right tabular-nums whitespace-nowrap">
                       Subtotal
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {purchase.lines.map((line) => {
                     const margin =
                       line.salePriceUsd === null
                         ? null
                         : marginPct(line.salePriceUsd, line.unitCostUsd);
                     return (
-                      <tr key={line.id}>
-<th
-                          scope="row"
-                          className="p-(--space-sm) text-left font-medium"
-                        >
-                          <div className="flex items-center gap-(--space-2xs)">
+                      <TableRow key={line.id}>
+                      <th
+                        scope="row"
+                        className="p-2 text-left align-middle font-normal"
+                      >
+                          <div className="flex items-center gap-2">
                             <Image
                               src={imageSrc(line.productImage ?? "")}
                               alt=""
                               width={40}
                               height={40}
-                              className="size-10 shrink-0 rounded border border-(--crm-line) bg-paper2 object-cover"
+                              className="size-10 shrink-0 rounded border border-border bg-muted object-cover"
                             />
                             <span className="min-w-0">
                               {line.productId ? (
@@ -159,7 +171,7 @@ export default async function PurchaseDetailPage({
                               ) : (
                                 <>
                                   {line.productName}
-                                  <span className="crm-muted block text-xs font-normal">
+                                  <span className="text-sm text-muted-foreground block text-xs font-normal">
                                     Ya no está en el catálogo
                                   </span>
                                 </>
@@ -167,50 +179,50 @@ export default async function PurchaseDetailPage({
                             </span>
                           </div>
                         </th>
-                        <td className="crm-doc__num">{line.qty}</td>
-                        <td className="crm-doc__num">
+                        <TableCell className="text-right tabular-nums whitespace-nowrap">{line.qty}</TableCell>
+                        <TableCell className="text-right tabular-nums whitespace-nowrap">
                           {formatUsd(line.unitCostUsd)}
-                        </td>
-                        <td className="crm-doc__num">
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums whitespace-nowrap">
                           {line.salePriceUsd === null
                             ? "—"
                             : formatUsd(line.salePriceUsd)}
-                        </td>
-                        <td className="crm-doc__num">
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums whitespace-nowrap">
                           {margin === null ? (
                             "—"
                           ) : margin < 15 ? (
                             // Color Y palabra: el color solo no se ve con
                             // daltonismo ni en una impresión.
-                            <span className="text-signal">
+                            <span className="text-primary">
                               {formatPct(margin)}
                               <span className="block text-xs">bajo</span>
                             </span>
                           ) : (
                             formatPct(margin)
                           )}
-                        </td>
-                        <td className="crm-doc__num font-medium">
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums whitespace-nowrap font-medium">
                           {formatUsd(line.unitCostUsd * line.qty)}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={5}>Total pagado</td>
-                    <td className="crm-doc__num">
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell colSpan={5}>Total pagado</TableCell>
+                    <TableCell className="text-right tabular-nums whitespace-nowrap">
                       {formatUsd(purchase.totalUsd)}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
             </div>
           </section>
         </div>
 
-        <section className="flex flex-col gap-(--space-sm)" aria-labelledby="pago">
+        <section className="flex flex-col gap-4" aria-labelledby="pago">
           <h2 id="pago" className="sr-only">
             Pago
           </h2>
@@ -221,8 +233,8 @@ export default async function PurchaseDetailPage({
             note={`A la tasa del día de la compra: Bs ${formatRate(purchase.rate)} por dólar.`}
           />
 
-          <div className="crm-card">
-            <div className="crm-card__body">
+          <div className="rounded-lg border bg-card shadow-sm">
+            <div className="p-4">
               <Facts stack>
                 <Field label="Unidades recibidas" value={units} />
                 <Field

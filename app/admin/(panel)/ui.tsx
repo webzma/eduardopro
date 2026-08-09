@@ -2,10 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { Icon } from "@tabler/icons-react";
-import { formatBs, formatUsd } from "../../lib/money";
-import { imageSrc } from "../../lib/images";
+import { Alert, AlertDescription } from "@/app/components/ui/alert";
+import { Card, CardContent } from "@/app/components/ui/card";
+import { formatBs, formatUsd } from "@/app/lib/money";
+import { imageSrc } from "@/app/lib/images";
+import { cn } from "@/app/lib/utils";
 
-/* Piezas compartidas del panel.
+/* Piezas compartidas del panel, construidas sobre shadcn.
  *
  * Regla que las gobierna a todas: NINGÚN dato se muestra sin su etiqueta. Una
  * fila que dice "08-ago · 50 · X" obliga a adivinar qué es cada cosa; con
@@ -21,10 +24,12 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <header className="mb-(--space-md) flex flex-wrap items-end justify-between gap-(--space-sm)">
+    <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
-        <h1 className="crm-h1">{title}</h1>
-        {description ? <p className="crm-muted mt-0.5">{description}</p> : null}
+        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+        {description ? (
+          <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
+        ) : null}
       </div>
       {action}
     </header>
@@ -46,17 +51,18 @@ export function Notice({
   children: ReactNode;
 }) {
   return (
-    <p
+    <Alert
       role={kind === "bad" ? "alert" : "status"}
-      className={`crm-note ${kind === "ok" ? "crm-note--ok" : ""} ${
-        kind === "bad" ? "crm-note--bad" : ""
-      } flex items-start gap-(--space-2xs)`}
+      variant={kind === "bad" ? "destructive" : "default"}
+      className={cn(
+        "border-l-4",
+        kind === "ok" && "border-l-navy",
+        kind === "info" && "border-l-muted-foreground",
+      )}
     >
-      {Glyph ? (
-        <Glyph size={16} stroke={1.75} aria-hidden className="mt-0.5 shrink-0" />
-      ) : null}
-      <span>{children}</span>
-    </p>
+      {Glyph ? <Glyph size={16} stroke={1.75} aria-hidden /> : null}
+      <AlertDescription>{children}</AlertDescription>
+    </Alert>
   );
 }
 
@@ -70,9 +76,14 @@ export function EmptyState({
   children?: ReactNode;
 }) {
   return (
-    <div className="crm-empty">
-      <Glyph size={28} stroke={1.5} aria-hidden className="mx-auto mb-2 opacity-40" />
-      <p className="font-medium text-coal2">{title}</p>
+    <div className="px-4 py-12 text-center text-sm text-muted-foreground">
+      <Glyph
+        size={28}
+        stroke={1.5}
+        aria-hidden
+        className="mx-auto mb-2 opacity-40"
+      />
+      <p className="font-medium text-foreground/80">{title}</p>
       {children ? <p className="mt-1">{children}</p> : null}
     </div>
   );
@@ -83,7 +94,7 @@ export function Field({
   label,
   value,
   hint,
-  className = "",
+  className,
 }: {
   label: string;
   value: ReactNode;
@@ -93,30 +104,18 @@ export function Field({
 }) {
   return (
     <div className={className}>
-      <dt className="crm-f__label">{label}</dt>
-      <dd className="crm-f__value">
+      <dt className="text-[0.6875rem] font-semibold tracking-[0.07em] text-muted-foreground uppercase">
+        {label}
+      </dt>
+      <dd className="mt-px text-sm font-medium tabular-nums">
         {value}
         {hint ? (
-          <span className="crm-f__value--muted mt-0.5 block text-xs">
+          <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
             {hint}
           </span>
         ) : null}
       </dd>
     </div>
-  );
-}
-
-/** Importe en las dos monedas, como valor de un Field. */
-export function Amount({ usd, rate }: { usd: number; rate?: number | null }) {
-  return (
-    <>
-      {formatUsd(usd)}
-      {rate ? (
-        <span className="crm-f__value--muted block text-xs">
-          {formatBs(usd, rate)}
-        </span>
-      ) : null}
-    </>
   );
 }
 
@@ -133,7 +132,7 @@ export function Thumbs({
   const shown = images.slice(0, max);
   const rest = images.length - shown.length;
   return (
-    <span className="crm-thumbs" aria-hidden>
+    <span className="flex shrink-0 items-center" aria-hidden>
       {shown.map((image, i) => (
         <Image
           key={i}
@@ -141,10 +140,23 @@ export function Thumbs({
           alt=""
           width={28}
           height={28}
-          className="size-7"
+          className="size-7 rounded-sm border border-border bg-muted object-cover not-first:-ml-2"
         />
       ))}
-      {rest > 0 ? <span className="crm-thumbs__more">+{rest}</span> : null}
+      {rest > 0 ? (
+        <span className="inline-flex h-7 min-w-7 items-center justify-center px-[3px] text-[0.6875rem] font-semibold text-secondary-foreground">
+          +{rest}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+/** Distintivo de referencia corta (#A3F2C1). */
+export function Ref({ children }: { children: ReactNode }) {
+  return (
+    <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[0.6875rem] font-semibold tracking-[0.04em] text-secondary-foreground">
+      {children}
     </span>
   );
 }
@@ -158,7 +170,6 @@ export function Record({
   reference,
   media,
   title,
-  badge,
   fields,
   amountLabel,
   amountUsd,
@@ -169,10 +180,8 @@ export function Record({
   /** Referencia corta: sin ella, dos registros del mismo día son
    *  indistinguibles al hablar de ellos. */
   reference: string;
-  /** Miniaturas de los productos, si el registro los tiene. */
   media?: ReactNode;
   title: ReactNode;
-  badge?: ReactNode;
   /** Los <Field> del cuerpo, sin incluir el importe. */
   fields: ReactNode;
   amountLabel: string;
@@ -182,18 +191,27 @@ export function Record({
   label: string;
 }) {
   return (
-    <li className="crm-rec">
-      <Link href={href} className="crm-rec__link" aria-label={label}>
-        <div className="crm-rec__top">
+    <li className="not-first:border-t not-first:border-border">
+      <Link
+        href={href}
+        aria-label={label}
+        // El anillo va por dentro: con outline normal se recortaría contra el
+        // borde de la tarjeta.
+        className="block p-4 transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+      >
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           {media}
-          <span className="crm-rec__ref">{reference}</span>
-          <span className="crm-rec__title">{title}</span>
-          {badge}
+          <Ref>{reference}</Ref>
+          <span className="min-w-0 flex-1 basis-48 text-sm font-semibold">
+            {title}
+          </span>
         </div>
-        <dl className="crm-rec__grid">
+        {/* auto-fit + minmax: cuatro columnas en escritorio, dos en móvil, sin
+            un solo media query que mantener. */}
+        <dl className="grid grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))] gap-x-4 gap-y-2">
           {fields}
           <Field
-            className="crm-rec__money"
+            className="sm:text-right [&_dd]:text-base [&_dd]:font-semibold"
             label={amountLabel}
             value={formatUsd(amountUsd)}
             hint={formatBs(amountUsd, rate)}
@@ -214,7 +232,14 @@ export function Facts({
   children: ReactNode;
 }) {
   return (
-    <dl className={`crm-facts ${stack ? "crm-facts--stack" : ""}`}>
+    <dl
+      className={cn(
+        "grid gap-4",
+        stack
+          ? "grid-cols-1 gap-2"
+          : "grid-cols-[repeat(auto-fit,minmax(8rem,1fr))]",
+      )}
+    >
       {children}
     </dl>
   );
@@ -233,15 +258,26 @@ export function GrandTotal({
   note?: ReactNode;
 }) {
   return (
-    <div className="crm-grand">
-      <span className="crm-grand__label">{label}</span>
-      <span className="crm-grand__usd">{formatUsd(usd)}</span>
-      <span className="crm-grand__bs">{formatBs(usd, rate)}</span>
-      {note ? (
-        <span className="mt-(--space-2xs) block text-xs text-paper/60">
-          {note}
+    /* Antes era un bloque negro. Destacaba, sí, pero un rectángulo de tinta
+     * en un panel de crema se lee como un cuerpo extraño. El peso lo dan
+     * ahora el tamaño y el acento, que es lo que ya usa el resto del panel. */
+    <Card className="gap-0 border-primary/30 bg-primary/5 py-4">
+      <CardContent className="px-4">
+        <span className="text-xs font-medium text-muted-foreground">
+          {label}
         </span>
-      ) : null}
-    </div>
+        <span className="block text-4xl leading-tight font-semibold tracking-tight text-primary tabular-nums">
+          {formatUsd(usd)}
+        </span>
+        <span className="mt-0.5 block text-lg font-medium tabular-nums">
+          {formatBs(usd, rate)}
+        </span>
+        {note ? (
+          <span className="mt-2 block text-xs text-muted-foreground">
+            {note}
+          </span>
+        ) : null}
+      </CardContent>
+    </Card>
   );
 }

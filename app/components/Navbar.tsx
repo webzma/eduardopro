@@ -17,12 +17,12 @@ const links = [
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b-2 border-coal bg-paper">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-(--space-md) px-(--page-gutter) py-(--space-xs)">
-        <a href="#" className="flex items-baseline gap-(--space-2xs)">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-[clamp(1rem,4vw,2.5rem)] py-3">
+        <a href="#" className="flex items-baseline gap-2">
           <span className="font-display text-xl leading-none uppercase sm:text-2xl">
             EduardoPro
           </span>
-          <span className="t-label hidden text-signal sm:inline">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] hidden text-signal sm:inline">
             Barbería
           </span>
         </a>
@@ -30,12 +30,12 @@ export default function Navbar() {
         {/* Hidden below lg rather than folded into a hamburger: every link is a
             section of this one page, and the footer nav repeats all five. */}
         <nav aria-label="Principal" className="hidden lg:block">
-          <ul className="flex items-center gap-x-(--space-md)">
+          <ul className="flex items-center gap-x-6">
             {links.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="mastlink t-label block whitespace-nowrap py-1"
+                  className="shadow-[inset_0_-2px_0_transparent] transition-shadow duration-[180ms] hover:shadow-[inset_0_-2px_0_var(--signal)] active:text-coal motion-reduce:transition-none text-xs font-semibold uppercase tracking-[0.18em] block whitespace-nowrap py-1"
                 >
                   {link.label}
                 </a>
@@ -48,7 +48,7 @@ export default function Navbar() {
           href={WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn btn--signal shrink-0 px-(--space-md) text-base"
+          className="inline-flex items-center justify-center gap-2 px-8 py-3 min-h-11 border-2 border-coal shadow-[4px_4px_0_var(--coal)] font-display font-normal text-[length:var(--text-md)] tracking-[0.04em] uppercase whitespace-nowrap transition-[transform,box-shadow,background-color] duration-[180ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--coal)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none bg-signal text-paper shrink-0 px-6 text-base"
         >
           <IconBrandWhatsapp size={18} stroke={1.75} aria-hidden />
           Pedir

@@ -1,6 +1,7 @@
 import { createClient } from "./supabase/server";
 import { fail } from "./supabase/config";
 import type { Role } from "./auth";
+import { veStartOfDay, veStartOfMonth, veEndOfDay } from "./period";
 
 export type SaleLine = {
   id: string;
@@ -36,29 +37,6 @@ export type Sale = {
 };
 
 export type CartItem = { productId: string; qty: number };
-
-/* Venezuela no aplica horario de verano, así que el desfase es fijo. Sin esto,
- * "ventas de hoy" se cortaría a medianoche UTC — las ocho de la noche aquí —
- * y el cierre de caja saldría partido en dos días. */
-const VE_OFFSET_MS = 4 * 60 * 60 * 1000;
-
-function veStartOfToday(): Date {
-  const nowVe = new Date(Date.now() - VE_OFFSET_MS);
-  return new Date(
-    Date.UTC(
-      nowVe.getUTCFullYear(),
-      nowVe.getUTCMonth(),
-      nowVe.getUTCDate(),
-    ) + VE_OFFSET_MS,
-  );
-}
-
-function veStartOfMonth(): Date {
-  const nowVe = new Date(Date.now() - VE_OFFSET_MS);
-  return new Date(
-    Date.UTC(nowVe.getUTCFullYear(), nowVe.getUTCMonth(), 1) + VE_OFFSET_MS,
-  );
-}
 
 type SaleRow = {
   id: string;
@@ -112,15 +90,90 @@ const SELECT = "*, sale_items(*, products(image))";
 /* RLS ya recorta por rol: el admin recibe todo y el vendedor solo lo suyo. No
  * hace falta —ni sería fiable— filtrar aquí por seller_id. */
 
-export async function getSales(limit = 100): Promise<Sale[]> {
+export async function getSales(
+  limit = 100,
+  /** ISO desde el que contar. Omitido = sin límite inferior. */
+  sinceIso?: string | null,
+): Promise<Sale[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let q = supabase
     .from("sales")
     .select(SELECT)
     .order("sold_at", { ascending: false })
     .limit(limit);
+  if (sinceIso) q = q.gte("sold_at", sinceIso);
+  const { data, error } = await q;
   if (error) fail(error);
   return (data ?? []).map((row) => toSale(row as SaleRow));
+}
+
+export type MethodTotal = {
+  method: string;
+  count: number;
+  totalUsd: number;
+  /** Suma de cada venta a SU propia tasa, no a la de hoy: es el dinero que
+   *  de verdad entró en caja. */
+  totalBs: number;
+};
+
+export type DayClose = {
+  dayStartIso: string;
+  sales: Sale[];
+  byMethod: MethodTotal[];
+  totalUsd: number;
+  totalBs: number;
+  units: number;
+};
+
+/**
+ * Cierre de un día. RLS lo recorta solo: el admin ve la caja entera y el
+ * vendedor la suya, que es justo lo que necesita para cuadrar su turno.
+ */
+export async function getDayClose(day: Date): Promise<DayClose> {
+  const from = veStartOfDay(day);
+  const to = veEndOfDay(day);
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("sales")
+    .select(SELECT)
+    .gte("sold_at", from.toISOString())
+    .lt("sold_at", to.toISOString())
+    .order("sold_at", { ascending: false });
+  if (error) fail(error);
+
+  const sales = (data ?? []).map((row) => toSale(row as SaleRow));
+  const acc = new Map<string, MethodTotal>();
+  let totalUsd = 0;
+  let totalBs = 0;
+  let units = 0;
+
+  for (const sale of sales) {
+    const bs = sale.totalUsd * sale.rate;
+    totalUsd += sale.totalUsd;
+    totalBs += bs;
+    units += sale.lines.reduce((n, l) => n + l.qty, 0);
+
+    const row = acc.get(sale.paymentMethod) ?? {
+      method: sale.paymentMethod,
+      count: 0,
+      totalUsd: 0,
+      totalBs: 0,
+    };
+    row.count += 1;
+    row.totalUsd += sale.totalUsd;
+    row.totalBs += bs;
+    acc.set(sale.paymentMethod, row);
+  }
+
+  return {
+    dayStartIso: from.toISOString(),
+    sales,
+    byMethod: [...acc.values()].sort((a, b) => b.totalUsd - a.totalUsd),
+    totalUsd,
+    totalBs,
+    units,
+  };
 }
 
 export async function getSale(id: string): Promise<Sale | null> {
@@ -175,7 +228,7 @@ export async function getSummary(): Promise<Summary> {
     .gte("sold_at", monthStartIso);
   if (error) fail(error);
 
-  const startToday = veStartOfToday().getTime();
+  const startToday = veStartOfDay().getTime();
   const summary: Summary = {
     todayUsd: 0,
     todayCount: 0,

@@ -6,13 +6,22 @@ import {
   IconLayoutDashboard,
   IconShoppingCartPlus,
   IconReceipt,
+  IconCashRegister,
   IconPackages,
   IconPackageImport,
   IconTruckDelivery,
   IconSettings,
   type Icon,
 } from "@tabler/icons-react";
-import type { Role } from "../../lib/auth";
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/app/components/ui/sidebar";
+import type { Role } from "@/app/lib/auth";
 
 type Item = { href: string; label: string; icon: Icon; adminOnly?: boolean };
 
@@ -27,6 +36,7 @@ const GROUPS: { title: string; items: Item[] }[] = [
         icon: IconShoppingCartPlus,
       },
       { href: "/admin/ventas", label: "Ventas", icon: IconReceipt },
+      { href: "/admin/caja", label: "Cierre de caja", icon: IconCashRegister },
     ],
   },
   {
@@ -60,40 +70,51 @@ const GROUPS: { title: string; items: Item[] }[] = [
   },
 ];
 
+// Las rutas "padre" solo se marcan en coincidencia exacta; si no, quedarían
+// activas a la vez que su propia subruta /nueva y habría dos resaltadas.
+const EXACT = ["/admin", "/admin/ventas", "/admin/compras"];
+
 export default function Nav({ role }: { role: Role }) {
   const pathname = usePathname();
-
-  // Las rutas "padre" (/admin, /admin/ventas, /admin/compras) solo se marcan
-  // en coincidencia exacta; si no, quedarían activas a la vez que su propia
-  // subruta /nueva y habría dos elementos resaltados.
-  const EXACT = ["/admin", "/admin/ventas", "/admin/compras"];
   const isActive = (href: string) =>
     EXACT.includes(href) ? pathname === href : pathname.startsWith(href);
 
   return (
-    <nav aria-label="Panel" className="crm-nav">
+    <>
       {GROUPS.map((group) => {
         const items = group.items.filter(
           (item) => !item.adminOnly || role === "admin",
         );
         if (items.length === 0) return null;
         return (
-          <div key={group.title}>
-            <p className="crm-navgroup">{group.title}</p>
-            {items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={isActive(item.href) ? "page" : undefined}
-                className="crm-navlink"
-              >
-                <item.icon size={18} stroke={1.75} aria-hidden />
-                {item.label}
-              </Link>
-            ))}
-          </div>
+          <SidebarGroup key={group.title}>
+            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      // Lo deriva la ruta, no un estado de cliente que pueda
+                      // desincronizarse. isActive pinta; aria-current anuncia.
+                      isActive={isActive(item.href)}
+                      tooltip={item.label}
+                    >
+                      <Link
+                        href={item.href}
+                        aria-current={isActive(item.href) ? "page" : undefined}
+                      >
+                        <item.icon size={18} stroke={1.75} aria-hidden />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         );
       })}
-    </nav>
+    </>
   );
 }

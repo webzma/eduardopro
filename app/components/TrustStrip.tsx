@@ -11,7 +11,7 @@ function Run({ ariaHidden = false }: { ariaHidden?: boolean }) {
     <span aria-hidden={ariaHidden || undefined} className="flex shrink-0">
       {items.map((item) => (
         <span key={item} className="flex items-center">
-          <span className="px-(--space-md)">{item}</span>
+          <span className="px-6">{item}</span>
           <span aria-hidden className="text-signal">
             ★
           </span>
@@ -28,7 +28,7 @@ export default function TrustStrip() {
   return (
     <>
       <div
-        className="overflow-hidden border-y-2 border-coal bg-coal py-(--space-xs) text-paper"
+        className="overflow-hidden border-y-2 border-coal bg-coal py-3 text-paper"
         style={{ ["--focus-ring" as string]: "var(--paper)" }}
       >
         <div className="marquee inline-flex whitespace-nowrap font-display text-lg tracking-widest uppercase">

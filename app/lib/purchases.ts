@@ -81,13 +81,18 @@ const SELECT = "*, purchase_items(*, products(image))";
 /* RLS ya restringe estas lecturas al admin; no hace falta —ni sería fiable—
  * filtrar aquí por rol. */
 
-export async function getPurchases(limit = 100): Promise<Purchase[]> {
+export async function getPurchases(
+  limit = 100,
+  sinceIso?: string | null,
+): Promise<Purchase[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let q = supabase
     .from("purchases")
     .select(SELECT)
     .order("bought_at", { ascending: false })
     .limit(limit);
+  if (sinceIso) q = q.gte("bought_at", sinceIso);
+  const { data, error } = await q;
   if (error) fail(error);
   return (data ?? []).map((row) => toPurchase(row as Row));
 }

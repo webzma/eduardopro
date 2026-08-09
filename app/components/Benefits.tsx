@@ -36,34 +36,34 @@ const spec = [
 
 export default function Benefits() {
   return (
-    <section id="oficio" className="bg-paper2 py-(--space-2xl) md:py-(--space-3xl)">
-      <div className="mx-auto max-w-7xl px-(--page-gutter)">
+    <section id="oficio" className="bg-paper2 py-18 md:py-28">
+      <div className="mx-auto max-w-7xl px-[clamp(1rem,4vw,2.5rem)]">
         {/* S2 · Hanging head — left-flush over a left-flush table. The break is
             explicit: a `ch` max-width resolves against the body font, not the
             display font, and silently shreds a condensed head into one word
             per line. */}
-        <p className="t-script">Las condiciones, en una tabla</p>
-        <h2 className="t-head">
+        <p className="font-script text-[length:var(--text-lg)] leading-[1.3] text-signal normal-case tracking-normal">Las condiciones, en una tabla</p>
+        <h2 className="font-display font-normal uppercase text-[length:var(--text-display-s)] leading-[1.06] tracking-[-0.01em] [overflow-wrap:anywhere] min-w-0">
           El oficio,
           <br />
           bien hecho.
         </h2>
-        <p className="mt-(--space-md) max-w-[52ch] text-(length:--text-md) leading-relaxed text-coal2">
+        <p className="mt-6 max-w-[52ch] text-[length:var(--text-md)] leading-relaxed text-coal2">
           Compramos directo a distribuidores. Tú recibes precio de barbería y
           productos que aguantan el día a día en la silla.
         </p>
 
-        <dl className="mt-(--space-xl) border-t-2 border-navy">
+        <dl className="mt-12 border-t-2 border-navy">
           {spec.map((row) => (
             <div
               key={row.key}
-              className="grid gap-x-(--space-md) gap-y-(--space-3xs) border-b-2 border-navy py-(--space-md) md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_minmax(0,1.3fr)] md:items-baseline"
+              className="grid gap-x-6 gap-y-1 border-b-2 border-navy py-6 md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_minmax(0,1.3fr)] md:items-baseline"
             >
-              <dt className="t-label text-navy">{row.key}</dt>
-              <dd className="tnum font-display text-2xl leading-tight uppercase">
+              <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-navy">{row.key}</dt>
+              <dd className="tabular-nums font-display text-2xl leading-tight uppercase">
                 {row.value}
               </dd>
-              <dd className="text-(length:--text-base) leading-relaxed text-coal2">
+              <dd className="text-[length:var(--text-base)] leading-relaxed text-coal2">
                 {row.note}
               </dd>
             </div>
