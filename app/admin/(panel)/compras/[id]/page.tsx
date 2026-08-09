@@ -152,13 +152,13 @@ export default async function PurchaseDetailPage({
                         scope="row"
                         className="p-2 text-left align-middle font-normal"
                       >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             <Image
                               src={imageSrc(line.productImage ?? "")}
                               alt=""
-                              width={40}
-                              height={40}
-                              className="size-10 shrink-0 rounded border border-border bg-muted object-cover"
+                              width={80}
+                              height={80}
+                              className="size-20 shrink-0 rounded-md border border-border bg-muted object-cover shadow-sm"
                             />
                             <span className="min-w-0">
                               {line.productId ? (

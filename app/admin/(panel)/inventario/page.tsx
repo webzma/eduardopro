@@ -126,7 +126,7 @@ export default async function InventoryPage({
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-20">
+                  <TableHead className="w-28">
                     <span className="sr-only">Foto</span>
                   </TableHead>
                   <TableHead>Producto</TableHead>
@@ -149,7 +149,7 @@ export default async function InventoryPage({
                 {products.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="py-3">
-                      <Avatar className="size-14 rounded-md border">
+                      <Avatar className="size-24 rounded-md border shadow-sm">
                         <AvatarImage
                           src={imageSrc(product.image)}
                           alt=""
@@ -157,7 +157,7 @@ export default async function InventoryPage({
                         />
                         {/* Si la foto no carga, las iniciales antes que un
                             hueco roto. */}
-                        <AvatarFallback className="rounded-md text-xs">
+                        <AvatarFallback className="rounded-md text-lg font-semibold">
                           {product.name.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>

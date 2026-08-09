@@ -19,15 +19,24 @@ import { getMonthSpend } from "../../lib/purchases";
 import { getRate } from "../../lib/rate";
 import { formatBs, formatUsd, PAYMENT_LABELS } from "../../lib/money";
 import {
+  Chip,
   EmptyState,
-  Field,
   Notice,
+  PAYMENT_TONES,
   PageHeader,
-  Record,
+  ProductMosaic,
   Stat,
-  Thumbs,
 } from "./ui";
 import { buttonVariants } from "@/app/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/ui/table";
 import { getSettings } from "../../lib/settings";
 import Pending from "./Pending";
 
@@ -215,46 +224,94 @@ export default async function DashboardPage() {
           {sales.length === 0 ? (
             <EmptyState icon={IconReceiptOff} title="Aún no hay ventas registradas" />
           ) : (
-            <ul>
-              {sales.map((sale) => {
-                const productos =
-                  sale.lines.map((l) => l.productName).join(", ") ||
-                  "Sin renglones";
-                return (
-                  <Record
-                    key={sale.id}
-                    href={`/admin/ventas/${sale.id}`}
-                    reference={`#${sale.id.slice(0, 6).toUpperCase()}`}
-                  media={
-                    <Thumbs images={sale.lines.map((l) => l.productImage)} />
-                  }
-                    title={productos}
-                    label={`Venta ${sale.id.slice(0, 6)}, ${formatUsd(sale.totalUsd)}`}
-                    amountLabel="Total"
-                    amountUsd={sale.totalUsd}
-                    rate={sale.rate}
-                    fields={
-                      <>
-                        <Field
-                          label="Fecha"
-                          value={TIME.format(new Date(sale.soldAt))}
-                        />
-                        <Field
-                          label="Forma de pago"
-                          value={
-                            PAYMENT_LABELS[sale.paymentMethod] ??
-                            sale.paymentMethod
-                          }
-                        />
-                      </>
-                    }
-                  />
-                );
-              })}
-            </ul>
+            // La misma tabla que /admin/ventas, recortada a lo que cabe en un
+            // resumen. Dos formas distintas de listar lo mismo obligaban a
+            // reaprender la pantalla al pasar de una a otra.
+            <div
+              className="overflow-x-auto"
+              role="region"
+              aria-labelledby="tabla-resumen"
+              tabIndex={0}
+            >
+              <Table>
+                <TableCaption id="tabla-resumen" className="sr-only">
+                  Las últimas ventas registradas, con su fecha, forma de pago y
+                  total
+                </TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-28">
+                      <span className="sr-only">Productos</span>
+                    </TableHead>
+                    <TableHead>Producto / ID</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Forma de pago</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {sales.map((sale) => {
+                    const ref = `#${sale.id.slice(0, 6).toUpperCase()}`;
+                    const fecha = new Date(sale.soldAt);
+                    return (
+                      <TableRow key={sale.id}>
+                        <TableCell className="py-3">
+                          <ProductMosaic
+                            className="w-24"
+                            images={sale.lines.map((l) => l.productImage)}
+                          />
+                        </TableCell>
+
+                        <th
+                          scope="row"
+                          className="p-2 text-left align-middle font-normal"
+                        >
+                          <Link
+                            href={`/admin/ventas/${sale.id}`}
+                            aria-label={`Venta ${ref}, ${formatUsd(sale.totalUsd)}`}
+                            className="block max-w-64 rounded-sm hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                          >
+                            <span className="block truncate font-medium">
+                              {sale.lines.map((l) => l.productName).join(", ") ||
+                                "Sin renglones"}
+                            </span>
+                            <span className="mt-0.5 block text-xs text-muted-foreground">
+                              {ref}
+                              {sale.lines.length > 1
+                                ? ` · ${sale.lines.length} productos`
+                                : null}
+                            </span>
+                          </Link>
+                        </th>
+
+                        <TableCell className="whitespace-nowrap">
+                          {TIME.format(fecha)}
+                        </TableCell>
+
+                        <TableCell>
+                          <Chip tone={PAYMENT_TONES[sale.paymentMethod]}>
+                            {PAYMENT_LABELS[sale.paymentMethod] ??
+                              sale.paymentMethod}
+                          </Chip>
+                        </TableCell>
+
+                        <TableCell className="text-right whitespace-nowrap">
+                          <span className="block font-semibold tabular-nums text-jade">
+                            {formatUsd(sale.totalUsd)}
+                          </span>
+                          <span className="mt-0.5 block text-xs tabular-nums text-muted-foreground">
+                            {formatBs(sale.totalUsd, sale.rate)}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </div>
-
       </div>
     </>
   );

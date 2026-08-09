@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { Icon } from "@tabler/icons-react";
@@ -221,35 +220,70 @@ export function Field({
   );
 }
 
-/** Fotos de los productos de un registro, solapadas. Puramente decorativas:
- *  los nombres van al lado. */
-export function Thumbs({
+/**
+ * Las fotos de un registro en un solo cuadro. Con un producto es una foto
+ * grande; con varios se reparte el cuadro en cuadrícula, y a partir de cuatro
+ * la última celda cuenta las que faltan.
+ *
+ * Es la forma de que "esta venta llevó tres productos" se vea ANTES de leer
+ * nada. La versión anterior —tres miniaturas de 28px solapadas— decía lo
+ * mismo, pero tan pequeño que no se distinguía un champú de una cera.
+ *
+ * Decorativa por definición: los nombres van siempre al lado, así que va
+ * aria-hidden y ninguna imagen lleva alt.
+ */
+export function ProductMosaic({
   images,
-  max = 3,
+  className,
+  sizes = "128px",
 }: {
   images: (string | null)[];
-  max?: number;
+  /** El ancho. El alto lo pone aspect-square: la cuadrícula solo cuadra si el
+   *  cuadro es cuadrado. */
+  className?: string;
+  sizes?: string;
 }) {
-  if (images.length === 0) return null;
-  const shown = images.slice(0, max);
+  const shown = images.slice(0, 4);
   const rest = images.length - shown.length;
+  if (shown.length === 0) return null;
   return (
-    <span className="flex shrink-0 items-center" aria-hidden>
+    <span
+      aria-hidden
+      className={cn(
+        // gap-px sobre fondo de borde: las separaciones son el propio borde
+        // asomando, no cuatro bordes que se suman y engordan la retícula.
+        "relative grid aspect-square shrink-0 gap-px overflow-hidden rounded-md border border-border bg-border shadow-sm",
+        shown.length === 1 ? "grid-cols-1" : "grid-cols-2",
+        shown.length >= 3 && "grid-rows-2",
+        className,
+      )}
+    >
       {shown.map((image, i) => (
-        <Image
+        <span
           key={i}
-          src={imageSrc(image ?? "")}
-          alt=""
-          width={28}
-          height={28}
-          className="size-7 rounded-sm border border-border bg-muted object-cover not-first:-ml-2"
-        />
-      ))}
-      {rest > 0 ? (
-        <span className="inline-flex h-7 min-w-7 items-center justify-center px-[3px] text-[0.6875rem] font-semibold text-secondary-foreground">
-          +{rest}
+          className={cn(
+            "relative block bg-muted",
+            // Con tres fotos la primera ocupa la columna izquierda entera: si
+            // no, queda un hueco que parece una imagen que no cargó.
+            shown.length === 3 && i === 0 && "row-span-2",
+          )}
+        >
+          <Image
+            src={imageSrc(image ?? "")}
+            alt=""
+            fill
+            sizes={sizes}
+            className="object-cover"
+          />
+          {/* El "+N" va SOBRE la última foto, no en una celda propia: así las
+              cuatro celdas siguen siendo cuatro fotos. */}
+          {rest > 0 && i === shown.length - 1 ? (
+            <span className="absolute inset-0 flex items-center justify-center bg-coal/70 text-sm font-semibold text-paper tabular-nums">
+              +{rest}
+            </span>
+          ) : null}
         </span>
-      ) : null}
+      ))}
     </span>
   );
 }
@@ -298,81 +332,6 @@ export function Ref({ children }: { children: ReactNode }) {
     <span className="shrink-0 rounded-sm bg-coal px-1.5 py-px text-[0.6875rem] font-semibold tracking-[0.04em] text-paper">
       {children}
     </span>
-  );
-}
-
-/**
- * Fila de un historial. La fila entera es el enlace —un destino de tabulación
- * por registro, área de pulsación grande en móvil— y cada dato va etiquetado.
- */
-export function Record({
-  href,
-  reference,
-  media,
-  title,
-  fields,
-  amountLabel,
-  amountUsd,
-  rate,
-  label,
-  tone = "jade",
-}: {
-  href: string;
-  /** Referencia corta: sin ella, dos registros del mismo día son
-   *  indistinguibles al hablar de ellos. */
-  reference: string;
-  media?: ReactNode;
-  title: ReactNode;
-  /** Los <Field> del cuerpo, sin incluir el importe. */
-  fields: ReactNode;
-  amountLabel: string;
-  amountUsd: number;
-  rate: number;
-  /** Nombre accesible del enlace: sin él solo se leería la referencia. */
-  label: string;
-  /** Color del filo y del importe. Verde por defecto: estos registros son
-   *  ventas, y una venta es dinero que entra. */
-  tone?: Tone;
-}) {
-  const t = TONES[tone];
-  return (
-    <li className="not-first:border-t not-first:border-border">
-      <Link
-        href={href}
-        aria-label={label}
-        // El anillo va por dentro: con outline normal se recortaría contra el
-        // borde de la tarjeta.
-        className="relative block py-4 pr-4 pl-5 transition-colors even:bg-zebra hover:bg-tintamber focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:outline-none"
-      >
-        <span
-          className={cn("absolute inset-y-0 left-0 w-1.5", t.bar)}
-          aria-hidden
-        />
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          {media}
-          <Ref>{reference}</Ref>
-          <span className="min-w-0 flex-1 basis-48 text-sm font-semibold">
-            {title}
-          </span>
-        </div>
-        {/* auto-fit + minmax: cuatro columnas en escritorio, dos en móvil, sin
-            un solo media query que mantener. */}
-        <dl className="grid grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))] gap-x-4 gap-y-2">
-          {fields}
-          <Field
-            className={cn(
-              "sm:text-right [&_dd]:text-base [&_dd]:font-semibold",
-              tone === "jade" && "[&_dd]:text-jade",
-              tone === "navy" && "[&_dd]:text-navy",
-              tone === "signal" && "[&_dd]:text-signal",
-            )}
-            label={amountLabel}
-            value={formatUsd(amountUsd)}
-            hint={formatBs(amountUsd, rate)}
-          />
-        </dl>
-      </Link>
-    </li>
   );
 }
 

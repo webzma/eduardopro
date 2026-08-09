@@ -216,9 +216,9 @@ export default function PurchaseForm({
                               <Image
                                 src={imageSrc(line.image ?? "")}
                                 alt=""
-                                width={28}
-                                height={28}
-                                className="size-7 shrink-0 rounded border border-border object-cover"
+                                width={56}
+                                height={56}
+                                className="size-14 shrink-0 rounded-md border border-border object-cover shadow-sm"
                               />
                               <span className="truncate text-sm font-medium">
                                 {line.name}
@@ -465,14 +465,14 @@ export default function PurchaseForm({
                 {results.slice(0, 30).map((product) => (
                   <li
                     key={product.id}
-                    className="flex items-center gap-4 px-4 py-2"
+                    className="flex items-center gap-4 px-4 py-2 even:bg-zebra"
                   >
                     <Image
                       src={imageSrc(product.image)}
                       alt=""
-                      width={32}
-                      height={32}
-                      className="size-8 shrink-0 rounded border border-border object-cover"
+                      width={72}
+                      height={72}
+                      className="size-18 shrink-0 rounded-md border border-border object-cover shadow-sm"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">

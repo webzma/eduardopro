@@ -149,9 +149,9 @@ export default function SaleForm({
                     <Image
                       src={imageSrc(product.image)}
                       alt=""
-                      width={44}
-                      height={44}
-                      className="size-11 shrink-0 rounded border border-border object-cover"
+                      width={80}
+                      height={80}
+                      className="size-20 shrink-0 rounded-md border border-border object-cover shadow-sm"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">
@@ -246,9 +246,9 @@ export default function SaleForm({
                       <Image
                         src={imageSrc(line.product.image)}
                         alt=""
-                        width={40}
-                        height={40}
-                        className="size-10 shrink-0 rounded border border-border object-cover"
+                        width={64}
+                        height={64}
+                        className="size-16 shrink-0 rounded-md border border-border object-cover shadow-sm"
                       />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">

@@ -14,9 +14,7 @@ import {
   PAYMENT_LABELS,
   ROLE_LABELS,
 } from "@/app/lib/money";
-import { imageSrc } from "@/app/lib/images";
 import { buttonVariants } from "@/app/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -29,7 +27,14 @@ import {
 } from "@/app/components/ui/table";
 import PeriodFilter from "../PeriodFilter";
 import { isPeriod, periodStart, type Period } from "@/app/lib/period";
-import { Chip, EmptyState, PAYMENT_TONES, PageHeader, Stat } from "../ui";
+import {
+  Chip,
+  EmptyState,
+  PAYMENT_TONES,
+  PageHeader,
+  ProductMosaic,
+  Stat,
+} from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -139,8 +144,8 @@ export default async function SalesPage({
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-20">
-                    <span className="sr-only">Foto</span>
+                  <TableHead className="w-28">
+                    <span className="sr-only">Productos</span>
                   </TableHead>
                   <TableHead>Producto / ID</TableHead>
                   <TableHead>Fecha y hora</TableHead>
@@ -156,34 +161,16 @@ export default async function SalesPage({
                   const units = sale.lines.reduce((n, l) => n + l.qty, 0);
                   const fecha = new Date(sale.soldAt);
                   const ref = `#${sale.id.slice(0, 6).toUpperCase()}`;
-                  const extra = sale.lines.length - 1;
                   return (
                     <TableRow key={sale.id}>
                       <TableCell className="py-3">
-                        <span className="relative block size-14">
-                          <Avatar className="size-14 rounded-md border">
-                            <AvatarImage
-                              src={imageSrc(sale.lines[0]?.productImage ?? "")}
-                              alt=""
-                              className="object-cover"
-                            />
-                            <AvatarFallback className="rounded-md text-xs">
-                              {(sale.lines[0]?.productName ?? "?")
-                                .slice(0, 2)
-                                .toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          {/* Una venta puede llevar varios productos: se
-                              muestra el primero y se cuenta el resto. */}
-                          {extra > 0 ? (
-                            <span
-                              aria-hidden
-                              className="absolute -right-1 -bottom-1 rounded-full bg-secondary px-1.5 text-[0.6875rem] font-semibold text-secondary-foreground ring-2 ring-card"
-                            >
-                              +{extra}
-                            </span>
-                          ) : null}
-                        </span>
+                        {/* Cuando la venta lleva varios productos el cuadro se
+                            reparte entre ellos: se ve que fueron varios sin
+                            leer la lista de nombres. */}
+                        <ProductMosaic
+                          className="w-24"
+                          images={sale.lines.map((l) => l.productImage)}
+                        />
                       </TableCell>
 
                       {/* th, no td: el nombre es la cabecera de su fila, así un
@@ -204,6 +191,9 @@ export default async function SalesPage({
                           </span>
                           <span className="mt-0.5 block text-xs font-semibold tracking-[0.04em] text-muted-foreground">
                             {ref}
+                            {sale.lines.length > 1
+                              ? ` · ${sale.lines.length} productos`
+                              : null}
                           </span>
                         </Link>
                       </th>

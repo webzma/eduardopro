@@ -46,9 +46,9 @@ export default async function EditProductPage({
         <Image
           src={imageSrc(product.image)}
           alt=""
-          width={48}
-          height={48}
-          className="size-12 shrink-0 rounded border border-border object-cover"
+          width={112}
+          height={112}
+          className="size-28 shrink-0 rounded-lg border border-border object-cover shadow-sm"
         />
         <div>
           <h1 className="text-xl font-semibold tracking-tight">{product.name}</h1>

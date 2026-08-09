@@ -9,12 +9,10 @@ import {
 import { requireAdmin } from "../../../lib/auth";
 import { getPurchases } from "../../../lib/purchases";
 import { formatBs, formatUsd } from "../../../lib/money";
-import { imageSrc } from "@/app/lib/images";
 import PeriodFilter from "../PeriodFilter";
 import { isPeriod, periodStart, type Period } from "@/app/lib/period";
-import { EmptyState, PageHeader, Stat } from "../ui";
+import { EmptyState, PageHeader, ProductMosaic, Stat } from "../ui";
 import { buttonVariants } from "@/app/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -127,8 +125,8 @@ export default async function PurchasesPage({
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-20">
-                    <span className="sr-only">Foto</span>
+                  <TableHead className="w-28">
+                    <span className="sr-only">Productos</span>
                   </TableHead>
                   <TableHead>Producto / ID</TableHead>
                   <TableHead>Fecha y hora</TableHead>
@@ -145,36 +143,14 @@ export default async function PurchasesPage({
                   // Los 6 primeros caracteres del uuid bastan para nombrar una
                   // compra en voz alta sin leer 36 caracteres.
                   const ref = `#${purchase.id.slice(0, 6).toUpperCase()}`;
-                  const extra = purchase.lines.length - 1;
                   return (
                     <TableRow key={purchase.id}>
                       <TableCell className="py-3">
-                        <span className="relative block size-14">
-                          <Avatar className="size-14 rounded-md border">
-                            <AvatarImage
-                              src={imageSrc(
-                                purchase.lines[0]?.productImage ?? "",
-                              )}
-                              alt=""
-                              className="object-cover"
-                            />
-                            <AvatarFallback className="rounded-md text-xs">
-                              {(purchase.lines[0]?.productName ?? "?")
-                                .slice(0, 2)
-                                .toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          {/* Una compra puede llevar varios productos: se
-                              muestra el primero y se cuenta el resto. */}
-                          {extra > 0 ? (
-                            <span
-                              aria-hidden
-                              className="absolute -right-1 -bottom-1 rounded-full bg-secondary px-1.5 text-[0.6875rem] font-semibold text-secondary-foreground ring-2 ring-card"
-                            >
-                              +{extra}
-                            </span>
-                          ) : null}
-                        </span>
+                        {/* Varios renglones, varias fotos en el mismo cuadro. */}
+                        <ProductMosaic
+                          className="w-24"
+                          images={purchase.lines.map((l) => l.productImage)}
+                        />
                       </TableCell>
 
                       {/* th, no td: el nombre es la cabecera de su fila, así un
@@ -196,6 +172,9 @@ export default async function PurchasesPage({
                           </span>
                           <span className="mt-0.5 block text-xs font-semibold tracking-[0.04em] text-muted-foreground">
                             {ref}
+                            {purchase.lines.length > 1
+                              ? ` · ${purchase.lines.length} productos`
+                              : null}
                           </span>
                         </Link>
                       </th>

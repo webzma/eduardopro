@@ -41,7 +41,7 @@ export default async function Products() {
         ) : (
           // Tailwind's grid-cols-N expands to repeat(N, minmax(0,1fr)), so the
           // image-bearing tracks can't blow out on a long product name.
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => {
               const soldOut = product.stock <= 0;
               return (
@@ -54,7 +54,7 @@ export default async function Products() {
                       src={imageSrc(product.image)}
                       alt={product.name}
                       fill
-                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       className="transition-transform duration-[560ms] group-hover/card:scale-[1.02] motion-reduce:transition-none object-cover"
                     />
                     {soldOut ? (
