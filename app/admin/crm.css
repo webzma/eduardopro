@@ -610,3 +610,237 @@
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   CAMPOS ETIQUETADOS
+   Un valor sin etiqueta es una adivinanza: "08-ago · 50 · X"
+   no dice cuál de esos números es qué, ni qué es la X. Cada
+   dato lleva su nombre encima, siempre, en toda anchura.
+   ═══════════════════════════════════════════════════════════ */
+.crm-f__label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ash);
+  line-height: 1.3;
+}
+
+.crm-f__value {
+  display: block;
+  margin-top: 1px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  color: var(--coal);
+}
+
+.crm-f__value--muted {
+  font-weight: 400;
+  color: var(--ash);
+}
+
+/* ── Fila de historial ─────────────────────────────────────── */
+.crm-rec + .crm-rec {
+  border-top: 1px solid var(--crm-line);
+}
+
+.crm-rec__link {
+  display: block;
+  padding: var(--space-sm);
+  transition: background-color var(--dur-short) var(--ease-out);
+}
+
+.crm-rec__link:hover {
+  background: color-mix(in oklch, var(--paper-2) 50%, transparent);
+}
+
+.crm-rec__link:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--focus-ring);
+}
+
+.crm-rec__top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  align-items: center;
+  margin-bottom: var(--space-2xs);
+}
+
+/* Referencia corta: sin ella dos ventas del mismo día son
+   indistinguibles al hablar de ellas. */
+.crm-rec__ref {
+  padding: 1px var(--space-3xs);
+  border-radius: var(--crm-radius-sm);
+  background: var(--paper-2);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--coal-2);
+}
+
+.crm-rec__title {
+  min-width: 0;
+  flex: 1 1 12rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* auto-fit + minmax: cuatro columnas en escritorio, dos en
+   móvil, sin un solo media query que mantener. */
+.crm-rec__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: var(--space-2xs) var(--space-sm);
+}
+
+/* El importe cierra la fila y pesa más que el resto. */
+.crm-rec__money .crm-f__value {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+@media (min-width: 40rem) {
+  .crm-rec__money {
+    text-align: right;
+  }
+}
+
+/* ── Tabla de renglones de un documento ─────────────────────
+   Aquí la tabla es lo correcto: pocas filas, columnas fijas, y
+   la cabecera ES la etiqueta de cada dato. */
+.crm-doc {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.crm-doc th {
+  padding: var(--space-2xs) var(--space-sm);
+  border-bottom: 1px solid var(--crm-line);
+  background: color-mix(in oklch, var(--paper-2) 55%, transparent);
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ash);
+  white-space: nowrap;
+}
+
+.crm-doc td {
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--crm-line-soft);
+  vertical-align: top;
+  font-size: var(--text-sm);
+}
+
+.crm-doc tbody tr:last-child td {
+  border-bottom: 1px solid var(--crm-line);
+}
+
+.crm-doc tfoot td {
+  padding: var(--space-sm);
+  border-bottom: 0;
+  font-weight: 600;
+}
+
+.crm-doc__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Ficha de resumen ───────────────────────────────────────
+   Etiqueta arriba y valor debajo, no en la misma línea: con
+   dos columnas los valores largos empujan la etiqueta y la
+   pareja deja de leerse junta. */
+.crm-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-sm);
+}
+
+.crm-facts--stack {
+  grid-template-columns: 1fr;
+  gap: var(--space-2xs);
+}
+
+/* ── Total destacado ────────────────────────────────────── */
+.crm-grand {
+  padding: var(--space-sm);
+  border-radius: var(--crm-radius);
+  background: var(--coal);
+  color: var(--paper);
+}
+
+.crm-grand__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--paper) 65%, transparent);
+}
+
+.crm-grand__usd {
+  display: block;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* El rojo de la landing no contrasta sobre tinta: aquí va el
+   lifted, que mide 5.36 sobre --coal. */
+.crm-grand__bs {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-md);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--signal-lift);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crm-rec__link {
+    transition-duration: 1ms;
+  }
+}
+
+/* ── Pila de miniaturas ──────────────────────────────────────
+   Solapadas para que tres fotos ocupen lo que ocuparían dos.
+   Decorativas: el nombre del producto va al lado, así que las
+   imágenes llevan alt vacío y no se anuncian dos veces. */
+.crm-thumbs {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.crm-thumbs > * {
+  border-radius: var(--crm-radius-sm);
+  border: 1px solid var(--crm-line);
+  background: var(--paper-2);
+  object-fit: cover;
+}
+
+.crm-thumbs > * + * {
+  margin-left: -0.5rem;
+}
+
+/* Contador cuando hay más de las que caben. */
+.crm-thumbs__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 3px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--coal-2);
+}

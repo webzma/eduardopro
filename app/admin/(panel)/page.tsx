@@ -17,7 +17,7 @@ import { getSales, getSummary } from "../../lib/sales";
 import { getMonthSpend } from "../../lib/purchases";
 import { getRate } from "../../lib/rate";
 import { formatBs, formatUsd, PAYMENT_LABELS } from "../../lib/money";
-import { EmptyState, Notice, PageHeader, Record } from "./ui";
+import { EmptyState, Field, Notice, PageHeader, Record, Thumbs } from "./ui";
 
 export const dynamic = "force-dynamic";
 
@@ -213,18 +213,28 @@ export default async function DashboardPage() {
                   <Record
                     key={sale.id}
                     href={`/admin/ventas/${sale.id}`}
-                    label={`Venta del ${TIME.format(new Date(sale.soldAt))}, ${formatUsd(sale.totalUsd)}`}
+                    reference={`#${sale.id.slice(0, 6).toUpperCase()}`}
+                  media={
+                    <Thumbs images={sale.lines.map((l) => l.productImage)} />
+                  }
                     title={productos}
+                    label={`Venta ${sale.id.slice(0, 6)}, ${formatUsd(sale.totalUsd)}`}
+                    amountLabel="Total"
                     amountUsd={sale.totalUsd}
                     rate={sale.rate}
-                    meta={
+                    fields={
                       <>
-                        <span>{TIME.format(new Date(sale.soldAt))}</span>
-                        <span aria-hidden>·</span>
-                        <span className="crm-badge crm-badge--quiet">
-                          {PAYMENT_LABELS[sale.paymentMethod] ??
-                            sale.paymentMethod}
-                        </span>
+                        <Field
+                          label="Fecha"
+                          value={TIME.format(new Date(sale.soldAt))}
+                        />
+                        <Field
+                          label="Forma de pago"
+                          value={
+                            PAYMENT_LABELS[sale.paymentMethod] ??
+                            sale.paymentMethod
+                          }
+                        />
                       </>
                     }
                   />
@@ -251,15 +261,22 @@ export default async function DashboardPage() {
               {lowStock.map((product) => (
                 <li
                   key={product.id}
-                  className="flex items-center justify-between gap-(--space-sm) px-(--space-sm) py-(--space-2xs)"
+                  className="flex items-center justify-between gap-(--space-sm) px-(--space-sm) py-(--space-xs)"
                 >
-                  <span className="min-w-0 flex-1 truncate text-sm">
-                    {product.name}
-                  </span>
+                  <dl className="min-w-0 flex-1">
+                    <Field
+                      label={product.category || "Sin categoría"}
+                      value={
+                        <span className="block truncate">{product.name}</span>
+                      }
+                    />
+                  </dl>
                   <span
-                    className={`crm-badge ${product.stock === 0 ? "crm-badge--signal" : "crm-badge--warn"}`}
+                    className={`crm-badge shrink-0 ${product.stock === 0 ? "crm-badge--signal" : "crm-badge--warn"}`}
                   >
-                    {product.stock === 0 ? "Agotado" : `Quedan ${product.stock}`}
+                    {product.stock === 0
+                      ? "Agotado"
+                      : `Quedan ${product.stock}`}
                   </span>
                 </li>
               ))}

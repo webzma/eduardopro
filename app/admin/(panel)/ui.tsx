@@ -1,11 +1,15 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import type { Icon } from "@tabler/icons-react";
 import { formatBs, formatUsd } from "../../lib/money";
+import { imageSrc } from "../../lib/images";
 
-/* Piezas compartidas del panel. Existen para que las mismas decisiones
- * —qué es un error y qué un aviso, cómo se anuncia un importe, qué se dice
- * cuando no hay nada— se tomen una sola vez y no diverjan pantalla a pantalla. */
+/* Piezas compartidas del panel.
+ *
+ * Regla que las gobierna a todas: NINGÚN dato se muestra sin su etiqueta. Una
+ * fila que dice "08-ago · 50 · X" obliga a adivinar qué es cada cosa; con
+ * "Fecha / Unidades / Proveedor" encima no hay nada que adivinar. */
 
 export function PageHeader({
   title,
@@ -74,140 +78,170 @@ export function EmptyState({
   );
 }
 
-/**
- * Importe en las dos monedas. `rate` opcional: sin tasa se muestra solo el
- * dólar en vez de inventar una conversión.
- *
- * El separador va en un <span aria-hidden> con espacio real alrededor: sin él
- * el lector encadena "109 dólares Bs 82.480" como si fuera una sola cifra.
- */
-export function Money({
-  usd,
-  rate,
+/** Etiqueta encima, valor debajo. La unidad mínima de todo el panel. */
+export function Field({
+  label,
+  value,
+  hint,
   className = "",
 }: {
-  usd: number;
-  rate?: number | null;
+  label: string;
+  value: ReactNode;
+  /** Segunda línea: el equivalente en bolívares, un matiz, una advertencia. */
+  hint?: ReactNode;
   className?: string;
 }) {
   return (
-    <span className={className}>
-      <span className="tabular-nums">{formatUsd(usd)}</span>
+    <div className={className}>
+      <dt className="crm-f__label">{label}</dt>
+      <dd className="crm-f__value">
+        {value}
+        {hint ? (
+          <span className="crm-f__value--muted mt-0.5 block text-xs">
+            {hint}
+          </span>
+        ) : null}
+      </dd>
+    </div>
+  );
+}
+
+/** Importe en las dos monedas, como valor de un Field. */
+export function Amount({ usd, rate }: { usd: number; rate?: number | null }) {
+  return (
+    <>
+      {formatUsd(usd)}
       {rate ? (
-        <>
-          <span aria-hidden> · </span>
-          <span className="crm-muted tabular-nums">{formatBs(usd, rate)}</span>
-        </>
+        <span className="crm-f__value--muted block text-xs">
+          {formatBs(usd, rate)}
+        </span>
       ) : null}
+    </>
+  );
+}
+
+/** Fotos de los productos de un registro, solapadas. Puramente decorativas:
+ *  los nombres van al lado. */
+export function Thumbs({
+  images,
+  max = 3,
+}: {
+  images: (string | null)[];
+  max?: number;
+}) {
+  if (images.length === 0) return null;
+  const shown = images.slice(0, max);
+  const rest = images.length - shown.length;
+  return (
+    <span className="crm-thumbs" aria-hidden>
+      {shown.map((image, i) => (
+        <Image
+          key={i}
+          src={imageSrc(image ?? "")}
+          alt=""
+          width={28}
+          height={28}
+          className="size-7"
+        />
+      ))}
+      {rest > 0 ? <span className="crm-thumbs__more">+{rest}</span> : null}
     </span>
   );
 }
 
-/** Fila de un historial. La fila entera es el enlace: un solo destino de
- *  tabulación por registro y un área de pulsación grande en móvil. */
+/**
+ * Fila de un historial. La fila entera es el enlace —un destino de tabulación
+ * por registro, área de pulsación grande en móvil— y cada dato va etiquetado.
+ */
 export function Record({
   href,
+  reference,
+  media,
   title,
-  meta,
+  badge,
+  fields,
+  amountLabel,
   amountUsd,
   rate,
   label,
 }: {
   href: string;
+  /** Referencia corta: sin ella, dos registros del mismo día son
+   *  indistinguibles al hablar de ellos. */
+  reference: string;
+  /** Miniaturas de los productos, si el registro los tiene. */
+  media?: ReactNode;
   title: ReactNode;
-  meta: ReactNode;
+  badge?: ReactNode;
+  /** Los <Field> del cuerpo, sin incluir el importe. */
+  fields: ReactNode;
+  amountLabel: string;
   amountUsd: number;
   rate: number;
-  /** Nombre accesible del enlace: sin él solo se leería la fecha. */
+  /** Nombre accesible del enlace: sin él solo se leería la referencia. */
   label: string;
 }) {
   return (
-    <li className="crm-record">
-      <Link href={href} className="crm-record__link" aria-label={label}>
-        <span className="crm-record__main">
-          <span className="crm-record__title block">{title}</span>
-          <span className="crm-record__meta">{meta}</span>
-        </span>
-        <span className="crm-record__aside">
-          <span className="crm-record__amount block">{formatUsd(amountUsd)}</span>
-          <span className="crm-record__sub block">
-            {formatBs(amountUsd, rate)}
-          </span>
-        </span>
+    <li className="crm-rec">
+      <Link href={href} className="crm-rec__link" aria-label={label}>
+        <div className="crm-rec__top">
+          {media}
+          <span className="crm-rec__ref">{reference}</span>
+          <span className="crm-rec__title">{title}</span>
+          {badge}
+        </div>
+        <dl className="crm-rec__grid">
+          {fields}
+          <Field
+            className="crm-rec__money"
+            label={amountLabel}
+            value={formatUsd(amountUsd)}
+            hint={formatBs(amountUsd, rate)}
+          />
+        </dl>
       </Link>
     </li>
   );
 }
 
-/** Renglón de un documento: producto, cantidad y subtotal. */
-export function DocLine({
-  name,
-  note,
-  qty,
-  amountUsd,
-  extra,
+/** Ficha de datos sueltos: etiqueta arriba, valor debajo. */
+export function Facts({
+  stack,
+  children,
 }: {
-  name: ReactNode;
-  note?: ReactNode;
-  qty: number;
-  amountUsd: number;
-  extra?: ReactNode;
+  /** Una sola columna, para barras laterales estrechas. */
+  stack?: boolean;
+  children: ReactNode;
 }) {
   return (
-    <li className="crm-line">
-      <span className="flex min-w-0 flex-1 items-baseline gap-(--space-2xs)">
-        <span className="crm-line__qty shrink-0">
-          <span className="sr-only">Cantidad: </span>
-          {qty}
-        </span>
-        <span className="min-w-0">
-          <span className="block text-sm">{name}</span>
-          {note ? <span className="crm-muted block text-xs">{note}</span> : null}
-        </span>
-      </span>
-      <span className="text-right">
-        <span className="block text-sm font-medium tabular-nums">
-          {formatUsd(amountUsd)}
-        </span>
-        {extra ? <span className="crm-muted block text-xs">{extra}</span> : null}
-      </span>
-    </li>
+    <dl className={`crm-facts ${stack ? "crm-facts--stack" : ""}`}>
+      {children}
+    </dl>
   );
 }
 
-/** Bloque de totales al pie de un documento. */
-export function Total({
+/** El total del documento, con el peso visual que le corresponde. */
+export function GrandTotal({
   label,
   usd,
   rate,
-  emphasis,
+  note,
 }: {
   label: string;
   usd: number;
   rate: number;
-  /** Cuál de las dos monedas se cobró de verdad. */
-  emphasis?: "usd" | "bs";
+  note?: ReactNode;
 }) {
   return (
-    <div>
-      <div className="crm-total">
-        <span className="text-sm font-medium">{label}</span>
-        <span
-          className={`crm-total__value ${emphasis === "usd" ? "text-signal" : ""}`}
-        >
-          {formatUsd(usd)}
+    <div className="crm-grand">
+      <span className="crm-grand__label">{label}</span>
+      <span className="crm-grand__usd">{formatUsd(usd)}</span>
+      <span className="crm-grand__bs">{formatBs(usd, rate)}</span>
+      {note ? (
+        <span className="mt-(--space-2xs) block text-xs text-paper/60">
+          {note}
         </span>
-      </div>
-      <div className="crm-total mt-0.5">
-        <span className="crm-muted text-xs">En bolívares</span>
-        <span
-          className={`text-base font-medium tabular-nums ${
-            emphasis === "bs" ? "text-signal" : ""
-          }`}
-        >
-          {formatBs(usd, rate)}
-        </span>
-      </div>
+      ) : null}
     </div>
   );
 }

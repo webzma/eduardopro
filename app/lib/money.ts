@@ -50,6 +50,13 @@ export function priceForMargin(cost: number, marginPercent: number): number {
   return cost / (1 - m);
 }
 
+/** Nombre de cara al usuario. Una sola traducción para todo el panel: si
+ *  estuviera repetida, "Vendedor" y "vendedor" acabarían conviviendo. */
+export const ROLE_LABELS: Record<string, string> = {
+  admin: "Administrador",
+  vendedor: "Vendedor",
+};
+
 export const PAYMENT_LABELS: Record<string, string> = {
   usd_efectivo: "Efectivo USD",
   bs_efectivo: "Efectivo Bs",

@@ -8,6 +8,8 @@ export type PurchaseLine = {
   qty: number;
   unitCostUsd: number;
   salePriceUsd: number | null;
+  /** Foto actual del producto; null si ya no está en el catálogo. */
+  productImage: string | null;
 };
 
 export type Purchase = {
@@ -47,6 +49,7 @@ type Row = {
     qty: number;
     unit_cost_usd: number | string;
     sale_price_usd: number | string | null;
+    products: { image: string } | null;
   }[];
 };
 
@@ -68,11 +71,12 @@ function toPurchase(row: Row): Purchase {
       unitCostUsd: Number(line.unit_cost_usd),
       salePriceUsd:
         line.sale_price_usd === null ? null : Number(line.sale_price_usd),
+      productImage: line.products?.image ?? null,
     })),
   };
 }
 
-const SELECT = "*, purchase_items(*)";
+const SELECT = "*, purchase_items(*, products(image))";
 
 /* RLS ya restringe estas lecturas al admin; no hace falta —ni sería fiable—
  * filtrar aquí por rol. */

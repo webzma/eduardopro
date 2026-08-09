@@ -1,5 +1,6 @@
 import { createClient } from "./supabase/server";
 import { fail } from "./supabase/config";
+import type { Role } from "./auth";
 
 export type SaleLine = {
   id: string;
@@ -9,12 +10,23 @@ export type SaleLine = {
   unitPriceUsd: number;
   /** Costo congelado al vender. 0 si el producto no tenía costo registrado. */
   unitCostUsd: number;
+  /**
+   * Foto ACTUAL del producto, no una congelada. Es lo correcto aquí: al
+   * reemplazar una foto se borra el archivo anterior, así que una ruta
+   * guardada en la línea apuntaría a un archivo que ya no existe. El nombre y
+   * el precio sí se congelan porque son hechos contables; la foto no lo es.
+   * null si el producto se borró del catálogo.
+   */
+  productImage: string | null;
 };
 
 export type Sale = {
   id: string;
   soldAt: string;
   sellerEmail: string | null;
+  /** Rol de quien vendió, congelado al registrar. null en ventas anteriores a
+   *  que existiera la columna, o si esa persona ya no está en la plantilla. */
+  sellerRole: Role | null;
   paymentMethod: string;
   rate: number;
   rateSource: "bcv" | "manual";
@@ -52,6 +64,7 @@ type SaleRow = {
   id: string;
   sold_at: string;
   seller_email: string | null;
+  seller_role: string | null;
   payment_method: string;
   rate_usd_to_bs: number | string;
   rate_source: string;
@@ -64,6 +77,7 @@ type SaleRow = {
     qty: number;
     unit_price_usd: number | string;
     unit_cost_usd: number | string | null;
+    products: { image: string } | null;
   }[];
 };
 
@@ -72,6 +86,10 @@ function toSale(row: SaleRow): Sale {
     id: row.id,
     soldAt: row.sold_at,
     sellerEmail: row.seller_email,
+    sellerRole:
+      row.seller_role === "admin" || row.seller_role === "vendedor"
+        ? row.seller_role
+        : null,
     paymentMethod: row.payment_method,
     rate: Number(row.rate_usd_to_bs),
     rateSource: row.rate_source === "manual" ? "manual" : "bcv",
@@ -84,11 +102,12 @@ function toSale(row: SaleRow): Sale {
       qty: line.qty,
       unitPriceUsd: Number(line.unit_price_usd),
       unitCostUsd: Number(line.unit_cost_usd ?? 0),
+      productImage: line.products?.image ?? null,
     })),
   };
 }
 
-const SELECT = "*, sale_items(*)";
+const SELECT = "*, sale_items(*, products(image))";
 
 /* RLS ya recorta por rol: el admin recibe todo y el vendedor solo lo suyo. No
  * hace falta —ni sería fiable— filtrar aquí por seller_id. */

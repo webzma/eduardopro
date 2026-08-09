@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { IconArrowLeft, IconCircleCheck } from "@tabler/icons-react";
 import { requireStaff } from "../../../../lib/auth";
@@ -8,9 +9,10 @@ import {
   formatRate,
   formatUsd,
   PAYMENT_LABELS,
-  PAYS_IN_BS,
+  ROLE_LABELS,
 } from "../../../../lib/money";
-import { DocLine, Notice, Total } from "../../ui";
+import { imageSrc } from "../../../../lib/images";
+import { Facts, Field, GrandTotal, Notice } from "../../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +38,6 @@ export default async function SaleDetailPage({
   const sale = await getSale(id);
   if (!sale) notFound();
 
-  const paidInBs = PAYS_IN_BS.has(sale.paymentMethod);
   const isAdmin = role === "admin";
   const units = sale.lines.reduce((n, l) => n + l.qty, 0);
   const profit = sale.lines.reduce(
@@ -60,109 +61,169 @@ export default async function SaleDetailPage({
         </div>
       ) : null}
 
-      <header className="mb-(--space-md)">
+      <header className="mb-(--space-md) flex flex-wrap items-center gap-(--space-2xs)">
         <h1 className="crm-h1">Venta</h1>
-        <p className="crm-muted mt-0.5">
-          {DATE.format(new Date(sale.soldAt))}
-          {isAdmin && sale.sellerEmail ? ` · ${sale.sellerEmail}` : ""}
-        </p>
+        <span className="crm-rec__ref">
+          #{sale.id.slice(0, 6).toUpperCase()}
+        </span>
       </header>
 
       <div className="grid gap-(--space-md) lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-        <section className="crm-card" aria-labelledby="renglones">
-          <div className="crm-card__head">
-            <h2 id="renglones" className="crm-h2">
-              Renglones
-            </h2>
-            <span className="crm-muted text-xs">
-              {units} {units === 1 ? "unidad" : "unidades"}
-            </span>
-          </div>
-          <ul className="crm-lines">
-            {sale.lines.map((line) => (
-              <DocLine
-                key={line.id}
-                qty={line.qty}
-                name={line.productName}
-                note={
-                  <>
-                    {formatUsd(line.unitPriceUsd)} c/u
-                    {/* product_id queda en NULL si el producto se borró: el
-                        nombre se copió al vender para que esto sobreviva. */}
-                    {line.productId === null
-                      ? " · ya no está en el catálogo"
-                      : ""}
-                  </>
-                }
-                amountUsd={line.unitPriceUsd * line.qty}
-                extra={
-                  isAdmin && line.unitCostUsd > 0
-                    ? `costo ${formatUsd(line.unitCostUsd)}`
-                    : undefined
-                }
-              />
-            ))}
-          </ul>
-        </section>
-
-        <section className="crm-card" aria-labelledby="resumen-venta">
-          <div className="crm-card__head">
-            <h2 id="resumen-venta" className="crm-h2">
-              Resumen
-            </h2>
-          </div>
-          <div className="crm-card__body">
-            <dl className="flex flex-col gap-(--space-2xs) text-sm">
-              <div className="flex justify-between gap-(--space-sm)">
-                <dt className="crm-muted">Método de pago</dt>
-                <dd>
-                  {PAYMENT_LABELS[sale.paymentMethod] ?? sale.paymentMethod}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-(--space-sm)">
-                <dt className="crm-muted">Tasa aplicada</dt>
-                <dd className="tabular-nums">
-                  Bs {formatRate(sale.rate)}
-                  <span className="crm-muted">
-                    {" "}
-                    ({sale.rateSource === "bcv" ? "BCV" : "manual"})
-                  </span>
-                </dd>
-              </div>
-              {isAdmin ? (
-                <div className="flex justify-between gap-(--space-sm)">
-                  <dt className="crm-muted">Ganancia</dt>
-                  <dd className="tabular-nums">
-                    {formatUsd(profit)}
-                    {anyCostless ? (
-                      <span className="crm-muted"> · incompleta</span>
-                    ) : sale.totalUsd > 0 ? (
-                      <span className="crm-muted">
-                        {" "}
-                        · {formatPct((profit / sale.totalUsd) * 100)}
-                      </span>
-                    ) : null}
-                  </dd>
-                </div>
-              ) : null}
-              {sale.note ? (
-                <div className="flex justify-between gap-(--space-sm)">
-                  <dt className="crm-muted">Nota</dt>
-                  <dd className="text-right">{sale.note}</dd>
-                </div>
-              ) : null}
-            </dl>
-
-            <div className="mt-(--space-sm) border-t border-(--crm-line) pt-(--space-sm)">
-              {/* Se destaca la moneda en la que realmente se cobró. */}
-              <Total
-                label="Total"
-                usd={sale.totalUsd}
-                rate={sale.rate}
-                emphasis={paidInBs ? "bs" : "usd"}
-              />
+        <div className="flex flex-col gap-(--space-md)">
+          {/* Los datos de cabecera, cada uno con su nombre. */}
+          <div className="crm-card">
+            <div className="crm-card__body">
+              <Facts>
+                <Field label="Fecha" value={DATE.format(new Date(sale.soldAt))} />
+                <Field
+                  label="Forma de pago"
+                  value={
+                    PAYMENT_LABELS[sale.paymentMethod] ?? sale.paymentMethod
+                  }
+                />
+                <Field
+                  label="Tasa aplicada"
+                  value={`Bs ${formatRate(sale.rate)}`}
+                  hint={`por dólar · ${sale.rateSource === "bcv" ? "BCV" : "manual"}`}
+                />
+                {isAdmin ? (
+                  <Field
+                    label="Registrada por"
+                    value={sale.sellerRole ? ROLE_LABELS[sale.sellerRole] : "—"}
+                  />
+                ) : null}
+                {sale.note ? <Field label="Nota" value={sale.note} /> : null}
+              </Facts>
             </div>
           </div>
+
+          {/* Aquí la tabla SÍ es lo correcto: pocas filas, columnas fijas, y
+              la cabecera es la etiqueta de cada dato. */}
+          <section className="crm-card overflow-hidden" aria-labelledby="renglones">
+            <div className="crm-card__head">
+              <h2 id="renglones" className="crm-h2">
+                Renglones
+              </h2>
+              <span className="crm-muted text-xs">
+                {units} {units === 1 ? "unidad" : "unidades"}
+              </span>
+            </div>
+            <div className="crm-scroll">
+              <table className="crm-doc">
+                <caption className="sr-only">
+                  Productos incluidos en esta venta
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col" className="crm-doc__num">
+                      Cantidad
+                    </th>
+                    <th scope="col" className="crm-doc__num">
+                      Precio unit.
+                    </th>
+                    {isAdmin ? (
+                      <th scope="col" className="crm-doc__num">
+                        Costo unit.
+                      </th>
+                    ) : null}
+                    <th scope="col" className="crm-doc__num">
+                      Subtotal
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sale.lines.map((line) => (
+                    <tr key={line.id}>
+<th
+                          scope="row"
+                          className="p-(--space-sm) text-left font-medium"
+                        >
+                          <div className="flex items-center gap-(--space-2xs)">
+                            <Image
+                              src={imageSrc(line.productImage ?? "")}
+                              alt=""
+                              width={40}
+                              height={40}
+                              className="size-10 shrink-0 rounded border border-(--crm-line) bg-paper2 object-cover"
+                            />
+                            <span className="min-w-0">
+                              {line.productName}
+                              {/* product_id queda en NULL si el producto se
+                                  borró: el nombre se copió al vender para que
+                                  esto sobreviva. */}
+                              {line.productId === null ? (
+                                <span className="crm-muted block text-xs font-normal">
+                                  Ya no está en el catálogo
+                                </span>
+                              ) : null}
+                            </span>
+                          </div>
+                        </th>
+                      <td className="crm-doc__num">{line.qty}</td>
+                      <td className="crm-doc__num">
+                        {formatUsd(line.unitPriceUsd)}
+                      </td>
+                      {isAdmin ? (
+                        <td className="crm-doc__num">
+                          {line.unitCostUsd > 0 ? (
+                            formatUsd(line.unitCostUsd)
+                          ) : (
+                            <span className="crm-muted">Sin registrar</span>
+                          )}
+                        </td>
+                      ) : null}
+                      <td className="crm-doc__num font-medium">
+                        {formatUsd(line.unitPriceUsd * line.qty)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan={isAdmin ? 4 : 3}>Total</td>
+                    <td className="crm-doc__num">{formatUsd(sale.totalUsd)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <section className="flex flex-col gap-(--space-sm)" aria-labelledby="cobro">
+          <h2 id="cobro" className="sr-only">
+            Cobro
+          </h2>
+          <GrandTotal
+            label="Total cobrado"
+            usd={sale.totalUsd}
+            rate={sale.rate}
+            note={`A la tasa del día de la venta: Bs ${formatRate(sale.rate)} por dólar.`}
+          />
+
+          {isAdmin ? (
+            <div className="crm-card">
+              <div className="crm-card__body">
+                <Facts stack>
+                  <Field
+                    label="Ganancia"
+                    value={formatUsd(profit)}
+                    hint={
+                      anyCostless
+                        ? "Incompleta: hay renglones sin costo registrado"
+                        : sale.totalUsd > 0
+                          ? `${formatPct((profit / sale.totalUsd) * 100)} de lo cobrado`
+                          : undefined
+                    }
+                  />
+                  <Field
+                    label="Costo de la mercancía"
+                    value={formatUsd(sale.totalUsd - profit)}
+                  />
+                </Facts>
+              </div>
+            </div>
+          ) : null}
         </section>
       </div>
     </>

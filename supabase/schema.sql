@@ -294,78 +294,14 @@ create policy "las lineas siguen a su venta" on public.sale_items
 -- vendiendo la última unidad a la vez no pueden dejar el stock en negativo:
 -- la segunda no encuentra fila que actualizar y la venta entera se revierte.
 -- ═════════════════════════════════════════════════════════════════════════
-create or replace function public.register_sale(
-  p_items   jsonb,     -- [{"product_id":"...","qty":2}, ...]
-  p_payment text,
-  p_rate    numeric,
-  p_source  text,
-  p_note    text default null
-)
-returns uuid
-language plpgsql
-security definer
-set search_path = public, pg_temp
-as $$
-declare
-  v_sale_id uuid;
-  v_item    jsonb;
-  v_qty     integer;
-  v_prod    public.products;
-  v_total   numeric := 0;
-  v_email   text;
-begin
-  if not public.is_staff() then
-    raise exception 'No autorizado' using errcode = '42501';
-  end if;
-  if p_rate is null or p_rate <= 0 then
-    raise exception 'Tasa inválida';
-  end if;
-  if p_items is null or jsonb_array_length(p_items) = 0 then
-    raise exception 'La venta no tiene renglones';
-  end if;
-
-  select email into v_email from auth.users where id = auth.uid();
-
-  insert into public.sales (seller_id, seller_email, payment_method,
-                            rate_usd_to_bs, rate_source, total_usd, note)
-  values (auth.uid(), v_email, p_payment, p_rate, p_source, 0,
-          nullif(btrim(coalesce(p_note, '')), ''))
-  returning id into v_sale_id;
-
-  for v_item in select * from jsonb_array_elements(p_items) loop
-    v_qty := (v_item->>'qty')::int;
-    if v_qty is null or v_qty <= 0 then
-      raise exception 'Cantidad inválida';
-    end if;
-
-    -- Descuenta y devuelve la fila en una sola sentencia. Si no hay stock
-    -- suficiente, no actualiza nada y v_prod queda NULL.
-    update public.products
-       set stock = stock - v_qty
-     where id = (v_item->>'product_id')
-       and stock >= v_qty
-    returning * into v_prod;
-
-    if v_prod.id is null then
-      raise exception 'Sin stock suficiente para "%"',
-        coalesce((select name from public.products
-                   where id = (v_item->>'product_id')),
-                 v_item->>'product_id');
-    end if;
-
-    insert into public.sale_items (sale_id, product_id, product_name, qty, unit_price_usd)
-    values (v_sale_id, v_prod.id, v_prod.name, v_qty, v_prod.price);
-
-    v_total := v_total + (v_prod.price * v_qty);
-  end loop;
-
-  update public.sales set total_usd = v_total where id = v_sale_id;
-  return v_sale_id;
-end;
-$$;
-
-revoke all on function public.register_sale(jsonb, text, numeric, text, text) from public;
-grant execute on function public.register_sale(jsonb, text, numeric, text, text) to authenticated;
+-- La función vive en la sección 14, no aquí: necesita las columnas
+-- sale_items.unit_cost_usd y sales.seller_role, que se añaden allí. Tenerla
+-- dos veces en este archivo era una trampa — se editaba la copia muerta.
+--
+-- Lo que NO cambia y conviene tener presente al leerla: nadie escribe ventas
+-- directamente. No hay política de INSERT sobre sales ni sale_items, así que
+-- register_sale() es la única puerta y el descuento de stock viaja en su
+-- misma transacción.
 
 -- ═════════════════════════════════════════════════════════════════════════
 -- 10 · Imágenes de productos (Supabase Storage)
@@ -563,15 +499,32 @@ revoke all on function public.register_purchase(jsonb, text, numeric, text, text
 grant execute on function public.register_purchase(jsonb, text, numeric, text, text) to authenticated;
 
 -- ═════════════════════════════════════════════════════════════════════════
--- 14 · El costo también se congela en la venta
+-- 14 · Lo que se congela en la venta: costo y rol de quien vendió
 --
--- Sin esto, el margen del histórico se deformaría igual que se deformaría el
--- precio: al comprar más caro el mes que viene, las ventas de este mes
--- parecerían haber ganado menos de lo que ganaron.
+-- El costo, porque sin él el margen del histórico se deformaría igual que se
+-- deformaría el precio: al comprar más caro el mes que viene, las ventas de
+-- este mes parecerían haber ganado menos de lo que ganaron.
+--
+-- El rol, porque no se puede deducir después. La política de staff solo deja
+-- a cada quien ver SU propia ficha, así que un join devolvería vacío para las
+-- ventas de los demás. Y aunque se pudiera consultar, ascender a alguien
+-- reescribiría quién era cuando vendió.
 -- ═════════════════════════════════════════════════════════════════════════
 alter table public.sale_items
   add column if not exists unit_cost_usd numeric not null default 0
   check (unit_cost_usd >= 0);
+
+alter table public.sales
+  add column if not exists seller_role text
+  check (seller_role is null or seller_role in ('admin', 'vendedor'));
+
+-- Relleno para las ventas que ya existían. Queda NULL si esa persona ya no
+-- está en la plantilla; la UI lo muestra como "—" en vez de inventarlo.
+update public.sales s
+   set seller_role = st.role
+  from public.staff st
+ where st.user_id = s.seller_id
+   and s.seller_role is null;
 
 create or replace function public.register_sale(
   p_items   jsonb,
@@ -592,6 +545,7 @@ declare
   v_prod    public.products;
   v_total   numeric := 0;
   v_email   text;
+  v_role    text;
 begin
   if not public.is_staff() then
     raise exception 'No autorizado' using errcode = '42501';
@@ -604,10 +558,11 @@ begin
   end if;
 
   select email into v_email from auth.users where id = auth.uid();
+  v_role := public.staff_role();
 
-  insert into public.sales (seller_id, seller_email, payment_method,
+  insert into public.sales (seller_id, seller_email, seller_role, payment_method,
                             rate_usd_to_bs, rate_source, total_usd, note)
-  values (auth.uid(), v_email, p_payment, p_rate, p_source, 0,
+  values (auth.uid(), v_email, v_role, p_payment, p_rate, p_source, 0,
           nullif(btrim(coalesce(p_note, '')), ''))
   returning id into v_sale_id;
 
@@ -641,3 +596,6 @@ begin
   return v_sale_id;
 end;
 $$;
+
+revoke all on function public.register_sale(jsonb, text, numeric, text, text) from public;
+grant execute on function public.register_sale(jsonb, text, numeric, text, text) to authenticated;
