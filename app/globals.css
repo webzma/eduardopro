@@ -64,6 +64,34 @@
      backgrounds — on cream it drops to 3.18 and fails. */
   --signal-lift: oklch(64% 0.19 26);
 
+  /* ── Colores de significado (solo /admin) ──────────────────────
+     La landing sigue con un rojo y punto. El panel necesita más:
+     quien cobra tiene que distinguir de un vistazo lo que entra de
+     lo que sale y lo que reclama atención, sin leer la etiqueta.
+       jade  → dinero que entra, existencias sanas, confirmaciones
+       amber → avisos que no bloquean (stock bajo, tasa vieja)
+       navy  → información neutra, compras y proveedores
+       signal→ errores y lo que exige acción YA
+     Cada uno con su tinte de superficie a juego. Medidos, no a ojo:
+       jade   / paper .... 6.15 AA   ·  jade  / tint-jade .... 5.86 AA
+       amber  / paper .... 5.29 AA   ·  amber / tint-amber ... 4.98 AA
+       navy   / tint-navy  9.96 AA   ·  signal/ tint-signal .. 5.33 AA
+       coal   / band ..... 13.73 AA  ·  coal  / zebra ....... 16.29 AA
+       ash    / band ...... 5.24 AA  ·  ash   / zebra ........ 6.22 AA
+     Los cuatro tintes llevan tinta --coal (15.8–16.3) o --ash (6.0–6.2).
+     Todos dentro del gamut sRGB. */
+  --jade: oklch(45% 0.085 165);
+  --amber: oklch(50% 0.095 70);
+  --tint-jade: oklch(93% 0.035 165);
+  --tint-amber: oklch(93% 0.05 85);
+  --tint-navy: oklch(93% 0.028 250);
+  --tint-signal: oklch(93% 0.035 26);
+
+  /* Banda de cabecera de tabla y fila alterna. Sin ellas una tabla de
+     doce filas en crema es un bloque de texto sin asideros. */
+  --band: oklch(88% 0.04 84);
+  --zebra: oklch(93.5% 0.032 85);
+
   /* Focus ring flips per surface; sections override --focus-ring locally. */
   --focus-ring: var(--navy);
 
@@ -124,6 +152,14 @@
   --color-navy: var(--navy);
   --color-signal: var(--signal);
   --color-signallift: var(--signal-lift);
+  --color-jade: var(--jade);
+  --color-amber: var(--amber);
+  --color-tintjade: var(--tint-jade);
+  --color-tintamber: var(--tint-amber);
+  --color-tintnavy: var(--tint-navy);
+  --color-tintsignal: var(--tint-signal);
+  --color-band: var(--band);
+  --color-zebra: var(--zebra);
 
   --font-sans: var(--font-body-stack);
   --font-display: var(--font-display);

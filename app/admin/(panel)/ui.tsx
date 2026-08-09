@@ -12,27 +12,131 @@ import { cn } from "@/app/lib/utils";
  *
  * Regla que las gobierna a todas: NINGÚN dato se muestra sin su etiqueta. Una
  * fila que dice "08-ago · 50 · X" obliga a adivinar qué es cada cosa; con
- * "Fecha / Unidades / Proveedor" encima no hay nada que adivinar. */
+ * "Fecha / Unidades / Proveedor" encima no hay nada que adivinar.
+ *
+ * Segunda regla, la del color: cada tono SIGNIFICA algo y significa siempre lo
+ * mismo. Verde es dinero que entra, ámbar es un aviso, azul es dato neutro y
+ * rojo es lo que exige acción. Un color decorativo, puesto porque quedaba
+ * bonito, rompe el sistema entero: en cuanto un verde no quiere decir nada,
+ * ninguno quiere decir nada. */
+
+/** Los cuatro tonos del panel. `neutral` es la tarjeta de siempre. */
+export type Tone = "jade" | "amber" | "navy" | "signal" | "neutral";
+
+const TONES: Record<Tone, { bar: string; chip: string; surface: string }> = {
+  // Las fichas de color llevan crema, nunca tinta: en --signal la tinta mide
+  // 2.98 y no llega a AA. Lo que vale para el rojo se aplica a los cuatro.
+  jade: { bar: "bg-jade", chip: "bg-jade text-paper", surface: "bg-tintjade" },
+  amber: {
+    bar: "bg-amber",
+    chip: "bg-amber text-paper",
+    surface: "bg-tintamber",
+  },
+  navy: { bar: "bg-navy", chip: "bg-navy text-paper", surface: "bg-tintnavy" },
+  signal: {
+    bar: "bg-signal",
+    chip: "bg-signal text-paper",
+    surface: "bg-tintsignal",
+  },
+  neutral: {
+    bar: "bg-border",
+    chip: "bg-secondary text-secondary-foreground",
+    surface: "bg-card",
+  },
+};
 
 export function PageHeader({
   title,
   description,
+  icon: Glyph,
   action,
 }: {
   title: string;
   description?: ReactNode;
+  /** Marca de la sección. La misma que lleva en el menú lateral, para que se
+   *  reconozca dónde estás sin leer el título. */
+  icon?: Icon;
   action?: ReactNode;
 }) {
   return (
-    <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div className="min-w-0">
-        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-        {description ? (
-          <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
-        ) : null}
+    <header className="mb-6 border-b-2 border-border pb-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          {Glyph ? (
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
+              <Glyph size={22} stroke={1.75} aria-hidden />
+            </span>
+          ) : null}
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+            {description ? (
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {description}
+              </p>
+            ) : null}
+          </div>
+        </div>
+        {action}
       </div>
-      {action}
     </header>
+  );
+}
+
+/**
+ * Cifra grande con su etiqueta, su color y su icono. Es la tarjeta que abre
+ * cada pantalla del panel: sustituye a las tres fichas planas que había en
+ * Ventas y Compras y al Kpi que el Resumen tenía por su cuenta.
+ */
+export function Stat({
+  label,
+  value,
+  sub,
+  icon: Glyph,
+  tone = "neutral",
+}: {
+  label: string;
+  value: ReactNode;
+  sub?: ReactNode;
+  icon?: Icon;
+  tone?: Tone;
+}) {
+  const t = TONES[tone];
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-lg border shadow-sm",
+        t.surface,
+      )}
+    >
+      {/* La franja de color va al borde, no detrás del texto: tiñe la tarjeta
+          sin bajarle el contraste a la cifra. */}
+      <span className={cn("absolute inset-y-0 left-0 w-1.5", t.bar)} aria-hidden />
+      <div className="flex items-start gap-3 p-4 pl-5">
+        {Glyph ? (
+          <span
+            className={cn(
+              "flex size-9 shrink-0 items-center justify-center rounded-md",
+              t.chip,
+            )}
+          >
+            <Glyph size={20} stroke={1.75} aria-hidden />
+          </span>
+        ) : null}
+        <div className="min-w-0">
+          <p className="text-[0.6875rem] font-semibold tracking-[0.07em] text-muted-foreground uppercase">
+            {label}
+          </p>
+          <p className="mt-0.5 text-xl leading-tight font-semibold tracking-tight tabular-nums">
+            {value}
+          </p>
+          {sub ? (
+            <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+              {sub}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -56,8 +160,9 @@ export function Notice({
       variant={kind === "bad" ? "destructive" : "default"}
       className={cn(
         "border-l-4",
-        kind === "ok" && "border-l-navy",
-        kind === "info" && "border-l-muted-foreground",
+        kind === "ok" && "border-l-jade bg-tintjade",
+        kind === "info" && "border-l-navy bg-tintnavy",
+        kind === "bad" && "bg-tintsignal",
       )}
     >
       {Glyph ? <Glyph size={16} stroke={1.75} aria-hidden /> : null}
@@ -77,13 +182,10 @@ export function EmptyState({
 }) {
   return (
     <div className="px-4 py-12 text-center text-sm text-muted-foreground">
-      <Glyph
-        size={28}
-        stroke={1.5}
-        aria-hidden
-        className="mx-auto mb-2 opacity-40"
-      />
-      <p className="font-medium text-foreground/80">{title}</p>
+      <span className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-tintnavy text-navy">
+        <Glyph size={26} stroke={1.5} aria-hidden />
+      </span>
+      <p className="font-medium text-foreground">{title}</p>
       {children ? <p className="mt-1">{children}</p> : null}
     </div>
   );
@@ -152,10 +254,48 @@ export function Thumbs({
   );
 }
 
+/**
+ * Etiqueta de color con punto. El punto hace el trabajo que el color NO puede
+ * hacer solo: quien no distingue verde de ámbar sigue viendo cuatro formas
+ * distintas de rellenar la píldora, y el texto siempre está ahí.
+ */
+export function Chip({
+  tone = "neutral",
+  children,
+}: {
+  tone?: Tone;
+  children: ReactNode;
+}) {
+  const t = TONES[tone];
+  return (
+    <span
+      className={cn(
+        "inline-flex w-fit items-center gap-1.5 rounded-full border border-border px-2 py-0.5 text-xs font-medium whitespace-nowrap",
+        t.surface,
+      )}
+    >
+      <span className={cn("size-1.5 shrink-0 rounded-full", t.bar)} aria-hidden />
+      {children}
+    </span>
+  );
+}
+
+/** Cada forma de cobro, su color. Efectivo en dólares es el que más pesa en
+ *  caja, así que se lleva el verde; lo que entra en bolívares va en azul. */
+export const PAYMENT_TONES: Record<string, Tone> = {
+  usd_efectivo: "jade",
+  bs_efectivo: "navy",
+  pago_movil: "navy",
+  transferencia: "navy",
+  otro: "neutral",
+};
+
 /** Distintivo de referencia corta (#A3F2C1). */
 export function Ref({ children }: { children: ReactNode }) {
   return (
-    <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[0.6875rem] font-semibold tracking-[0.04em] text-secondary-foreground">
+    // De tinta sobre crema (17.04): la referencia es el identificador que se
+    // dicta por teléfono, no una nota al margen que se pueda perder.
+    <span className="shrink-0 rounded-sm bg-coal px-1.5 py-px text-[0.6875rem] font-semibold tracking-[0.04em] text-paper">
       {children}
     </span>
   );
@@ -175,6 +315,7 @@ export function Record({
   amountUsd,
   rate,
   label,
+  tone = "jade",
 }: {
   href: string;
   /** Referencia corta: sin ella, dos registros del mismo día son
@@ -189,7 +330,11 @@ export function Record({
   rate: number;
   /** Nombre accesible del enlace: sin él solo se leería la referencia. */
   label: string;
+  /** Color del filo y del importe. Verde por defecto: estos registros son
+   *  ventas, y una venta es dinero que entra. */
+  tone?: Tone;
 }) {
+  const t = TONES[tone];
   return (
     <li className="not-first:border-t not-first:border-border">
       <Link
@@ -197,8 +342,12 @@ export function Record({
         aria-label={label}
         // El anillo va por dentro: con outline normal se recortaría contra el
         // borde de la tarjeta.
-        className="block p-4 transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+        className="relative block py-4 pr-4 pl-5 transition-colors even:bg-zebra hover:bg-tintamber focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:outline-none"
       >
+        <span
+          className={cn("absolute inset-y-0 left-0 w-1.5", t.bar)}
+          aria-hidden
+        />
         <div className="mb-2 flex flex-wrap items-center gap-2">
           {media}
           <Ref>{reference}</Ref>
@@ -211,7 +360,12 @@ export function Record({
         <dl className="grid grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))] gap-x-4 gap-y-2">
           {fields}
           <Field
-            className="sm:text-right [&_dd]:text-base [&_dd]:font-semibold"
+            className={cn(
+              "sm:text-right [&_dd]:text-base [&_dd]:font-semibold",
+              tone === "jade" && "[&_dd]:text-jade",
+              tone === "navy" && "[&_dd]:text-navy",
+              tone === "signal" && "[&_dd]:text-signal",
+            )}
             label={amountLabel}
             value={formatUsd(amountUsd)}
             hint={formatBs(amountUsd, rate)}

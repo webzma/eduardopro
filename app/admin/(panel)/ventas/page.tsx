@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { IconShoppingCartPlus, IconReceiptOff } from "@tabler/icons-react";
+import {
+  IconShoppingCartPlus,
+  IconReceiptOff,
+  IconReceipt,
+  IconPackages,
+  IconCashBanknote,
+} from "@tabler/icons-react";
 import { requireStaff } from "@/app/lib/auth";
 import { getSales } from "@/app/lib/sales";
 import {
@@ -10,7 +16,6 @@ import {
 } from "@/app/lib/money";
 import { imageSrc } from "@/app/lib/images";
 import { buttonVariants } from "@/app/components/ui/button";
-import { Badge } from "@/app/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import {
   Table,
@@ -24,7 +29,7 @@ import {
 } from "@/app/components/ui/table";
 import PeriodFilter from "../PeriodFilter";
 import { isPeriod, periodStart, type Period } from "@/app/lib/period";
-import { EmptyState, Field, PageHeader } from "../ui";
+import { Chip, EmptyState, PAYMENT_TONES, PageHeader, Stat } from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +76,7 @@ export default async function SalesPage({
     <>
       <PageHeader
         title="Ventas"
+        icon={IconReceipt}
         description={
           isAdmin
             ? "Todas las ventas del negocio."
@@ -89,26 +95,29 @@ export default async function SalesPage({
       </div>
 
       {sales.length > 0 ? (
-        <dl className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-4">
-          <Field
+        <div className="mb-6 grid gap-4 sm:grid-cols-3">
+          <Stat
             label="Ventas del periodo"
             value={String(sales.length)}
-            className="rounded-lg border bg-card p-4 shadow-sm"
+            icon={IconReceipt}
+            tone="navy"
           />
-          <Field
+          <Stat
             label="Unidades vendidas"
             value={String(totalUnits)}
-            className="rounded-lg border bg-card p-4 shadow-sm"
+            icon={IconPackages}
+            tone="amber"
           />
-          <Field
+          <Stat
             label="Total facturado"
             value={formatUsd(totalUsd)}
-            className="rounded-lg border bg-card p-4 shadow-sm"
+            icon={IconCashBanknote}
+            tone="jade"
           />
-        </dl>
+        </div>
       ) : null}
 
-      <div className="rounded-lg border bg-card shadow-sm">
+      <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
         {sales.length === 0 ? (
           <EmptyState icon={IconReceiptOff} title="Todavía no hay ventas">
             <Link href="/admin/ventas/nueva" className="underline">
@@ -207,10 +216,10 @@ export default async function SalesPage({
                       </TableCell>
 
                       <TableCell>
-                        <Badge variant="secondary" className="whitespace-nowrap">
+                        <Chip tone={PAYMENT_TONES[sale.paymentMethod]}>
                           {PAYMENT_LABELS[sale.paymentMethod] ??
                             sale.paymentMethod}
-                        </Badge>
+                        </Chip>
                       </TableCell>
 
                       <TableCell className="text-right tabular-nums whitespace-nowrap">
@@ -228,7 +237,9 @@ export default async function SalesPage({
                       ) : null}
 
                       <TableCell className="text-right whitespace-nowrap">
-                        <span className="block font-semibold tabular-nums">
+                        {/* Verde: en este panel el verde es siempre dinero que
+                            entra, aquí y en el Resumen. */}
+                        <span className="block font-semibold tabular-nums text-jade">
                           {formatUsd(sale.totalUsd)}
                         </span>
                         {/* A la tasa guardada con la venta, no a la de hoy: el

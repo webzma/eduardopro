@@ -12,6 +12,8 @@ import {
   IconCheck,
   IconSparkles,
   IconWand,
+  IconPackages,
+  IconTruckDelivery,
 } from "@tabler/icons-react";
 import {
   registerPurchaseAction,
@@ -164,9 +166,12 @@ export default function PurchaseForm({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
         <div className="flex flex-col gap-6">
           {/* ── Qué llegó ── */}
-          <div className="rounded-lg border bg-card shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
-              <h2 className="text-base font-semibold">Mercancía recibida</h2>
+          <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-border bg-band p-4">
+              <h2 className="flex items-center gap-2 text-base font-semibold">
+                <IconPackageImport size={18} stroke={1.75} aria-hidden />
+                2. Mercancía recibida
+              </h2>
               <span className="text-sm text-muted-foreground text-xs">
                 {lines.length} {lines.length === 1 ? "renglón" : "renglones"}
               </span>
@@ -418,9 +423,12 @@ export default function PurchaseForm({
           </div>
 
           {/* ── Buscador ── */}
-          <div className="rounded-lg border bg-card shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
-              <h2 className="text-base font-semibold">Añadir al pedido</h2>
+          <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-border bg-band p-4">
+              <h2 className="flex items-center gap-2 text-base font-semibold">
+                <IconPackages size={18} stroke={1.75} aria-hidden />
+                1. Añadir al pedido
+              </h2>
               <div className="relative max-w-64 flex-1">
                 <IconSearch
                   size={16}
@@ -500,9 +508,14 @@ export default function PurchaseForm({
         </div>
 
         {/* ── Resumen ── */}
-        <div className="rounded-lg border bg-card shadow-sm lg:sticky lg:top-6">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
-            <h2 className="text-base font-semibold">Compra</h2>
+        <div className="overflow-hidden rounded-lg border-2 border-navy bg-card shadow-sm lg:sticky lg:top-6">
+          {/* Azul, no rojo: el rojo es la columna de cobrar. Una compra es
+              dinero que sale, y las dos pantallas no pueden parecer la misma. */}
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-navy p-4 text-paper">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
+              <IconTruckDelivery size={18} stroke={1.75} aria-hidden />
+              3. Cerrar la compra
+            </h2>
           </div>
           <div className="p-4">
             <Label htmlFor="supplier" className="mb-1 block">
@@ -528,25 +541,29 @@ export default function PurchaseForm({
             />
 
             <div
-              className="mt-6 border-t border-border pt-4"
+              className="mt-6 rounded-md border-2 border-signal bg-tintsignal p-3"
               aria-live="polite"
             >
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm font-medium">Total pagado</span>
-                <span className="text-xl font-semibold tabular-nums">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[0.6875rem] font-semibold tracking-[0.07em] text-muted-foreground uppercase">
+                  Total pagado
+                </span>
+                <span className="text-2xl leading-tight font-semibold tabular-nums text-signal">
                   {formatUsd(total)}
                 </span>
               </div>
-              <div className="mt-0.5 flex items-baseline justify-between">
-                <span className="text-sm text-muted-foreground text-xs">A la tasa del día</span>
-                <span className="text-base font-medium tabular-nums text-primary">
+              <div className="mt-0.5 flex items-baseline justify-between gap-2">
+                <span className="text-xs text-muted-foreground">
+                  A la tasa del día
+                </span>
+                <span className="text-lg font-semibold tabular-nums">
                   {formatBs(total, rate)}
                 </span>
               </div>
             </div>
 
             {state.error ? (
-              <p role="alert" className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive mt-3">
+              <p role="alert" className="mt-3 rounded-md border border-l-4 border-l-destructive bg-tintsignal px-4 py-2 text-sm text-destructive">
                 <IconAlertTriangle
                   size={16}
                   stroke={1.75}
@@ -559,7 +576,7 @@ export default function PurchaseForm({
             <button
               type="submit"
               disabled={lines.length === 0 || incomplete || pending}
-              className={cn(buttonVariants(), "mt-3 w-full")}
+              className={cn(buttonVariants({ size: "lg" }), "mt-3 w-full")}
             >
               {pending ? (
                 <>

@@ -11,6 +11,7 @@ import {
   IconAlertTriangle,
   IconLoader2,
   IconCheck,
+  IconPackages,
 } from "@tabler/icons-react";
 import { registerSaleAction, type SaleFormState } from "../../../actions";
 import { formatBs, formatUsd, PAYMENT_LABELS } from "../../../../lib/money";
@@ -26,6 +27,7 @@ import {
   SelectValue,
 } from "@/app/components/ui/select";
 import { Input } from "@/app/components/ui/input";
+import { Chip } from "../../ui";
 import { cn } from "@/app/lib/utils";
 
 type Line = { product: Product; qty: number };
@@ -102,9 +104,12 @@ export default function SaleForm({
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
         {/* ── Buscador y catálogo ── */}
-        <div className="rounded-lg border bg-card shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
-            <h2 className="text-base font-semibold">Productos</h2>
+        <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-border bg-band p-4">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
+              <IconPackages size={18} stroke={1.75} aria-hidden />
+              1. Elige los productos
+            </h2>
             <div className="relative max-w-64 flex-1">
               <IconSearch
                 size={16}
@@ -133,36 +138,45 @@ export default function SaleForm({
                 return (
                   <li
                     key={product.id}
-                    className="flex items-center gap-4 p-2 px-4"
+                    className={cn(
+                      "flex items-center gap-4 p-2 px-4 transition-colors even:bg-zebra",
+                      // Lo que ya va en el carrito se marca en verde: al
+                      // recorrer una lista larga se ve qué está pedido sin
+                      // tener que mirar al ticket.
+                      taken > 0 && "bg-tintjade even:bg-tintjade",
+                    )}
                   >
                     <Image
                       src={imageSrc(product.image)}
                       alt=""
-                      width={36}
-                      height={36}
-                      className="size-9 shrink-0 rounded border border-border object-cover"
+                      width={44}
+                      height={44}
+                      className="size-11 shrink-0 rounded border border-border object-cover"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">
                         {product.name}
                       </p>
-                      <p className="text-sm text-muted-foreground truncate text-xs">
+                      <p className="truncate text-xs text-muted-foreground">
                         {product.category || "Sin categoría"} ·{" "}
-                        {formatUsd(product.price)} ·{" "}
-                        {formatBs(product.price, rate)}
+                        <span className="font-semibold text-jade">
+                          {formatUsd(product.price)}
+                        </span>{" "}
+                        · {formatBs(product.price, rate)}
                       </p>
                     </div>
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
-                        left <= 0
-                          ? "bg-primary/15 text-primary"
-                          : left <= 3
-                            ? "bg-muted text-secondary-foreground"
-                            : "bg-muted text-secondary-foreground"
-                      }`}
+                    {taken > 0 ? (
+                      <Chip tone="jade">
+                        {taken} en el carrito
+                      </Chip>
+                    ) : null}
+                    {/* Agotado en rojo, por acabarse en ámbar, con existencias
+                        en gris: el color solo aparece cuando dice algo. */}
+                    <Chip
+                      tone={left <= 0 ? "signal" : left <= 3 ? "amber" : "neutral"}
                     >
-                      {left} disp.
-                    </span>
+                      {left <= 0 ? "Agotado" : `${left} disp.`}
+                    </Chip>
                     <button
                       type="button"
                       onClick={() => add(product)}
@@ -180,14 +194,27 @@ export default function SaleForm({
         </div>
 
         {/* ── Ticket ── */}
-        <div className="rounded-lg border bg-card shadow-sm lg:sticky lg:top-6">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
-            <h2 className="text-base font-semibold">Venta</h2>
+        <div className="overflow-hidden rounded-lg border-2 border-signal bg-card shadow-sm lg:sticky lg:top-6">
+          {/* El ticket va en rojo de arriba abajo: es la columna donde se
+              cierra la venta, no una tarjeta más de la pantalla. */}
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-signal p-4 text-paper">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
+              <IconShoppingCart size={18} stroke={1.75} aria-hidden />
+              2. Carrito
+              {lines.length > 0 ? (
+                <span className="rounded-full bg-paper px-2 text-sm font-bold text-signal tabular-nums">
+                  {lines.length}
+                </span>
+              ) : null}
+            </h2>
             {lines.length > 0 ? (
               <button
                 type="button"
                 onClick={() => setLines([])}
-                className={buttonVariants({ variant: "ghost", size: "sm" })}
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  "text-paper hover:bg-paper hover:text-signal",
+                )}
               >
                 <IconTrash size={16} stroke={1.75} />
                 Vaciar
@@ -197,62 +224,99 @@ export default function SaleForm({
 
           <div className="p-4">
             {lines.length === 0 ? (
-              <div className="px-4 py-12 text-center text-sm text-muted-foreground">
-                <IconShoppingCart size={28} stroke={1.5} className="mx-auto mb-2 opacity-40" />
+              <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+                <span className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-tintsignal text-signal">
+                  <IconShoppingCart size={26} stroke={1.5} aria-hidden />
+                </span>
                 Añade productos para empezar la venta.
               </div>
             ) : (
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2">
                 {lines.map((line) => (
-                  <li key={line.product.id} className="flex items-center gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
-                        {line.product.name}
-                      </p>
-                      <p className="text-sm text-muted-foreground text-xs tabular-nums">
-                        {formatUsd(line.product.price)} c/u
-                      </p>
+                  <li
+                    key={line.product.id}
+                    className="rounded-md border border-border bg-zebra p-2"
+                  >
+                    {/* La foto también en el carrito, no solo en el catálogo.
+                        Quien cobra mira el ticket, no la lista de la
+                        izquierda: sin la foto aquí, comprobar que lo añadido
+                        es lo que el cliente tiene en la mano obliga a leer
+                        nombres que se parecen entre sí. */}
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src={imageSrc(line.product.image)}
+                        alt=""
+                        width={40}
+                        height={40}
+                        className="size-10 shrink-0 rounded border border-border object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">
+                          {line.product.name}
+                        </p>
+                        <p className="text-xs tabular-nums text-muted-foreground">
+                          {formatUsd(line.product.price)} c/u
+                        </p>
+                      </div>
+                      <span className="text-sm font-semibold tabular-nums text-jade">
+                        {formatUsd(line.product.price * line.qty)}
+                      </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setQty(line.product.id, line.qty - 1)}
-                      aria-label={`Quitar una unidad de ${line.product.name}`}
-                      className={buttonVariants({ variant: "outline", size: "icon-sm" })}
-                    >
-                      <IconMinus size={15} stroke={2} />
-                    </button>
-                    {/* Input, no texto: con solo los botones ± poner 12
-                        unidades son doce pulsaciones y no hay forma de
-                        teclear la cantidad. */}
-                    <Input
-                      type="number"
-                      min="1"
-                      max={line.product.stock}
-                      value={line.qty}
-                      onChange={(e) =>
-                        setQty(line.product.id, Math.trunc(+e.target.value || 0))
-                      }
-                      aria-label={`Cantidad de ${line.product.name}`}
-                      className="w-14 px-1 text-center"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setQty(line.product.id, line.qty + 1)}
-                      disabled={line.qty >= line.product.stock}
-                      aria-label={`Añadir una unidad de ${line.product.name}`}
-                      className={buttonVariants({ variant: "outline", size: "icon-sm" })}
-                    >
-                      <IconPlus size={15} stroke={2} />
-                    </button>
-                    <span className="w-16 text-right text-sm font-medium tabular-nums">
-                      {formatUsd(line.product.price * line.qty)}
-                    </span>
+
+                    <div className="mt-2 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setQty(line.product.id, line.qty - 1)}
+                        aria-label={`Quitar una unidad de ${line.product.name}`}
+                        className={buttonVariants({
+                          variant: "outline",
+                          size: "icon-sm",
+                        })}
+                      >
+                        <IconMinus size={15} stroke={2} />
+                      </button>
+                      {/* Input, no texto: con solo los botones ± poner 12
+                          unidades son doce pulsaciones y no hay forma de
+                          teclear la cantidad. */}
+                      <Input
+                        type="number"
+                        min="1"
+                        max={line.product.stock}
+                        value={line.qty}
+                        onChange={(e) =>
+                          setQty(
+                            line.product.id,
+                            Math.trunc(+e.target.value || 0),
+                          )
+                        }
+                        aria-label={`Cantidad de ${line.product.name}`}
+                        className="w-14 bg-card px-1 text-center"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setQty(line.product.id, line.qty + 1)}
+                        disabled={line.qty >= line.product.stock}
+                        aria-label={`Añadir una unidad de ${line.product.name}`}
+                        className={buttonVariants({
+                          variant: "outline",
+                          size: "icon-sm",
+                        })}
+                      >
+                        <IconPlus size={15} stroke={2} />
+                      </button>
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        Quedan {line.product.stock - line.qty}
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
             )}
 
-            <div className="mt-6 border-t border-border pt-4">
+            <div className="mt-6 border-t-2 border-border pt-4">
+              <p className="mb-2 text-[0.6875rem] font-semibold tracking-[0.07em] text-muted-foreground uppercase">
+                3. Cómo se cobró
+              </p>
               <Label htmlFor="payment">Método de pago</Label>
               <Select
                 name="payment"
@@ -271,39 +335,57 @@ export default function SaleForm({
                 </SelectContent>
               </Select>
 
-              <Label htmlFor="note" className="mb-1 block text-sm font-medium text-secondary-foreground mt-3">
-                Nota <span className="text-sm text-muted-foreground">(opcional)</span>
+              <Label
+                htmlFor="note"
+                className="mt-3 mb-1 block text-sm font-medium text-secondary-foreground"
+              >
+                Nota{" "}
+                <span className="text-sm font-normal text-muted-foreground">
+                  (opcional)
+                </span>
               </Label>
               <Input
                 id="note"
                 name="note"
                 type="text"
                 placeholder="Cliente, referencia del pago…"
-                
               />
             </div>
 
+            {/* El total, en verde y en su propia caja. Es la cifra que se le
+                canta al cliente: no puede competir con el resto del panel. */}
             <div
-              className="mt-6 border-t border-border pt-4"
+              className="mt-6 rounded-md border-2 border-jade bg-tintjade p-3"
               aria-live="polite"
             >
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm font-medium">Total</span>
-                <span className="text-xl font-semibold tabular-nums">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[0.6875rem] font-semibold tracking-[0.07em] text-muted-foreground uppercase">
+                  Total a cobrar
+                </span>
+                <span className="text-2xl leading-tight font-semibold tabular-nums text-jade">
                   {formatUsd(total)}
                 </span>
               </div>
-              <div className="mt-0.5 flex items-baseline justify-between">
-                <span className="text-sm text-muted-foreground text-xs">A la tasa del día</span>
-                <span className="text-base font-medium tabular-nums text-primary">
+              <div className="mt-0.5 flex items-baseline justify-between gap-2">
+                <span className="text-xs text-muted-foreground">
+                  A la tasa del día
+                </span>
+                <span className="text-lg font-semibold tabular-nums">
                   {formatBs(total, rate)}
                 </span>
               </div>
             </div>
 
             {state.error ? (
-              <p role="alert" className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive mt-3">
-                <IconAlertTriangle size={16} stroke={1.75} className="inline align-text-bottom" />{" "}
+              <p
+                role="alert"
+                className="mt-3 rounded-md border border-l-4 border-l-destructive bg-tintsignal px-4 py-2 text-sm text-destructive"
+              >
+                <IconAlertTriangle
+                  size={16}
+                  stroke={1.75}
+                  className="inline align-text-bottom"
+                />{" "}
                 {state.error}
               </p>
             ) : null}
@@ -311,7 +393,7 @@ export default function SaleForm({
             <button
               type="submit"
               disabled={lines.length === 0 || pending}
-              className={cn(buttonVariants(), "mt-3 w-full")}
+              className={cn(buttonVariants({ size: "lg" }), "mt-3 w-full")}
             >
               {pending ? (
                 <>
@@ -325,7 +407,7 @@ export default function SaleForm({
                 </>
               )}
             </button>
-            <p className="text-sm text-muted-foreground mt-2 text-center text-xs">
+            <p className="mt-2 text-center text-xs text-muted-foreground">
               Al registrarla se descuenta el stock automáticamente.
             </p>
           </div>

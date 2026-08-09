@@ -6,10 +6,11 @@ import {
   IconAlertTriangle,
   IconShoppingCartPlus,
   IconCashRegister,
+  IconReceipt,
   IconReceiptOff,
   IconTruckDelivery,
   IconTrendingUp,
-  type Icon,
+  IconLayoutDashboard,
 } from "@tabler/icons-react";
 import { requireStaff } from "../../lib/auth";
 import { getProducts, SupabaseSetupError } from "../../lib/products";
@@ -17,7 +18,15 @@ import { getSales, getSummary } from "../../lib/sales";
 import { getMonthSpend } from "../../lib/purchases";
 import { getRate } from "../../lib/rate";
 import { formatBs, formatUsd, PAYMENT_LABELS } from "../../lib/money";
-import { EmptyState, Field, Notice, PageHeader, Record, Thumbs } from "./ui";
+import {
+  EmptyState,
+  Field,
+  Notice,
+  PageHeader,
+  Record,
+  Stat,
+  Thumbs,
+} from "./ui";
 import { buttonVariants } from "@/app/components/ui/button";
 import { getSettings } from "../../lib/settings";
 import Pending from "./Pending";
@@ -33,44 +42,6 @@ const TIME = new Intl.DateTimeFormat("es-VE", {
 });
 
 const LOW_STOCK = 3;
-
-function Kpi({
-  label,
-  value,
-  sub,
-  icon: Glyph,
-  alert,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  icon: Icon;
-  /** Tiñe la cifra de rojo — solo cuando pide acción, nunca decorativo. */
-  alert?: boolean;
-}) {
-  return (
-    <div className="rounded-lg border bg-card shadow-sm">
-      <div className="p-4 flex items-start gap-4">
-        <span
-          className={`flex size-9 shrink-0 items-center justify-center rounded-md ${
-            alert
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-secondary-foreground"
-          }`}
-        >
-          <Glyph size={20} stroke={1.75} aria-hidden />
-        </span>
-        <div className="min-w-0">
-          <p className="mb-1 text-sm text-muted-foreground">{label}</p>
-          <p className={`text-xl leading-tight font-semibold tracking-tight tabular-nums ${alert ? "text-primary" : ""}`}>
-            {value}
-          </p>
-          {sub ? <p className="mt-0.5 text-sm tabular-nums text-muted-foreground">{sub}</p> : null}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default async function DashboardPage() {
   const { role } = await requireStaff();
@@ -111,6 +82,7 @@ export default async function DashboardPage() {
     <>
       <PageHeader
         title="Resumen"
+        icon={IconLayoutDashboard}
         description={
           isAdmin
             ? "Cifras de todo el negocio."
@@ -142,10 +114,13 @@ export default async function DashboardPage() {
         />
       </div>
 
+      {/* Verde lo que entra, rojo lo que sale, ámbar lo que reclama atención.
+          El mismo código de color que usan las tablas de Ventas y Compras. */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi
+        <Stat
           label="Vendido hoy"
           icon={IconCashBanknote}
+          tone="jade"
           value={formatUsd(summary.todayUsd)}
           sub={
             rate
@@ -153,9 +128,10 @@ export default async function DashboardPage() {
               : `${summary.todayCount} ventas`
           }
         />
-        <Kpi
+        <Stat
           label="Vendido este mes"
           icon={IconCalendarMonth}
+          tone="jade"
           value={formatUsd(summary.monthUsd)}
           sub={
             rate
@@ -166,9 +142,10 @@ export default async function DashboardPage() {
         {/* El valor del inventario es dato de negocio: el vendedor ve en su
             lugar lo que sí necesita, cuánto puede vender ahora mismo. */}
         {isAdmin ? (
-          <Kpi
+          <Stat
             label="Valor del inventario"
             icon={IconBuildingWarehouse}
+            tone="navy"
             value={formatUsd(stockValue)}
             sub={
               rate
@@ -177,17 +154,20 @@ export default async function DashboardPage() {
             }
           />
         ) : (
-          <Kpi
+          <Stat
             label="Disponible para vender"
             icon={IconBuildingWarehouse}
+            tone="navy"
             value={String(products.filter((p) => p.stock > 0).length)}
             sub={`De ${products.length} productos en catálogo`}
           />
         )}
-        <Kpi
+        {/* Ámbar cuando hay poco stock, gris cuando no hay nada que mirar: el
+            color aparece porque hay algo que hacer, no siempre. */}
+        <Stat
           label="Stock bajo"
           icon={IconAlertTriangle}
-          alert={lowStock.length > 0}
+          tone={lowStock.length > 0 ? "amber" : "neutral"}
           value={String(lowStock.length)}
           sub={`Productos con ${LOW_STOCK} o menos`}
         />
@@ -195,17 +175,20 @@ export default async function DashboardPage() {
 
       {isAdmin ? (
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Kpi
+          <Stat
             label="Comprado este mes"
             icon={IconTruckDelivery}
+            tone="signal"
             value={formatUsd(monthSpend)}
             sub={rate ? formatBs(monthSpend, rate.value) : undefined}
           />
           {/* Si falta el costo en alguna línea, esa venta cuenta como 100 %
-              beneficio y la cifra sale inflada. Se dice, no se disimula. */}
-          <Kpi
+              beneficio y la cifra sale inflada. Se dice, no se disimula — y el
+              ámbar lo dice antes de que nadie lea la letra pequeña. */}
+          <Stat
             label="Ganancia del mes"
             icon={IconTrendingUp}
+            tone={summary.profitPartial ? "amber" : "jade"}
             value={formatUsd(summary.monthProfit)}
             sub={
               summary.monthUsd === 0
@@ -219,9 +202,12 @@ export default async function DashboardPage() {
       ) : null}
 
       <div className="mt-6">
-        <div className="rounded-lg border bg-card shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
-            <h2 className="text-base font-semibold">Últimas ventas</h2>
+        <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-border bg-band p-4">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
+              <IconReceipt size={18} stroke={1.75} aria-hidden />
+              Últimas ventas
+            </h2>
             <Link href="/admin/ventas" className={buttonVariants({ variant: "ghost", size: "sm" })}>
               Ver todas
             </Link>

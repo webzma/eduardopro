@@ -4,6 +4,8 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconReceiptOff,
+  IconCashBanknote,
+  IconDeviceMobile,
 } from "@tabler/icons-react";
 import { requireStaff } from "@/app/lib/auth";
 import { getDayClose } from "@/app/lib/sales";
@@ -21,7 +23,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/ui/table";
-import { EmptyState, Field, PageHeader } from "../ui";
+import {
+  Chip,
+  EmptyState,
+  PAYMENT_TONES,
+  PageHeader,
+  Stat,
+} from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +78,7 @@ export default async function CashClosePage({
     <>
       <PageHeader
         title="Cierre de caja"
+        icon={IconCashRegister}
         description={
           role === "admin"
             ? "Lo que entró en el día, para cuadrar con el dinero físico."
@@ -142,28 +151,31 @@ export default async function CashClosePage({
       ) : (
         <>
           {/* Lo primero que se mira al cerrar: cuánto hay que contar y dónde. */}
-          <dl className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] gap-4">
-            <Field
+          <div className="mb-6 grid gap-4 sm:grid-cols-3">
+            <Stat
               label="Efectivo y divisas en $"
               value={formatUsd(enDolares)}
-              hint="Dólares en la caja"
-              className="rounded-lg border border-primary/30 bg-primary/5 p-4"
+              sub="Dólares en la caja"
+              icon={IconCashBanknote}
+              tone="jade"
             />
-            <Field
+            <Stat
               label="Cobrado en bolívares"
               value={`Bs ${enBolivares.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-              hint="Efectivo Bs, pago móvil y transferencias"
-              className="rounded-lg border border-primary/30 bg-primary/5 p-4"
+              sub="Efectivo Bs, pago móvil y transferencias"
+              icon={IconDeviceMobile}
+              tone="navy"
             />
-            <Field
+            <Stat
               label="Total del día"
               value={formatUsd(close.totalUsd)}
-              hint={`${close.sales.length} ${close.sales.length === 1 ? "venta" : "ventas"} · ${close.units} ${close.units === 1 ? "unidad" : "unidades"}`}
-              className="rounded-lg border bg-card p-4 shadow-sm"
+              sub={`${close.sales.length} ${close.sales.length === 1 ? "venta" : "ventas"} · ${close.units} ${close.units === 1 ? "unidad" : "unidades"}`}
+              icon={IconCashRegister}
+              tone="amber"
             />
-          </dl>
+          </div>
 
-          <div className="mb-6 rounded-lg border bg-card shadow-sm">
+          <div className="mb-6 overflow-hidden rounded-lg border bg-card shadow-sm">
             <div className="overflow-x-auto">
               <Table>
                 <TableCaption className="sr-only">
@@ -184,9 +196,9 @@ export default async function CashClosePage({
                         scope="row"
                         className="p-2 text-left align-middle font-normal"
                       >
-                        <span className="font-medium">
+                        <Chip tone={PAYMENT_TONES[m.method]}>
                           {PAYMENT_LABELS[m.method] ?? m.method}
-                        </span>
+                        </Chip>
                         <span className="block text-xs text-muted-foreground">
                           {PAYS_IN_BS.has(m.method)
                             ? "Se cobró en bolívares"
@@ -196,7 +208,7 @@ export default async function CashClosePage({
                       <TableCell className="text-right tabular-nums">
                         {m.count}
                       </TableCell>
-                      <TableCell className="text-right font-medium tabular-nums">
+                      <TableCell className="text-right font-semibold tabular-nums text-jade">
                         {formatUsd(m.totalUsd)}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
@@ -231,8 +243,8 @@ export default async function CashClosePage({
             </div>
           </div>
 
-          <section aria-labelledby="detalle" className="rounded-lg border bg-card shadow-sm">
-            <div className="flex items-center justify-between gap-2 border-b p-4">
+          <section aria-labelledby="detalle" className="overflow-hidden rounded-lg border bg-card shadow-sm">
+            <div className="flex items-center justify-between gap-2 border-b-2 border-border bg-band p-4">
               <h2 id="detalle" className="text-base font-semibold">
                 Ventas del día
               </h2>

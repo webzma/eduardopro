@@ -2,12 +2,14 @@ import {
   IconCircleCheck,
   IconAlertTriangle,
   IconDeviceFloppy,
+  IconSettings,
 } from "@tabler/icons-react";
 import { requireAdmin } from "../../../lib/auth";
 import { getSettings } from "../../../lib/settings";
 import { getRate } from "../../../lib/rate";
 import { formatRate } from "../../../lib/money";
 import { setRateAction } from "../../actions";
+import { PageHeader } from "../ui";
 import { cn } from "@/app/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
 import { Label } from "@/app/components/ui/label";
@@ -36,27 +38,28 @@ export default async function SettingsPage({
 
   return (
     <>
-      <header className="mb-6">
-        <h1 className="text-xl font-semibold tracking-tight">Ajustes</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Tasa de cambio del panel.</p>
-      </header>
+      <PageHeader
+        title="Ajustes"
+        icon={IconSettings}
+        description="Tasa de cambio del panel."
+      />
 
       {params.ok ? (
-        <p role="status" className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-navy mb-6">
+        <p role="status" className="mb-6 rounded-md border border-l-4 border-l-jade bg-tintjade px-4 py-2 text-sm">
           <IconCircleCheck size={16} stroke={1.75} className="inline align-text-bottom" />{" "}
           Tasa de respaldo guardada.
         </p>
       ) : null}
       {params.error ? (
-        <p role="alert" className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive mb-6">
+        <p role="alert" className="mb-6 rounded-md border border-l-4 border-l-destructive bg-tintsignal px-4 py-2 text-sm text-destructive">
           <IconAlertTriangle size={16} stroke={1.75} className="inline align-text-bottom" />{" "}
           Escribe un número mayor que cero.
         </p>
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <div className="rounded-lg border bg-card shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+        <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-border bg-band p-4">
             <h2 className="text-base font-semibold">Tasa en uso</h2>
             {rate ? (
               <Badge variant={rate.source === "bcv" ? "secondary" : "outline"}>
@@ -93,8 +96,8 @@ export default async function SettingsPage({
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
+        <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-border bg-band p-4">
             <h2 className="text-base font-semibold">Respaldo manual</h2>
           </div>
           <div className="p-4">

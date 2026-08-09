@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { IconShoppingCartPlus } from "@tabler/icons-react";
 import { requireStaff } from "../../../../lib/auth";
 import { getProducts } from "../../../../lib/products";
 import { getRate } from "../../../../lib/rate";
 import { formatRate } from "../../../../lib/money";
+import { PageHeader } from "../../ui";
 import SaleForm from "./SaleForm";
 
 export const dynamic = "force-dynamic";
@@ -17,10 +19,11 @@ export default async function NewSalePage() {
 
   return (
     <>
-      <header className="mb-6">
-        <h1 className="text-xl font-semibold tracking-tight">Registrar venta</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          {rate ? (
+      <PageHeader
+        title="Registrar venta"
+        icon={IconShoppingCartPlus}
+        description={
+          rate ? (
             <>
               Tasa aplicada: Bs {formatRate(rate.value)} por dólar (
               {rate.source === "bcv" ? "BCV" : "respaldo manual"}). Queda
@@ -28,12 +31,12 @@ export default async function NewSalePage() {
             </>
           ) : (
             "Sin tasa disponible."
-          )}
-        </p>
-      </header>
+          )
+        }
+      />
 
       {!rate ? (
-        <p className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive">
+        <p className="rounded-md border border-l-4 border-l-destructive bg-tintsignal px-4 py-2 text-sm text-destructive">
           No hay tasa disponible: el BCV no responde y no hay respaldo manual
           configurado. No se pueden registrar ventas sin tasa, porque el
           histórico quedaría sin referencia en bolívares.{" "}
@@ -43,7 +46,7 @@ export default async function NewSalePage() {
           .
         </p>
       ) : sellable.length === 0 ? (
-        <p className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-muted-foreground">
+        <p className="rounded-md border border-l-4 border-l-navy bg-tintnavy px-4 py-2 text-sm">
           No hay productos con existencias.{" "}
           <Link href="/admin/inventario" className="underline">
             Revisar el inventario

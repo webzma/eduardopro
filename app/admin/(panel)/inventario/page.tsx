@@ -13,9 +13,9 @@ import { adjustStockAction, createProductAction } from "../../actions";
 import RowActions from "./RowActions";
 import ImagePicker from "./ImagePicker";
 import { imageSrc } from "../../../lib/images";
-import { EmptyState, Notice, PageHeader } from "../ui";
+import { Chip, EmptyState, Notice, PageHeader } from "../ui";
+import { cn } from "@/app/lib/utils";
 import { Button, buttonVariants } from "@/app/components/ui/button";
-import { Badge } from "@/app/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import {
   Table,
@@ -77,6 +77,7 @@ export default async function InventoryPage({
     <>
       <PageHeader
         title="Inventario"
+        icon={IconPackages}
         description={
           <>
             {products.length}{" "}
@@ -103,7 +104,7 @@ export default async function InventoryPage({
         </div>
       ) : null}
 
-      <div className="rounded-lg border bg-card shadow-sm">
+      <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
         {products.length === 0 ? (
           <EmptyState icon={IconPackages} title="No hay productos todavía">
             {isAdmin ? "Agrega el primero en el formulario de abajo." : null}
@@ -187,7 +188,7 @@ export default async function InventoryPage({
                     ) : null}
 
                     <TableCell className="text-right whitespace-nowrap">
-                      <span className="block font-medium tabular-nums">
+                      <span className="block font-semibold tabular-nums text-jade">
                         {formatUsd(product.price)}
                       </span>
                       {rate ? (
@@ -235,7 +236,16 @@ export default async function InventoryPage({
                             <IconMinus size={15} stroke={2} aria-hidden />
                           </Button>
                         </form>
-                        <span className="w-8 text-center font-medium tabular-nums">
+                        <span
+                          className={cn(
+                            "w-8 rounded-sm text-center font-semibold tabular-nums",
+                            product.stock === 0
+                              ? "bg-tintsignal text-signal"
+                              : product.stock <= 3
+                                ? "bg-tintamber text-amber"
+                                : "text-foreground",
+                          )}
+                        >
                           {product.stock}
                         </span>
                         <form action={adjustStockAction}>
@@ -254,21 +264,19 @@ export default async function InventoryPage({
                     </TableCell>
 
                     <TableCell>
+                      {/* Cada estado con su color Y su palabra. El color solo
+                          no se ve con daltonismo ni en una impresión. */}
                       <div className="flex flex-wrap gap-1">
                         {product.stock === 0 ? (
-                          <Badge>Agotado</Badge>
+                          <Chip tone="signal">Agotado</Chip>
                         ) : product.stock <= 3 ? (
-                          <Badge className="bg-primary/15 text-primary">
-                            Quedan {product.stock}
-                          </Badge>
+                          <Chip tone="amber">Quedan {product.stock}</Chip>
                         ) : null}
                         {!product.active ? (
-                          <Badge className="bg-navy text-paper">Oculto</Badge>
+                          <Chip tone="navy">Oculto</Chip>
                         ) : null}
                         {product.stock > 3 && product.active ? (
-                          <span className="text-xs text-muted-foreground">
-                            En venta
-                          </span>
+                          <Chip tone="jade">En venta</Chip>
                         ) : null}
                       </div>
                     </TableCell>
@@ -291,7 +299,7 @@ export default async function InventoryPage({
       </div>
 
       {isAdmin ? (
-        <div className="rounded-lg border bg-card shadow-sm mt-6">
+        <div className="mt-6 overflow-hidden rounded-lg border bg-card shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4">
             <h2 className="text-base font-semibold">Nuevo producto</h2>
           </div>
