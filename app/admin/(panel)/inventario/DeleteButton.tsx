@@ -1,6 +1,7 @@
 "use client";
 
-import { deleteProductAction } from "./actions";
+import { IconTrash } from "@tabler/icons-react";
+import { deleteProductAction } from "../../actions";
 
 export default function DeleteButton({
   id,
@@ -13,6 +14,8 @@ export default function DeleteButton({
     <form
       action={deleteProductAction}
       onSubmit={(event) => {
+        // Borrar no se puede deshacer y el historial de ventas conserva el
+        // nombre, así que confirmar aquí basta; no hace falta papelera.
         if (!confirm(`¿Eliminar "${name}"? Esta acción no se puede deshacer.`)) {
           event.preventDefault();
         }
@@ -21,9 +24,11 @@ export default function DeleteButton({
       <input type="hidden" name="id" value={id} />
       <button
         type="submit"
-        className="font-mono text-[11px] tracking-[0.16em] text-ink transition-colors hover:text-[#e08a8a]"
+        aria-label={`Eliminar ${name}`}
+        className="crm-btn crm-btn--quiet crm-btn--danger"
       >
-        ELIMINAR
+        <IconTrash size={16} stroke={1.75} />
+        Eliminar
       </button>
     </form>
   );

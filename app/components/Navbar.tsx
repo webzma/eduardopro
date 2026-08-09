@@ -1,3 +1,6 @@
+import { IconBrandWhatsapp } from "@tabler/icons-react";
+import { WHATSAPP_URL } from "../lib/site";
+
 const links = [
   { href: "#oficio", label: "El oficio" },
   { href: "#coleccion", label: "Catálogo" },
@@ -6,31 +9,33 @@ const links = [
   { href: "#contacto", label: "Contacto" },
 ];
 
-// N6 · Newspaper masthead. Static, in flow — the shop sign at the top of the
-// page, not a bar that follows you down it. Replaces the fixed wordmark +
-// link-row + button-right bar, which is the most-recognised generated nav.
+// Studied DNA, declared override: Hallmark normally routes away from the
+// wordmark-left / links-centre / button-right bar, because it is the most
+// recognisable generated nav. Every one of the reference captures uses exactly
+// that bar, sticky, so the DNA wins here — the slab wordmark and the hard-shadow
+// button are what keep it from reading generic.
 export default function Navbar() {
   return (
-    <header className="border-b-2 border-coal bg-paper">
-      <div className="mx-auto max-w-7xl px-(--page-gutter) pt-(--space-md) pb-(--space-sm) text-center">
-        <a
-          href="#"
-          className="t-display block leading-none"
-          style={{ fontSize: "clamp(2.75rem, 9vw, 5.5rem)" }}
-        >
-          EduardoPro
+    <header className="sticky top-0 z-50 border-b-2 border-coal bg-paper">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-(--space-md) px-(--page-gutter) py-(--space-xs)">
+        <a href="#" className="flex items-baseline gap-(--space-2xs)">
+          <span className="font-display text-xl leading-none uppercase sm:text-2xl">
+            EduardoPro
+          </span>
+          <span className="t-label hidden text-signal sm:inline">
+            Barbería
+          </span>
         </a>
-        <p className="t-label mt-(--space-2xs) text-coal2">
-          Suministros de barbería · Aroa, Yaracuy · Desde 2020
-        </p>
 
-        <nav aria-label="Principal" className="mt-(--space-sm)">
-          <ul className="flex flex-wrap items-center justify-center gap-x-(--space-md) gap-y-(--space-2xs)">
+        {/* Hidden below lg rather than folded into a hamburger: every link is a
+            section of this one page, and the footer nav repeats all five. */}
+        <nav aria-label="Principal" className="hidden lg:block">
+          <ul className="flex items-center gap-x-(--space-md)">
             {links.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="mastlink block whitespace-nowrap py-1 text-sm font-semibold tracking-widest uppercase"
+                  className="mastlink t-label block whitespace-nowrap py-1"
                 >
                   {link.label}
                 </a>
@@ -38,11 +43,16 @@ export default function Navbar() {
             ))}
           </ul>
         </nav>
-      </div>
 
-      {/* Double rule — the broadsheet close under a masthead. */}
-      <div aria-hidden className="border-t-2 border-coal">
-        <div className="h-0.75 border-t-2 border-coal" />
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn--signal shrink-0 px-(--space-md) text-base"
+        >
+          <IconBrandWhatsapp size={18} stroke={1.75} aria-hidden />
+          Pedir
+        </a>
       </div>
     </header>
   );

@@ -1,65 +1,86 @@
-import { redirect } from "next/navigation";
-import { isAuthed } from "../../lib/auth";
+import Link from "next/link";
 import { loginAction } from "../actions";
 
 export const dynamic = "force-dynamic";
+
+const ERRORS: Record<string, string> = {
+  campos: "Escribe tu correo y tu contraseña.",
+  credenciales: "Correo o contraseña incorrectos.",
+  noacceso:
+    "Esa cuenta existe pero no tiene acceso al panel. Pide que te den de alta como administrador o vendedor.",
+};
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  if (await isAuthed()) redirect("/admin");
   const { error } = await searchParams;
+  const message = error ? ERRORS[error] : undefined;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <div className="w-full max-w-sm">
-        <p className="mb-3 font-mono text-[11px] tracking-[0.3em] text-accent">
-          PANEL DE INVENTARIO
-        </p>
-        <h1 className="mb-8 font-display text-[40px] font-bold leading-none tracking-tight">
-          EduardoPro
-        </h1>
+    <div className="flex min-h-screen items-center justify-center p-(--page-gutter)">
+      <div className="crm-card w-full max-w-sm">
+        <div className="crm-card__body">
+          <p className="font-display text-lg uppercase">EduardoPro</p>
+          <h1 className="crm-h1 mt-(--space-sm)">Entrar al panel</h1>
+          <p className="crm-muted mt-0.5">Inventario y ventas.</p>
 
-        <form action={loginAction} className="space-y-5">
-          <div>
-            <label
-              htmlFor="password"
-              className="mb-2 block font-mono text-[11px] tracking-[0.22em] text-ink"
-            >
-              CONTRASEÑA
+          <form action={loginAction} className="mt-(--space-md)">
+            <label htmlFor="email" className="crm-label">
+              Correo
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              autoFocus
+              placeholder="tu@correo.com"
+              className="crm-field"
+            />
+
+            <label htmlFor="password" className="crm-label mt-(--space-sm)">
+              Contraseña
             </label>
             <input
               id="password"
               name="password"
               type="password"
-              autoFocus
-              className="w-full border-b border-hair bg-transparent py-3 text-[16px] text-cream outline-none transition-colors placeholder:text-ink/50 focus:border-accent"
+              autoComplete="current-password"
+              required
               placeholder="••••••••"
+              aria-invalid={error === "credenciales" || undefined}
+              aria-describedby={message ? "login-error" : undefined}
+              className="crm-field"
             />
-          </div>
 
-          {error ? (
-            <p className="font-mono text-[12px] tracking-[0.1em] text-[#e08a8a]">
-              Contraseña incorrecta.
-            </p>
-          ) : null}
+            {message ? (
+              <p
+                id="login-error"
+                role="status"
+                className="crm-note crm-note--bad mt-(--space-sm)"
+              >
+                {message}
+              </p>
+            ) : null}
 
-          <button
-            type="submit"
-            className="btn-accent w-full bg-accent px-9 py-4 font-mono text-[12px] font-medium tracking-[0.2em] text-[#171412] transition-colors"
+            <button
+              type="submit"
+              className="crm-btn crm-btn--primary mt-(--space-md) w-full"
+            >
+              Entrar
+            </button>
+          </form>
+
+          <Link
+            href="/"
+            className="crm-muted mt-(--space-md) inline-block text-sm underline"
           >
-            ENTRAR
-          </button>
-        </form>
-
-        <a
-          href="/"
-          className="mt-8 inline-block font-mono text-[11px] tracking-[0.22em] text-ink transition-colors hover:text-cream"
-        >
-          ← VOLVER AL SITIO
-        </a>
+            ← Volver al sitio
+          </Link>
+        </div>
       </div>
     </div>
   );

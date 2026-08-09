@@ -42,6 +42,7 @@ export default function Benefits() {
             explicit: a `ch` max-width resolves against the body font, not the
             display font, and silently shreds a condensed head into one word
             per line. */}
+        <p className="t-script">Las condiciones, en una tabla</p>
         <h2 className="t-head">
           El oficio,
           <br />
@@ -59,7 +60,7 @@ export default function Benefits() {
               className="grid gap-x-(--space-md) gap-y-(--space-3xs) border-b-2 border-navy py-(--space-md) md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_minmax(0,1.3fr)] md:items-baseline"
             >
               <dt className="t-label text-navy">{row.key}</dt>
-              <dd className="tnum font-display text-2xl leading-none font-extrabold uppercase">
+              <dd className="tnum font-display text-2xl leading-tight uppercase">
                 {row.value}
               </dd>
               <dd className="text-(length:--text-base) leading-relaxed text-coal2">

@@ -1,10 +1,16 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "./supabase/server";
+import { fail } from "./supabase/config";
+
+export { SupabaseSetupError } from "./supabase/config";
 
 export type Product = {
   id: string;
   name: string;
   category: string;
+  /** Precio de VENTA en USD. */
   price: number;
+  /** Último costo de COMPRA en USD. Lo fija cada compra registrada. */
+  cost: number;
   stock: number;
   image: string;
   active: boolean;
@@ -17,6 +23,7 @@ type Row = {
   name: string;
   category: string;
   price: number | string;
+  cost_usd?: number | string;
   stock: number;
   image: string;
   active: boolean;
@@ -25,22 +32,14 @@ type Row = {
 
 const TABLE = "products";
 
-let cached: SupabaseClient | null = null;
-
-function db(): SupabaseClient {
-  if (cached) return cached;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error(
-      "Supabase no está configurado. Define SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en .env.local (ver README).",
-    );
-  }
-  cached = createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  return cached;
-}
+/* Todo lo de abajo pasa por la clave publicable, así que RLS decide qué se ve
+ * y qué se puede tocar con la identidad de quien pide:
+ *   · anónimo  → solo lee los productos con active = true
+ *   · vendedor → lee todo y solo mueve stock, vía la función adjust_stock
+ *   · admin    → lee todo y escribe sin límite
+ * El rol sale de public.staff. No hay ninguna clave que ignore RLS en la
+ * aplicación: las políticas de supabase/schema.sql son la autoridad y esto
+ * solo es la capa de acceso. */
 
 function toProduct(row: Row): Product {
   return {
@@ -48,13 +47,14 @@ function toProduct(row: Row): Product {
     name: row.name,
     category: row.category,
     price: Number(row.price),
+    cost: Number(row.cost_usd ?? 0),
     stock: Number(row.stock),
     image: row.image,
     active: row.active,
   };
 }
 
-function slugify(value: string): string {
+export function slugify(value: string): string {
   return value
     .toLowerCase()
     .normalize("NFD")
@@ -64,23 +64,27 @@ function slugify(value: string): string {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  const { data, error } = await db()
+  const supabase = await createClient();
+  const { data, error } = await supabase
     .from(TABLE)
     .select("*")
     .order("created_at", { ascending: true });
-  if (error) throw new Error(error.message);
+  if (error) fail(error);
   return (data ?? []).map((row) => toProduct(row as Row));
 }
 
 // Público: nunca debe tumbar el sitio si la base falla o no está configurada.
+// El filtro active=true es redundante con RLS, y así queda: la política es la
+// que manda, esto solo lo hace explícito en el sitio de la lectura.
 export async function getActiveProducts(): Promise<Product[]> {
   try {
-    const { data, error } = await db()
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from(TABLE)
       .select("*")
       .eq("active", true)
       .order("created_at", { ascending: true });
-    if (error) throw new Error(error.message);
+    if (error) fail(error);
     return (data ?? []).map((row) => toProduct(row as Row));
   } catch (err) {
     console.warn(
@@ -92,20 +96,22 @@ export async function getActiveProducts(): Promise<Product[]> {
 }
 
 export async function getProduct(id: string): Promise<Product | null> {
-  const { data, error } = await db()
+  const supabase = await createClient();
+  const { data, error } = await supabase
     .from(TABLE)
     .select("*")
     .eq("id", id)
     .maybeSingle();
-  if (error) throw new Error(error.message);
+  if (error) fail(error);
   return data ? toProduct(data as Row) : null;
 }
 
 export async function createProduct(input: ProductInput): Promise<Product> {
-  const { data: rows, error: readError } = await db()
+  const supabase = await createClient();
+  const { data: rows, error: readError } = await supabase
     .from(TABLE)
     .select("id");
-  if (readError) throw new Error(readError.message);
+  if (readError) fail(readError);
   const taken = new Set((rows ?? []).map((row) => (row as { id: string }).id));
 
   const base = slugify(input.name) || "producto";
@@ -115,12 +121,13 @@ export async function createProduct(input: ProductInput): Promise<Product> {
     id = `${base}-${++n}`;
   }
 
-  const { data, error } = await db()
+  const { cost, ...rest } = input;
+  const { data, error } = await supabase
     .from(TABLE)
-    .insert({ id, ...input })
+    .insert({ id, ...rest, cost_usd: cost })
     .select()
     .single();
-  if (error) throw new Error(error.message);
+  if (error) fail(error);
   return toProduct(data as Row);
 }
 
@@ -128,27 +135,43 @@ export async function updateProduct(
   id: string,
   patch: Partial<ProductInput>,
 ): Promise<Product | null> {
-  const { data, error } = await db()
+  const supabase = await createClient();
+  // `cost` en la aplicación es `cost_usd` en la base.
+  const { cost, ...rest } = patch;
+  const row = cost === undefined ? rest : { ...rest, cost_usd: cost };
+  const { data, error } = await supabase
     .from(TABLE)
-    .update(patch)
+    .update(row)
     .eq("id", id)
     .select()
     .maybeSingle();
-  if (error) throw new Error(error.message);
+  if (error) fail(error);
   return data ? toProduct(data as Row) : null;
 }
 
+/**
+ * Va por la función adjust_stock de la base, no por un UPDATE. Dos razones:
+ *   · El vendedor no tiene permiso de UPDATE sobre products — RLS es a nivel
+ *     de fila y no sabe decir "solo la columna stock". La función sí, porque
+ *     es lo único que escribe.
+ *   · Es atómica: leer-y-luego-escribir dejaba que dos ventas simultáneas
+ *     leyeran stock = 5 y ambas guardaran 4.
+ */
 export async function adjustStock(
   id: string,
   delta: number,
 ): Promise<Product | null> {
-  const current = await getProduct(id);
-  if (!current) return null;
-  const stock = Math.max(0, current.stock + delta);
-  return updateProduct(id, { stock });
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("adjust_stock", {
+    p_id: id,
+    p_delta: delta,
+  });
+  if (error) fail(error);
+  return data ? toProduct(data as Row) : null;
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  const { error } = await db().from(TABLE).delete().eq("id", id);
-  if (error) throw new Error(error.message);
+  const supabase = await createClient();
+  const { error } = await supabase.from(TABLE).delete().eq("id", id);
+  if (error) fail(error);
 }

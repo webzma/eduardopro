@@ -1,29 +1,34 @@
 import type { Metadata } from "next";
-import { Big_Shoulders, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Bevan, Yellowtail, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-// Display: industrial condensed, the painted-sign voice. Variable on opsz so the
-// hero can sit at a different optical size than the section heads.
-const bigShoulders = Big_Shoulders({
+// Display: a heavy Egyptian slab — the painted barbershop sign. Bevan ships at
+// 400 only, so nothing may ask it for a bolder weight: the browser would
+// synthesise a fake bold and the slabs would smear.
+const bevan = Bevan({
   variable: "--font-heading",
   subsets: ["latin"],
-  axes: ["opsz"],
-  // next/font has no metric-override data for this family, so the fallback is
-  // named explicitly — a condensed one, to keep the reflow small.
-  fallback: ["Arial Narrow", "Helvetica Neue Condensed", "sans-serif"],
+  weight: "400",
+  fallback: ["Rockwell", "Georgia", "serif"],
 });
 
-// Body + mono are one superfamily, so the small type reads as a single system.
+// The one flourish: a brush script, red, sitting above each section head.
+const yellowtail = Yellowtail({
+  // --font-script-face, no --font-script: esa segunda la define Tailwind en
+  // @theme como var(--font-script-stack), y usar el mismo nombre en los dos
+  // sitios crea una referencia circular que anula la propiedad.
+  variable: "--font-script-face",
+  subsets: ["latin"],
+  weight: "400",
+  fallback: ["Brush Script MT", "cursive"],
+});
+
+// Body carries the small tracked-out caps too — dropping IBM Plex Mono keeps
+// the page at the three-family ceiling now that the script has a slot.
 const plexSans = IBM_Plex_Sans({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "600"],
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-caption",
-  subsets: ["latin"],
-  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -40,7 +45,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${plexSans.variable} ${bigShoulders.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${plexSans.variable} ${bevan.variable} ${yellowtail.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>

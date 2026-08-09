@@ -1,31 +1,50 @@
+import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { WHATSAPP_URL } from "../lib/site";
+import { LOCATION_LABEL } from "../lib/site";
 
-// H1 · Marquee — the display fills the fold, hard left. No photograph: the
-// type is the visual, and a stock image of someone else's barbershop was the
-// least authentic thing on the old page.
+// Decorative barber pole, stood on end — the pair that brackets the fold in the
+// reference. Hidden below lg, where there's no room beside the display.
+function Pole({ className = "" }: { className?: string }) {
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute top-1/2 hidden w-8 -translate-y-1/2 flex-col lg:flex ${className}`}
+    >
+      <span className="h-4 border-2 border-coal bg-coal" />
+      <span className="pole-v h-56" />
+      <span className="h-4 border-2 border-coal bg-coal" />
+    </div>
+  );
+}
+
+// H1 · Marquee — the display fills the fold. No photograph: the type is the
+// visual, and a stock image of someone else's barbershop was the least
+// authentic thing on the old page.
 export default function Hero() {
   return (
-    <section className="border-b-2 border-coal bg-paper">
-      {/* Bottom padding runs ~1.5x the top so the hero sits into the page
-          instead of floating above it. */}
-      <div className="mx-auto grid max-w-7xl items-end gap-(--space-xl) px-(--page-gutter) pt-(--space-xl) pb-(--space-2xl) lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:pt-(--space-2xl) lg:pb-(--space-3xl)">
+    <section className="relative border-b-2 border-coal bg-paper">
+      <Pole className="left-(--page-gutter)" />
+      <Pole className="right-(--page-gutter)" />
+
+      <div className="mx-auto max-w-4xl px-(--page-gutter) pt-(--space-xl) pb-(--space-2xl) text-center lg:pt-(--space-2xl) lg:pb-(--space-3xl)">
         <div className="hero-in">
-          <h1 className="t-display">
-            Herramienta de gremio.
+          <p className="t-script">Herramienta de gremio desde 2020</p>
+
+          <h1 className="t-display mt-(--space-2xs)">
+            Filo de verdad.
             <br />
-            Precio de{" "}
-            <span className="box-decoration-clone bg-signal px-[0.12em] text-coal">
-              gremio.
-            </span>
+            <span className="text-signal">Precio de gremio.</span>
+            <br />
+            Sin vueltas.
           </h1>
 
-          <p className="mt-(--space-md) max-w-[46ch] text-(length:--text-md) leading-relaxed text-coal2">
+          <p className="mx-auto mt-(--space-md) max-w-[52ch] text-(length:--text-md) leading-relaxed text-coal2">
             Máquinas, navajas, ceras y repuestos comprados directo al
             distribuidor. La tienda está en Aroa — y si estás fuera, enviamos a
             donde estés.
           </p>
 
-          <div className="mt-(--space-lg) flex flex-wrap items-center gap-(--space-sm)">
+          <div className="mt-(--space-lg) flex flex-wrap items-center justify-center gap-(--space-sm)">
             <a href="#coleccion" className="btn btn--signal">
               Ver catálogo
             </a>
@@ -35,24 +54,14 @@ export default function Hero() {
               rel="noopener noreferrer"
               className="btn btn--ghost"
             >
+              <IconBrandWhatsapp size={20} stroke={1.75} aria-hidden />
               Pedir por WhatsApp
             </a>
           </div>
-        </div>
 
-        {/* Pinned-poster sticker. Pure CSS — halftone stands in for the photo. */}
-        <div aria-hidden className="hidden lg:block">
-          <div className="halftone relative border-2 border-coal p-(--space-md) shadow-(--shadow-hard)">
-            <div className="-rotate-2 border-2 border-coal bg-navy px-(--space-md) py-(--space-lg) text-center text-paper shadow-(--shadow-hard-sm)">
-              <p className="t-head text-paper" style={{ fontSize: "2.5rem" }}>
-                Al mayor
-                <br />y al detal
-              </p>
-              <p className="mt-(--space-2xs) font-mono text-xs tracking-widest uppercase">
-                Aroa, Yaracuy · Est. 2020
-              </p>
-            </div>
-          </div>
+          <p className="t-label mt-(--space-md) text-coal2">
+            {LOCATION_LABEL} · Venezuela · Al mayor y al detal
+          </p>
         </div>
       </div>
     </section>

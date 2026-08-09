@@ -12,8 +12,8 @@ function Run({ ariaHidden = false }: { ariaHidden?: boolean }) {
       {items.map((item) => (
         <span key={item} className="flex items-center">
           <span className="px-(--space-md)">{item}</span>
-          <span aria-hidden className="text-navy">
-            ◆
+          <span aria-hidden className="text-signal">
+            ★
           </span>
         </span>
       ))}
@@ -21,13 +21,17 @@ function Run({ ariaHidden = false }: { ariaHidden?: boolean }) {
   );
 }
 
-// Carnival's marquee banner, filled with the warm accent. Ink on red, not
-// cream — cream on this red measures 3.81 and fails AA.
+// The reference's ticker: an ink band, cream slab caps, red stars between the
+// items. Cream on ink measures 17.04 — the widest margin on the page, which is
+// what lets the band run at this small a size.
 export default function TrustStrip() {
   return (
     <>
-      <div className="overflow-hidden border-b-2 border-coal bg-signal py-(--space-xs) text-coal">
-        <div className="marquee inline-flex whitespace-nowrap font-display text-lg font-extrabold tracking-widest uppercase">
+      <div
+        className="overflow-hidden border-y-2 border-coal bg-coal py-(--space-xs) text-paper"
+        style={{ ["--focus-ring" as string]: "var(--paper)" }}
+      >
+        <div className="marquee inline-flex whitespace-nowrap font-display text-lg tracking-widest uppercase">
           <Run />
           <Run ariaHidden />
         </div>

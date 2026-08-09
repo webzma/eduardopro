@@ -1,44 +1,75 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createHmac, timingSafeEqual } from "crypto";
+import type { User } from "@supabase/supabase-js";
+import { createClient } from "./supabase/server";
+import { fail } from "./supabase/config";
 
-const COOKIE_NAME = "ep_admin";
-const SECRET = process.env.ADMIN_SECRET ?? "dev-insecure-secret-change-me";
+/** admin manda; vendedor solo mueve existencias. */
+export type Role = "admin" | "vendedor";
 
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "eduardo2020";
+export type Staff = { user: User; role: Role };
 
-function sessionToken(): string {
-  return createHmac("sha256", SECRET).update("admin-session-v1").digest("hex");
+/** La sesión de Supabase, o null. */
+export async function getUser(): Promise<User | null> {
+  const supabase = await createClient();
+  // getUser() valida el token contra Supabase. getSession() se limita a leer
+  // la cookie, que el cliente puede falsificar — no sirve para autorizar.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
 }
 
-export async function isAuthed(): Promise<boolean> {
-  const store = await cookies();
-  const value = store.get(COOKIE_NAME)?.value;
-  if (!value) return false;
-  const expected = sessionToken();
-  const a = Buffer.from(value);
-  const b = Buffer.from(expected);
-  return a.length === b.length && timingSafeEqual(a, b);
+/**
+ * El rol de quien mira, o null si no es del equipo. Estar logueado no basta:
+ * hay que figurar en public.staff. Es la misma condición que aplican las
+ * políticas RLS, así que la UI y la base no pueden discrepar — si alguien se
+ * salta esta comprobación, la base lo rechaza igual.
+ */
+export async function getRole(user: User | null): Promise<Role | null> {
+  if (!user) return null;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("staff")
+    .select("role")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (error) fail(error);
+  const role = (data as { role: string } | null)?.role;
+  return role === "admin" || role === "vendedor" ? role : null;
 }
 
-export async function requireAdmin(): Promise<void> {
-  if (!(await isAuthed())) redirect("/admin/login");
+/** Deja pasar a cualquiera del equipo. Corta el render si no lo es. */
+export async function requireStaff(): Promise<Staff> {
+  const user = await getUser();
+  if (!user) redirect("/admin/login");
+  const role = await getRole(user);
+  if (!role) redirect("/admin/login?error=noacceso");
+  return { user, role };
 }
 
-export async function signIn(password: string): Promise<boolean> {
-  if (password !== ADMIN_PASSWORD) return false;
-  const store = await cookies();
-  store.set(COOKIE_NAME, sessionToken(), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
-  return true;
+/**
+ * Solo admin. Un vendedor que llegue aquí vuelve al panel — no es un error
+ * suyo, simplemente esa pantalla no le corresponde.
+ */
+export async function requireAdmin(): Promise<Staff> {
+  const staff = await requireStaff();
+  if (staff.role !== "admin") redirect("/admin?error=soloadmin");
+  return staff;
+}
+
+export async function signIn(
+  email: string,
+  password: string,
+): Promise<string | null> {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (!error) return null;
+  // El mensaje de Supabase viene en inglés y distingue si el correo existe;
+  // se colapsa en uno solo para no filtrar qué cuentas hay.
+  return "Correo o contraseña incorrectos.";
 }
 
 export async function signOut(): Promise<void> {
-  const store = await cookies();
-  store.delete(COOKIE_NAME);
+  const supabase = await createClient();
+  await supabase.auth.signOut();
 }

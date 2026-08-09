@@ -1,6 +1,8 @@
 import { whatsappOrderUrl } from "../lib/site";
 import { getActiveProducts } from "../lib/products";
-import { ScissorsIcon } from "./icons";
+import Image from "next/image";
+import { IconScissors, IconBrandWhatsapp } from "@tabler/icons-react";
+import { imageSrc } from "../lib/images";
 
 // F6 · Product card grid — uniform on purpose. The rhythm comes from the
 // products, not from varying the tiles.
@@ -11,7 +13,10 @@ export default async function Products() {
     <section id="coleccion" className="bg-paper py-(--space-2xl) md:py-(--space-3xl)">
       <div className="mx-auto max-w-7xl px-(--page-gutter)">
         <header className="flex flex-col justify-between gap-(--space-sm) md:flex-row md:items-end">
-          <h2 className="t-head">El catálogo.</h2>
+          <div>
+            <p className="t-script">Precios honestos, en el mostrador</p>
+            <h2 className="t-head">El catálogo.</h2>
+          </div>
           {products.length > 0 ? (
             <p className="t-label tnum text-navy">
               {products.length}{" "}
@@ -23,8 +28,8 @@ export default async function Products() {
 
         {products.length === 0 ? (
           <div className="mt-(--space-xl) flex flex-col items-center border-2 border-coal bg-paper2 px-(--page-gutter) py-(--space-3xl) text-center shadow-(--shadow-hard)">
-            <span className="flex size-16 items-center justify-center border-2 border-coal bg-signal text-coal">
-              <ScissorsIcon className="size-7" />
+            <span className="flex size-16 items-center justify-center border-2 border-coal bg-signal text-paper">
+              <IconScissors size={28} stroke={1.75} />
             </span>
             <p className="t-head mt-(--space-md)" style={{ fontSize: "2rem" }}>
               Afilando el catálogo.
@@ -45,19 +50,19 @@ export default async function Products() {
                   className={`card flex flex-col ${soldOut ? "card--sold" : ""}`}
                 >
                   <div className="halftone relative aspect-square overflow-hidden border-b-2 border-coal bg-paper2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={product.image}
+                    <Image
+                      src={imageSrc(product.image)}
                       alt={product.name}
-                      loading="lazy"
-                      className="card__img size-full object-cover"
+                      fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      className="card__img object-cover"
                     />
                     {soldOut ? (
                       <span className="t-label absolute top-0 left-0 border-r-2 border-b-2 border-coal bg-navy px-(--space-2xs) py-1 text-paper">
                         Agotado
                       </span>
                     ) : product.stock <= 3 ? (
-                      <span className="t-label tnum absolute top-0 left-0 border-r-2 border-b-2 border-coal bg-signal px-(--space-2xs) py-1 text-coal">
+                      <span className="t-label tnum absolute top-0 left-0 border-r-2 border-b-2 border-coal bg-signal px-(--space-2xs) py-1 text-paper">
                         Últimas {product.stock}
                       </span>
                     ) : null}
@@ -65,11 +70,11 @@ export default async function Products() {
 
                   <div className="flex flex-1 flex-col p-(--space-sm)">
                     <p className="t-label text-navy">{product.category}</p>
-                    <h3 className="mt-(--space-3xs) font-display text-2xl leading-tight font-extrabold uppercase">
+                    <h3 className="mt-(--space-3xs) font-display text-2xl leading-tight uppercase">
                       {product.name}
                     </h3>
                     <div className="mt-(--space-md) flex flex-wrap items-center justify-between gap-(--space-2xs) border-t-2 border-navy pt-(--space-2xs)">
-                      <span className="tnum font-display text-3xl leading-none font-extrabold text-signaldeep">
+                      <span className="tnum font-display text-3xl leading-none text-signal">
                         ${product.price}
                       </span>
                       {soldOut ? (
@@ -83,6 +88,7 @@ export default async function Products() {
                           rel="noopener noreferrer"
                           className="tlink text-base"
                         >
+                          <IconBrandWhatsapp size={18} stroke={1.75} aria-hidden />
                           Pedir
                           <span aria-hidden className="tlink__arrow">
                             →

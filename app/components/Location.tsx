@@ -1,3 +1,4 @@
+import { IconMapPin, IconBrandWhatsapp } from "@tabler/icons-react";
 import {
   LOCATION,
   LOCATION_LABEL,
@@ -18,6 +19,7 @@ export default function Location() {
       className="bg-paper2 py-(--space-2xl) md:py-(--space-3xl)"
     >
       <div className="mx-auto max-w-7xl px-(--page-gutter)">
+        <p className="t-script">Pásate cuando quieras</p>
         <h2 className="t-head">Estamos en {LOCATION.town}.</h2>
         {/* El envío lo cuenta el panel; aquí no se repite. */}
         <p className="mt-(--space-md) max-w-[52ch] text-(length:--text-md) leading-relaxed text-coal2">
@@ -60,6 +62,7 @@ export default function Location() {
                 rel="noopener noreferrer"
                 className="btn btn--ghost"
               >
+                <IconMapPin size={20} stroke={1.75} aria-hidden />
                 Cómo llegar
               </a>
               <a
@@ -68,6 +71,7 @@ export default function Location() {
                 rel="noopener noreferrer"
                 className="tlink tlink--paper text-lg"
               >
+                <IconBrandWhatsapp size={20} stroke={1.75} aria-hidden />
                 Escríbenos
                 <span aria-hidden className="tlink__arrow">
                   →
@@ -78,7 +82,7 @@ export default function Location() {
 
           {/* La lámina del mapa: cabecera tipográfica arriba, mapa debajo. */}
           <figure className="flex min-h-96 flex-col border-2 border-coal bg-paper shadow-(--shadow-hard)">
-            <figcaption className="flex flex-wrap items-center justify-between gap-x-(--space-md) gap-y-1 border-b-2 border-coal bg-signal px-(--space-sm) py-(--space-2xs) text-coal">
+            <figcaption className="flex flex-wrap items-center justify-between gap-x-(--space-md) gap-y-1 border-b-2 border-coal bg-signal px-(--space-sm) py-(--space-2xs) text-paper">
               <span className="t-label">{LOCATION_LABEL}</span>
               <span className="t-label tnum">
                 {LOCATION.lat.toFixed(4)}° N · {Math.abs(LOCATION.lon).toFixed(4)}° O

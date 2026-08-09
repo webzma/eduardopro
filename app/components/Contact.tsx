@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { WHATSAPP_URL, whatsappOrderUrl } from "../lib/site";
 
 // The old form posted to "#" — it looked like a contact channel and silently
@@ -40,6 +41,7 @@ export default function Contact() {
     >
       <div className="mx-auto grid max-w-7xl gap-(--space-xl) px-(--page-gutter) lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-(--space-3xl)">
         <div>
+          <p className="t-script">Dale, escríbenos —</p>
           <h2 className="t-head">Hablemos.</h2>
           <p className="mt-(--space-md) max-w-[46ch] text-(length:--text-md) leading-relaxed text-coal2">
             Escríbenos y coordinamos la entrega en Aroa — o el envío, si estás
@@ -51,6 +53,7 @@ export default function Contact() {
             rel="noopener noreferrer"
             className="tlink mt-(--space-lg) inline-flex text-xl"
           >
+            <IconBrandWhatsapp size={22} stroke={1.75} aria-hidden />
             Abrir WhatsApp
             <span aria-hidden className="tlink__arrow">
               →
@@ -117,6 +120,7 @@ export default function Contact() {
           </div>
 
           <button type="submit" className="btn btn--signal justify-self-start">
+            <IconBrandWhatsapp size={20} stroke={1.75} aria-hidden />
             Enviar por WhatsApp
           </button>
         </form>

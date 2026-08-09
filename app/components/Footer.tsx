@@ -25,8 +25,10 @@ export default function Footer() {
           >
             EduardoPro
           </p>
+          {/* On ink the crimson can't carry text — this is the lifted red. */}
+          <p className="t-script text-signallift">Con filo desde 2020</p>
 
-          <p className="mt-(--space-md) max-w-[62ch] font-mono text-sm leading-relaxed">
+          <p className="mt-(--space-md) max-w-[62ch] text-sm leading-relaxed">
             Suministros de barbería · Máquinas, navajas, ceras y repuestos
             comprados directo al distribuidor · Precio de gremio, al mayor y al
             detal · Tienda en Aroa, Yaracuy · Enviamos a donde estés · En el
@@ -35,7 +37,7 @@ export default function Footer() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline underline-offset-4 hover:text-signal"
+              className="underline underline-offset-4 hover:text-signallift"
             >
               WhatsApp
             </a>
@@ -51,7 +53,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    className="block whitespace-nowrap py-1 text-sm font-semibold tracking-widest uppercase hover:text-signal"
+                    className="block whitespace-nowrap py-1 text-sm font-semibold tracking-widest uppercase hover:text-signallift"
                   >
                     {link.label}
                   </a>
@@ -60,7 +62,7 @@ export default function Footer() {
             </ul>
           </nav>
 
-          <p className="tnum mt-(--space-md) font-mono text-xs tracking-widest uppercase opacity-70">
+          <p className="t-label tnum mt-(--space-md) opacity-70">
             © 2026 EduardoPro — Todos los derechos reservados
           </p>
         </div>

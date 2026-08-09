@@ -1,31 +1,39 @@
 /* EduardoPro — design tokens
- * Hallmark · genre: editorial · theme: Carnival (drop: diner-sign, AA-retuned)
- * Portable copy of the system in app/globals.css. Colours are OKLCH; every
- * pair actually used on the page was measured against WCAG AA.
+ * Hallmark · genre: editorial · theme: studied-DNA (source: image — barbershop
+ * reference, 5 captures). Portable copy of the system in app/globals.css.
+ * Colours are OKLCH, all in sRGB gamut; every pair actually used on the page
+ * was computed against WCAG AA (OKLCH→sRGB→relative luminance), not eyeballed.
  */
 
 :root {
   /* ── Colour ──────────────────────────────────────────────
-     The barber pole: cream paper, cherry red, navy.
-     coal/paper 16.89 · coal/signal 5.25 · signal-deep/paper 6.18
-     · paper/navy 11.58 — all AA. */
-  --color-paper: oklch(95% 0.035 90);
-  --color-paper-2: oklch(91% 0.042 88);
-  --color-paper-3: oklch(86% 0.05 85);
-  --color-coal: oklch(16% 0.04 30); /* ink */
-  --color-coal-2: oklch(28% 0.05 30);
-  --color-ash: oklch(45% 0.04 35); /* muted */
-  --color-navy: oklch(30% 0.16 250); /* accent 2 — cool */
-  --color-signal: oklch(64% 0.21 25); /* accent 1 — warm, fills only */
-  --color-signal-deep: oklch(48% 0.2 25); /* warm accent as small type */
-  --color-focus: oklch(30% 0.16 250);
+     Cream paper, one deep crimson, navy held back for the pole.
+       coal/paper 17.04 · coal2/paper 12.73 · ash/paper 6.51
+       coal/paper2 15.09 · coal/paper3 12.87
+       signal/paper 5.73 · paper/signal 5.73 · paper/navy 10.55
+     FORBIDDEN — coal/signal is 2.98. The crimson sits at L50 so it can carry
+     cream text (the reference's button style); that puts dark-on-red below AA.
+     Red fills always carry --color-paper. */
+  --color-paper: oklch(95% 0.028 85); /* #f7eeda */
+  --color-paper-2: oklch(91% 0.035 85); /* #ece0c8 */
+  --color-paper-3: oklch(86% 0.042 83); /* #dfcfb2 */
+  --color-coal: oklch(15% 0.02 40); /* #120805 — ink */
+  --color-coal-2: oklch(28% 0.03 35); /* #36241f */
+  --color-ash: oklch(45% 0.03 38); /* #655049 — muted */
+  --color-navy: oklch(33% 0.095 250); /* #003664 — pole only */
+  --color-signal: oklch(50% 0.19 26); /* #b71920 — the one red, on cream */
+  --color-signal-lift: oklch(64% 0.19 26); /* #e9504b — the red on ink (5.36) */
+  --color-focus: oklch(33% 0.095 250);
 
   /* ── Type ───────────────────────────────────────────────
-     Display: Big Shoulders 800 (variable opsz).
-     Body + mono: IBM Plex superfamily. Three families, the ceiling. */
-  --font-display: "Big Shoulders", "Arial Narrow", sans-serif;
+     Display: Bevan — a heavy Egyptian slab, 400 ONLY. Nothing may request a
+     bolder weight; the browser would synthesise a fake bold and smear the
+     slabs. Script: Yellowtail 400, the red eyebrow above each section head,
+     never used for a heading itself. Body: IBM Plex Sans, which also carries
+     the tracked-out caps. Three families, the ceiling. */
+  --font-display: "Bevan", Rockwell, Georgia, serif;
+  --font-script: "Yellowtail", "Brush Script MT", cursive;
   --font-body: "IBM Plex Sans", system-ui, sans-serif;
-  --font-outlier: "IBM Plex Mono", ui-monospace, monospace;
 
   /* 1.25 major third, 16px base */
   --text-xs: 0.75rem;
@@ -37,7 +45,7 @@
   --text-2xl: 2.25rem;
   --text-3xl: 3rem;
   --text-display-s: clamp(2.5rem, 6vw, 4rem);
-  --text-display: clamp(2.75rem, 10vw, 7rem);
+  --text-display: clamp(2.75rem, 8.5vw, 6rem);
 
   /* ── Space — 4pt scale ──────────────────────────────── */
   --space-3xs: 0.25rem;
@@ -52,7 +60,7 @@
   --page-gutter: clamp(1rem, 4vw, 2.5rem);
 
   /* ── Rules, shadow, radius ──────────────────────────────
-     Carnival is hard-offset and square. No soft shadow, no radius. */
+     Hard-offset and square. No soft shadow, no radius. */
   --rule-hair: 1px;
   --rule-thick: 2px;
   --rule-slab: 4px;

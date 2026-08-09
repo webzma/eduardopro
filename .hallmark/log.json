@@ -1,5 +1,25 @@
 [
   {
+    "date": "2026-08-08",
+    "scope": "page",
+    "macrostructure": "Marquee Hero",
+    "genre": "editorial",
+    "theme": "studied-DNA",
+    "dna_source": "image (5 barbershop captures supplied by the user)",
+    "theme_axes": "light / slab-heavy / warm-crimson",
+    "nav": "N1b sticky bar (declared override — the reference uses it)",
+    "footer": "Ft4 Dense colophon",
+    "components": [
+      "H1 Marquee centred",
+      "S2 Hanging heads",
+      "F3 Tabular spec sheet",
+      "F6 Product card grid",
+      "T1 Quote cards"
+    ],
+    "enrichment": "none — Tier-A pure CSS (barber pole, horizontal + vertical)",
+    "brief": "EduardoPro · restyle landing + /admin to the reference DNA; /admin moved off its legacy dark palette onto this system"
+  },
+  {
     "date": "2026-07-27",
     "scope": "page",
     "macrostructure": "Marquee Hero",
@@ -9,7 +29,13 @@
     "theme_axes": "light / display-heavy / warm-red + cool-navy duo-tone",
     "nav": "N6 Newspaper masthead",
     "footer": "Ft4 Dense colophon",
-    "components": ["H1 Marquee", "S2 Hanging", "F3 Tabular spec sheet", "F6 Product card grid", "T1 Pull-quote with marginalia"],
+    "components": [
+      "H1 Marquee",
+      "S2 Hanging",
+      "F3 Tabular spec sheet",
+      "F6 Product card grid",
+      "T1 Pull-quote with marginalia"
+    ],
     "enrichment": "none — Tier-A pure CSS (barber-pole stripe + halftone)",
     "brief": "EduardoPro · suministros de barbería, Caracas — redesign for visual impact + authenticity"
   }
