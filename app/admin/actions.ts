@@ -72,18 +72,38 @@ function refresh(): void {
 export async function loginAction(formData: FormData): Promise<void> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  if (!email || !password) redirect("/admin/login?error=campos");
+  /* El rol elegido en el formulario es una DECLARACIÓN DE INTENCIÓN, no un
+   * permiso. Quién es admin y quién vendedor lo dice public.staff, y las
+   * políticas RLS aplican eso mismo en la base: marcar "Administrador" aquí no
+   * da un solo permiso extra. Sirve para dos cosas honestas —que cada uno vea
+   * de entrada la pantalla que espera, y que un error de cuenta se detecte al
+   * entrar en vez de tres pantallas más adelante. */
+  const raw = String(formData.get("rol") ?? "");
+  const intended = raw === "admin" || raw === "vendedor" ? raw : null;
+  // El rol elegido viaja de vuelta en el error para que el selector no se
+  // reinicie cada vez que alguien se equivoca de contraseña.
+  const back = intended ? `&rol=${intended}` : "";
+  if (!email || !password) redirect(`/admin/login?error=campos${back}`);
 
   const error = await signIn(email, password);
-  if (error) redirect("/admin/login?error=credenciales");
+  if (error) redirect(`/admin/login?error=credenciales${back}`);
 
   // Entrar no basta: si la cuenta no está en public.staff, RLS le negaría todo
   // de todas formas. Mejor decirlo aquí que dejarle un panel vacío.
   const role = await getRole(await getUser());
   if (!role) {
     await signOut();
-    redirect("/admin/login?error=noacceso");
+    redirect(`/admin/login?error=noacceso${back}`);
   }
+
+  // La cuenta es válida pero no es lo que la persona creía ser. Se cierra la
+  // sesión y se dice cuál es su rol de verdad: dejarla entrar «por si acaso»
+  // convertiría el selector en decorado.
+  if (intended && role !== intended) {
+    await signOut();
+    redirect(`/admin/login?error=rol&suyo=${role}${back}`);
+  }
+
   redirect("/admin");
 }
 

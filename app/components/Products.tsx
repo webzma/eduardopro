@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { whatsappOrderUrl } from "../lib/site";
 import { getActiveProducts } from "../lib/products";
 import Image from "next/image";
@@ -49,7 +50,12 @@ export default async function Products() {
                   key={product.id}
                   className={`group/card border-2 border-coal bg-paper shadow-[6px_6px_0_var(--coal)] transition-[transform,box-shadow] duration-[320ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[9px_9px_0_var(--coal)] focus-within:-translate-x-[3px] focus-within:-translate-y-[3px] focus-within:shadow-[9px_9px_0_var(--coal)] motion-reduce:transition-none flex flex-col ${soldOut ? "[&_img]:grayscale [&_img]:opacity-50 hover:translate-x-0 hover:translate-y-0 hover:shadow-[6px_6px_0_var(--coal)]" : ""}`}
                 >
-                  <div className="halftone relative aspect-square overflow-hidden border-b-2 border-coal bg-paper2">
+                  <Link
+                    href={`/producto/${product.id}`}
+                    tabIndex={-1}
+                    aria-hidden
+                    className="halftone relative block aspect-square overflow-hidden border-b-2 border-coal bg-paper2"
+                  >
                     <Image
                       src={imageSrc(product.image)}
                       alt={product.name}
@@ -66,12 +72,17 @@ export default async function Products() {
                         Últimas {product.stock}
                       </span>
                     ) : null}
-                  </div>
+                  </Link>
 
                   <div className="flex flex-1 flex-col p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-navy">{product.category}</p>
                     <h3 className="mt-1 font-display text-2xl leading-tight uppercase">
-                      {product.name}
+                      <Link
+                        href={`/producto/${product.id}`}
+                        className="underline-offset-4 hover:underline"
+                      >
+                        {product.name}
+                      </Link>
                     </h3>
                     <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t-2 border-navy pt-2">
                       <span className="tabular-nums font-display text-3xl leading-none text-signal">

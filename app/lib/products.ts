@@ -95,6 +95,35 @@ export async function getActiveProducts(): Promise<Product[]> {
   }
 }
 
+/**
+ * Un producto para la ficha pública. Es la versión de `getProduct` pensada para
+ * el sitio: exige `active = true` y nunca lanza — si la base no responde
+ * devuelve null y la ficha sale como 404, que es mejor que tumbar la página.
+ *
+ * El filtro `active` es redundante con RLS a propósito: si algún día alguien
+ * afloja la política, un producto retirado del catálogo seguiría sin tener
+ * ficha pública.
+ */
+export async function getActiveProduct(id: string): Promise<Product | null> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(TABLE)
+      .select("*")
+      .eq("id", id)
+      .eq("active", true)
+      .maybeSingle();
+    if (error) fail(error);
+    return data ? toProduct(data as Row) : null;
+  } catch (err) {
+    console.warn(
+      "[products] no se pudo leer la ficha:",
+      (err as Error).message,
+    );
+    return null;
+  }
+}
+
 export async function getProduct(id: string): Promise<Product | null> {
   const supabase = await createClient();
   const { data, error } = await supabase

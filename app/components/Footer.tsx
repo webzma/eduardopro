@@ -1,11 +1,13 @@
+import Link from "next/link";
+import { IconLock } from "@tabler/icons-react";
 import { WHATSAPP_URL } from "../lib/site";
 
 const links = [
-  { href: "#oficio", label: "El oficio" },
-  { href: "#coleccion", label: "Catálogo" },
-  { href: "#testimonios", label: "Testimonios" },
-  { href: "#ubicacion", label: "Ubicación" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/#oficio", label: "El oficio" },
+  { href: "/#coleccion", label: "Catálogo" },
+  { href: "/#testimonios", label: "Testimonios" },
+  { href: "/#ubicacion", label: "Ubicación" },
+  { href: "/#contacto", label: "Contacto" },
 ];
 
 // Ft4 · Dense typographic colophon. Closes the page like a printed sign-off
@@ -51,20 +53,32 @@ export default function Footer() {
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {links.map((link) => (
                 <li key={link.href}>
-                  <a
+                  <Link
                     href={link.href}
                     className="block whitespace-nowrap py-1 text-sm font-semibold tracking-widest uppercase hover:text-signallift"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] tabular-nums mt-6 opacity-70">
-            © 2026 EduardoPro — Todos los derechos reservados
-          </p>
+          {/* El acceso del equipo vive aquí abajo, no en la barra superior: el
+              cliente que entra a comprar no tiene por qué encontrárselo antes
+              que el catálogo, y quien trabaja aquí sabe dónde buscarlo. */}
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t-2 border-paper/30 pt-6">
+            <p className="text-xs font-semibold tracking-[0.18em] tabular-nums uppercase opacity-70">
+              © 2026 EduardoPro — Todos los derechos reservados
+            </p>
+            <Link
+              href="/admin/login"
+              className="inline-flex items-center justify-center gap-2 border-2 border-paper px-4 py-2 min-h-11 font-display text-sm tracking-[0.04em] whitespace-nowrap uppercase transition-colors duration-[180ms] hover:bg-paper hover:text-coal motion-reduce:transition-none"
+            >
+              <IconLock size={16} stroke={1.75} aria-hidden />
+              Acceso del equipo
+            </Link>
+          </div>
         </div>
       </footer>
     </>

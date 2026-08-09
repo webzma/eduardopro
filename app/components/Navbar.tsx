@@ -1,12 +1,13 @@
+import Link from "next/link";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { WHATSAPP_URL } from "../lib/site";
 
 const links = [
-  { href: "#oficio", label: "El oficio" },
-  { href: "#coleccion", label: "Catálogo" },
-  { href: "#testimonios", label: "Testimonios" },
-  { href: "#ubicacion", label: "Ubicación" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/#oficio", label: "El oficio" },
+  { href: "/#coleccion", label: "Catálogo" },
+  { href: "/#testimonios", label: "Testimonios" },
+  { href: "/#ubicacion", label: "Ubicación" },
+  { href: "/#contacto", label: "Contacto" },
 ];
 
 // Studied DNA, declared override: Hallmark normally routes away from the
@@ -18,27 +19,33 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b-2 border-coal bg-paper">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-[clamp(1rem,4vw,2.5rem)] py-3 sm:gap-6">
-        <a href="#" className="flex min-w-0 items-baseline gap-2">
+        {/* min-w-0 solo mientras hace falta: por debajo de `sm` el logotipo se
+            recorta para dejarle sitio al botón, pero en cuanto entran los
+            enlaces vuelve a ser intocable — un logotipo cortado no es una
+            solución responsive, es un error visible. */}
+        <Link href="/" className="flex min-w-0 items-baseline gap-2 sm:min-w-fit">
           <span className="truncate font-display text-xl leading-none uppercase sm:text-2xl">
             EduardoPro
           </span>
           <span className="text-xs font-semibold uppercase tracking-[0.18em] hidden text-signal sm:inline">
             Barbería
           </span>
-        </a>
+        </Link>
 
-        {/* Hidden below lg rather than folded into a hamburger: every link is a
-            section of this one page, and the footer nav repeats all five. */}
-        <nav aria-label="Principal" className="hidden lg:block">
+        {/* Ocultos por debajo de `xl` en vez de plegarse en un menú: cada
+            enlace es una sección de la portada y el pie los repite los cinco.
+            El corte estaba en `lg`, donde los tres bloques suman 1139px y el
+            botón se salía — se veía como un logotipo recortado. */}
+        <nav aria-label="Principal" className="hidden xl:block">
           <ul className="flex items-center gap-x-6">
             {links.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
                   className="shadow-[inset_0_-2px_0_transparent] transition-shadow duration-[180ms] hover:shadow-[inset_0_-2px_0_var(--signal)] active:text-coal motion-reduce:transition-none text-xs font-semibold uppercase tracking-[0.18em] block whitespace-nowrap py-1"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
