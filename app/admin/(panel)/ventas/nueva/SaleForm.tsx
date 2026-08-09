@@ -110,7 +110,7 @@ export default function SaleForm({
               <IconPackages size={18} stroke={1.75} aria-hidden />
               1. Elige los productos
             </h2>
-            <div className="relative max-w-64 flex-1">
+            <div className="relative basis-full sm:max-w-64 sm:flex-1 sm:basis-auto">
               <IconSearch
                 size={16}
                 stroke={1.75}
@@ -139,7 +139,10 @@ export default function SaleForm({
                   <li
                     key={product.id}
                     className={cn(
-                      "flex items-center gap-4 p-2 px-4 transition-colors even:bg-zebra",
+                      // La foto a la izquierda y TODO lo demás apilado a su
+                      // derecha. En una sola fila —foto, nombre, dos fichas y
+                      // el botón— no cabe nada por debajo de 640px.
+                      "flex items-center gap-3 p-3 transition-colors even:bg-zebra sm:gap-4 sm:px-4",
                       // Lo que ya va en el carrito se marca en verde: al
                       // recorrer una lista larga se ve qué está pedido sin
                       // tener que mirar al ticket.
@@ -164,28 +167,34 @@ export default function SaleForm({
                         </span>{" "}
                         · {formatBs(product.price, rate)}
                       </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        {taken > 0 ? (
+                          <Chip tone="jade">{taken} en el carrito</Chip>
+                        ) : null}
+                        {/* Agotado en rojo, por acabarse en ámbar, con
+                            existencias en gris: el color solo aparece cuando
+                            dice algo. */}
+                        <Chip
+                          tone={
+                            left <= 0 ? "signal" : left <= 3 ? "amber" : "neutral"
+                          }
+                        >
+                          {left <= 0 ? "Agotado" : `${left} disp.`}
+                        </Chip>
+                        <button
+                          type="button"
+                          onClick={() => add(product)}
+                          disabled={left <= 0}
+                          className={cn(
+                            buttonVariants({ variant: "outline" }),
+                            "ml-auto",
+                          )}
+                        >
+                          <IconPlus size={16} stroke={1.75} />
+                          Añadir
+                        </button>
+                      </div>
                     </div>
-                    {taken > 0 ? (
-                      <Chip tone="jade">
-                        {taken} en el carrito
-                      </Chip>
-                    ) : null}
-                    {/* Agotado en rojo, por acabarse en ámbar, con existencias
-                        en gris: el color solo aparece cuando dice algo. */}
-                    <Chip
-                      tone={left <= 0 ? "signal" : left <= 3 ? "amber" : "neutral"}
-                    >
-                      {left <= 0 ? "Agotado" : `${left} disp.`}
-                    </Chip>
-                    <button
-                      type="button"
-                      onClick={() => add(product)}
-                      disabled={left <= 0}
-                      className={buttonVariants({ variant: "outline" })}
-                    >
-                      <IconPlus size={16} stroke={1.75} />
-                      Añadir
-                    </button>
                   </li>
                 );
               })}

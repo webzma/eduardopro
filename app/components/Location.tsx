@@ -30,7 +30,7 @@ export default function Location() {
         <div className="mt-12 grid items-stretch gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           {/* El letrero esmaltado. */}
           <div
-            className="flex flex-col border-2 border-coal bg-navy p-8 text-paper shadow-[6px_6px_0_var(--coal)]"
+            className="flex min-w-0 flex-col border-2 border-coal bg-navy p-6 text-paper shadow-[6px_6px_0_var(--coal)] sm:p-8"
             style={{ ["--focus-ring" as string]: "var(--paper)" }}
           >
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-paper/80">La tienda</p>
@@ -39,7 +39,10 @@ export default function Location() {
             </p>
             {/* Coma, no interpunto: si esto parte en dos líneas, una línea que
                 acaba en "Yaracuy," se lee bien; una que acaba en "·" no. */}
-            <p className="font-display font-normal uppercase text-[length:var(--text-display-s)] leading-[1.06] tracking-[-0.01em] [overflow-wrap:anywhere] min-w-0 mt-1 text-lg text-paper/80">
+            {/* Sin el tamaño display de la cadena base: convivía con text-lg y
+                ganaba el orden del CSS, así que esta línea salía a 40px y
+                "VENEZUELA" se partía a mitad de palabra en el teléfono. */}
+            <p className="mt-1 min-w-0 font-display text-lg leading-[1.06] font-normal tracking-[-0.01em] text-paper/80 uppercase">
               {LOCATION.region}, {LOCATION.country}
             </p>
 
@@ -61,7 +64,7 @@ export default function Location() {
                 href={MAP_LINK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3 min-h-11 border-2 border-coal shadow-[4px_4px_0_var(--coal)] font-display font-normal text-[length:var(--text-md)] tracking-[0.04em] uppercase whitespace-nowrap transition-[transform,box-shadow,background-color] duration-[180ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--coal)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none bg-paper text-coal"
+                className="inline-flex items-center justify-center gap-2 py-3 min-h-11 border-2 border-coal shadow-[4px_4px_0_var(--coal)] font-display font-normal tracking-[0.04em] uppercase whitespace-nowrap px-4 text-sm sm:px-8 sm:text-[length:var(--text-md)] transition-[transform,box-shadow,background-color] duration-[180ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--coal)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none bg-paper text-coal"
               >
                 <IconMapPin size={20} stroke={1.75} aria-hidden />
                 Cómo llegar
@@ -86,7 +89,7 @@ export default function Location() {
           </div>
 
           {/* La lámina del mapa: cabecera tipográfica arriba, mapa debajo. */}
-          <figure className="flex min-h-96 flex-col border-2 border-coal bg-paper shadow-[6px_6px_0_var(--coal)]">
+          <figure className="flex min-h-96 min-w-0 flex-col border-2 border-coal bg-paper shadow-[6px_6px_0_var(--coal)]">
             <figcaption className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b-2 border-coal bg-signal px-4 py-2 text-paper">
               <span className="text-xs font-semibold uppercase tracking-[0.18em]">{LOCATION_LABEL}</span>
               <span className="text-xs font-semibold uppercase tracking-[0.18em] tabular-nums">
@@ -98,7 +101,7 @@ export default function Location() {
               title={`Mapa de ${LOCATION_LABEL}`}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="min-h-80 w-full flex-1 border-0"
+              className="min-h-80 w-full min-w-0 flex-1 border-0"
             />
           </figure>
         </div>

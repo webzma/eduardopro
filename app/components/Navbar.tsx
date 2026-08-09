@@ -17,9 +17,9 @@ const links = [
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b-2 border-coal bg-paper">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-[clamp(1rem,4vw,2.5rem)] py-3">
-        <a href="#" className="flex items-baseline gap-2">
-          <span className="font-display text-xl leading-none uppercase sm:text-2xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-[clamp(1rem,4vw,2.5rem)] py-3 sm:gap-6">
+        <a href="#" className="flex min-w-0 items-baseline gap-2">
+          <span className="truncate font-display text-xl leading-none uppercase sm:text-2xl">
             EduardoPro
           </span>
           <span className="text-xs font-semibold uppercase tracking-[0.18em] hidden text-signal sm:inline">
@@ -48,7 +48,10 @@ export default function Navbar() {
           href={WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 px-8 py-3 min-h-11 border-2 border-coal shadow-[4px_4px_0_var(--coal)] font-display font-normal text-[length:var(--text-md)] tracking-[0.04em] uppercase whitespace-nowrap transition-[transform,box-shadow,background-color] duration-[180ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--coal)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none bg-signal text-paper shrink-0 px-6 text-base"
+          // En el teléfono el botón se aprieta —menos aire lateral y un cuerpo
+          // menor— pero conserva los 44px de alto: es el destino principal de
+          // la barra y tiene que seguir siendo cómodo con el pulgar.
+          className="inline-flex items-center justify-center gap-2 py-3 min-h-11 border-2 border-coal shadow-[4px_4px_0_var(--coal)] font-display font-normal tracking-[0.04em] uppercase whitespace-nowrap transition-[transform,box-shadow,background-color] duration-[180ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--coal)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none bg-signal text-paper shrink-0 px-3 text-sm sm:px-6 sm:text-base"
         >
           <IconBrandWhatsapp size={18} stroke={1.75} aria-hidden />
           Pedir

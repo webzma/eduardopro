@@ -11,7 +11,15 @@ import { getPurchases } from "../../../lib/purchases";
 import { formatBs, formatUsd } from "../../../lib/money";
 import PeriodFilter from "../PeriodFilter";
 import { isPeriod, periodStart, type Period } from "@/app/lib/period";
-import { EmptyState, PageHeader, ProductMosaic, Stat } from "../ui";
+import {
+  celdaSecundaria,
+  EmptyState,
+  PageHeader,
+  ProductMosaic,
+  RowMeta,
+  RowMetaItem,
+  Stat,
+} from "../ui";
 import { buttonVariants } from "@/app/components/ui/button";
 import {
   Table,
@@ -34,6 +42,15 @@ const DAY = new Intl.DateTimeFormat("es-VE", {
 });
 
 const TIME = new Intl.DateTimeFormat("es-VE", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "America/Caracas",
+});
+
+/** Fecha y hora en una línea, para el repliegue del teléfono. */
+const SHORT = new Intl.DateTimeFormat("es-VE", {
+  day: "2-digit",
+  month: "short",
   hour: "2-digit",
   minute: "2-digit",
   timeZone: "America/Caracas",
@@ -119,20 +136,24 @@ export default async function PurchasesPage({
             aria-labelledby="tabla-compras"
             tabIndex={0}
           >
-            <Table>
+            <Table className="table-fixed lg:table-auto">
               <TableCaption id="tabla-compras" className="sr-only">
                 Compras registradas, con su fecha, proveedor y total
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-28">
+                  <TableHead className="w-24 lg:w-28">
                     <span className="sr-only">Productos</span>
                   </TableHead>
                   <TableHead>Producto / ID</TableHead>
-                  <TableHead>Fecha y hora</TableHead>
-                  <TableHead>Proveedor</TableHead>
-                  <TableHead className="text-right">Unidades</TableHead>
-                  <TableHead className="text-right">Total pagado</TableHead>
+                  <TableHead className={celdaSecundaria}>Fecha y hora</TableHead>
+                  <TableHead className={celdaSecundaria}>Proveedor</TableHead>
+                  <TableHead className={`${celdaSecundaria} text-right`}>
+                    Unidades
+                  </TableHead>
+                  <TableHead className={`${celdaSecundaria} text-right`}>
+                    Total pagado
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -148,7 +169,7 @@ export default async function PurchasesPage({
                       <TableCell className="py-3">
                         {/* Varios renglones, varias fotos en el mismo cuadro. */}
                         <ProductMosaic
-                          className="w-24"
+                          className="w-20 lg:w-24"
                           images={purchase.lines.map((l) => l.productImage)}
                         />
                       </TableCell>
@@ -158,41 +179,62 @@ export default async function PurchasesPage({
                           el único enlace de la fila. */}
                       <th
                         scope="row"
-                        className="p-2 text-left align-middle font-normal"
+                        className="w-full p-2 text-left align-middle font-normal"
                       >
-                        <Link
-                          href={`/admin/compras/${purchase.id}`}
-                          aria-label={`Compra ${ref} del ${FULL.format(fecha)}, ${formatUsd(purchase.totalUsd)}`}
-                          className="block max-w-64 rounded-sm hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                        >
-                          <span className="block truncate font-medium">
-                            {purchase.lines
-                              .map((l) => l.productName)
-                              .join(", ") || "Sin renglones"}
+                        <div className="flex items-start justify-between gap-2 lg:block">
+                          <Link
+                            href={`/admin/compras/${purchase.id}`}
+                            aria-label={`Compra ${ref} del ${FULL.format(fecha)}, ${formatUsd(purchase.totalUsd)}`}
+                            className="block min-w-0 rounded-sm hover:underline lg:max-w-64 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                          >
+                            <span className="block truncate font-medium">
+                              {purchase.lines
+                                .map((l) => l.productName)
+                                .join(", ") || "Sin renglones"}
+                            </span>
+                            <span className="mt-0.5 block text-xs font-semibold tracking-[0.04em] text-muted-foreground">
+                              {ref}
+                              {purchase.lines.length > 1
+                                ? ` · ${purchase.lines.length} productos`
+                                : null}
+                            </span>
+                          </Link>
+                          <span className="shrink-0 text-right lg:hidden">
+                            <span className="block font-semibold tabular-nums text-signal">
+                              {formatUsd(purchase.totalUsd)}
+                            </span>
+                            <span className="mt-0.5 block text-[0.6875rem] tabular-nums text-muted-foreground">
+                              {formatBs(purchase.totalUsd, purchase.rate)}
+                            </span>
                           </span>
-                          <span className="mt-0.5 block text-xs font-semibold tracking-[0.04em] text-muted-foreground">
-                            {ref}
-                            {purchase.lines.length > 1
-                              ? ` · ${purchase.lines.length} productos`
-                              : null}
-                          </span>
-                        </Link>
+                        </div>
+                        <RowMeta>
+                          <RowMetaItem label="Fecha">
+                            {SHORT.format(fecha)}
+                          </RowMetaItem>
+                          <RowMetaItem label="Uds.">{units}</RowMetaItem>
+                          <RowMetaItem label="Proveedor">
+                            {purchase.supplier ?? "—"}
+                          </RowMetaItem>
+                        </RowMeta>
                       </th>
 
-                      <TableCell className="whitespace-nowrap">
+                      <TableCell className={`${celdaSecundaria} whitespace-nowrap`}>
                         <span className="block">{DAY.format(fecha)}</span>
                         <span className="mt-0.5 block text-xs text-muted-foreground">
                           {TIME.format(fecha)}
                         </span>
                       </TableCell>
 
-                      <TableCell>
+                      <TableCell className={celdaSecundaria}>
                         <span className="block max-w-40 truncate">
                           {purchase.supplier ?? "—"}
                         </span>
                       </TableCell>
 
-                      <TableCell className="text-right tabular-nums whitespace-nowrap">
+                      <TableCell
+                        className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                      >
                         {units}
                         <span className="mt-0.5 block text-xs text-muted-foreground">
                           {purchase.lines.length}{" "}
@@ -202,7 +244,9 @@ export default async function PurchasesPage({
                         </span>
                       </TableCell>
 
-                      <TableCell className="text-right whitespace-nowrap">
+                      <TableCell
+                        className={`${celdaSecundaria} text-right whitespace-nowrap`}
+                      >
                         <span className="block font-semibold tabular-nums text-signal">
                           {formatUsd(purchase.totalUsd)}
                         </span>
@@ -219,10 +263,21 @@ export default async function PurchasesPage({
 
               <TableFooter>
                 <TableRow>
-                  <TableCell colSpan={5} className="font-medium">
+                  <TableCell colSpan={2} className="font-medium lg:hidden">
+                    Total en pantalla
+                    <span className="ml-2 font-semibold tabular-nums">
+                      {formatUsd(totalUsd)}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    colSpan={5}
+                    className="hidden font-medium lg:table-cell"
+                  >
                     Total en pantalla
                   </TableCell>
-                  <TableCell className="text-right font-semibold tabular-nums">
+                  <TableCell
+                    className={`${celdaSecundaria} text-right font-semibold tabular-nums`}
+                  >
                     {formatUsd(totalUsd)}
                   </TableCell>
                 </TableRow>

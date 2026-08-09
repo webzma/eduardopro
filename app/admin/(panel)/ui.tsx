@@ -324,6 +324,51 @@ export const PAYMENT_TONES: Record<string, Tone> = {
   otro: "neutral",
 };
 
+/* ── Tablas en un teléfono ────────────────────────────────────────────
+ * Una tabla de siete columnas en 390px solo cabe con scroll horizontal, y
+ * desplazar de lado para ver el importe de una venta es exactamente lo que
+ * nadie hace de pie en el mostrador.
+ *
+ * En vez de eso, las columnas secundarias se ocultan por debajo de `md` y sus
+ * datos reaparecen apilados dentro de la celda del nombre. No hay dos marcados
+ * que mantener: es la MISMA fila, y `hidden` saca del árbol de accesibilidad lo
+ * que no toca, así que un lector de pantalla nunca oye el dato dos veces.
+ *
+ * Se usa junto a `celdaSecundaria` en las cabeceras y celdas que se retiran. */
+
+/** Clase para la columna que solo existe cuando hay sitio. El corte va en `lg`
+ *  y no en `md`: a 768px las siete columnas medían 919px y la tabla seguía
+ *  desplazándose de lado, que es justo lo que se quería evitar. */
+export const celdaSecundaria = "hidden lg:table-cell";
+
+/** Contenedor de los datos replegados. Solo se ve en pantalla estrecha. */
+export function RowMeta({ children }: { children: ReactNode }) {
+  return (
+    <dl className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 lg:hidden">
+      {children}
+    </dl>
+  );
+}
+
+/** Un dato replegado, con su etiqueta: la regla de la casa no se suspende
+ *  porque la pantalla sea pequeña. */
+export function RowMetaItem({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex items-baseline gap-1">
+      <dt className="text-[0.625rem] font-semibold tracking-[0.06em] text-muted-foreground uppercase">
+        {label}
+      </dt>
+      <dd className="text-xs font-medium">{children}</dd>
+    </div>
+  );
+}
+
 /** Distintivo de referencia corta (#A3F2C1). */
 export function Ref({ children }: { children: ReactNode }) {
   return (

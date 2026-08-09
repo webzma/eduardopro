@@ -13,7 +13,15 @@ import { adjustStockAction, createProductAction } from "../../actions";
 import RowActions from "./RowActions";
 import ImagePicker from "./ImagePicker";
 import { imageSrc } from "../../../lib/images";
-import { Chip, EmptyState, Notice, PageHeader } from "../ui";
+import {
+  celdaSecundaria,
+  Chip,
+  EmptyState,
+  Notice,
+  PageHeader,
+  RowMeta,
+  RowMetaItem,
+} from "../ui";
 import { cn } from "@/app/lib/utils";
 import { Button, buttonVariants } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
@@ -120,27 +128,37 @@ export default async function InventoryPage({
             aria-labelledby="tabla-inventario"
             tabIndex={0}
           >
-            <Table>
+            <Table className="table-fixed lg:table-auto">
               <TableCaption id="tabla-inventario" className="sr-only">
                 Productos del catálogo con su stock, precio y estado
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-28">
+                  <TableHead className="w-24 lg:w-28">
                     <span className="sr-only">Foto</span>
                   </TableHead>
                   <TableHead>Producto</TableHead>
                   {isAdmin ? (
-                    <TableHead className="text-right">Costo</TableHead>
+                    <TableHead className={`${celdaSecundaria} text-right`}>
+                      Costo
+                    </TableHead>
                   ) : null}
-                  <TableHead className="text-right">Precio</TableHead>
+                  <TableHead className={`${celdaSecundaria} text-right`}>
+                    Precio
+                  </TableHead>
                   {isAdmin ? (
-                    <TableHead className="text-right">Margen</TableHead>
+                    <TableHead className={`${celdaSecundaria} text-right`}>
+                      Margen
+                    </TableHead>
                   ) : null}
-                  <TableHead className="text-center">Stock</TableHead>
-                  <TableHead>Estado</TableHead>
+                  <TableHead className="w-28 text-center lg:w-auto">
+                    Stock
+                  </TableHead>
+                  <TableHead className={celdaSecundaria}>Estado</TableHead>
                   {isAdmin ? (
-                    <TableHead className="text-right">Acciones</TableHead>
+                    <TableHead className={`${celdaSecundaria} text-right`}>
+                      Acciones
+                    </TableHead>
                   ) : null}
                 </TableRow>
               </TableHeader>
@@ -149,7 +167,7 @@ export default async function InventoryPage({
                 {products.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="py-3">
-                      <Avatar className="size-24 rounded-md border shadow-sm">
+                      <Avatar className="size-20 rounded-md border shadow-sm lg:size-24">
                         <AvatarImage
                           src={imageSrc(product.image)}
                           alt=""
@@ -167,7 +185,7 @@ export default async function InventoryPage({
                         lector de pantalla lo repite al leer cada celda. */}
                     <th
                       scope="row"
-                      className="max-w-56 p-2 text-left align-middle font-normal"
+                      className="w-full p-2 text-left align-middle font-normal lg:max-w-56"
                     >
                       <span className="block truncate font-medium">
                         {product.name}
@@ -175,10 +193,34 @@ export default async function InventoryPage({
                       <span className="block truncate text-xs text-muted-foreground">
                         {product.category || "Sin categoría"}
                       </span>
+                      <RowMeta>
+                        <RowMetaItem label="Precio">
+                          <span className="font-semibold text-jade">
+                            {formatUsd(product.price)}
+                          </span>
+                        </RowMetaItem>
+                        {product.stock === 0 ? (
+                          <Chip tone="signal">Agotado</Chip>
+                        ) : product.stock <= 3 ? (
+                          <Chip tone="amber">Quedan {product.stock}</Chip>
+                        ) : null}
+                        {!product.active ? <Chip tone="navy">Oculto</Chip> : null}
+                      </RowMeta>
+                      {isAdmin ? (
+                        <div className="mt-1.5 lg:hidden">
+                          <RowActions
+                            id={product.id}
+                            name={product.name}
+                            active={product.active}
+                          />
+                        </div>
+                      ) : null}
                     </th>
 
                     {isAdmin ? (
-                      <TableCell className="text-right tabular-nums whitespace-nowrap">
+                      <TableCell
+                        className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                      >
                         {product.cost > 0 ? (
                           formatUsd(product.cost)
                         ) : (
@@ -187,7 +229,9 @@ export default async function InventoryPage({
                       </TableCell>
                     ) : null}
 
-                    <TableCell className="text-right whitespace-nowrap">
+                    <TableCell
+                      className={`${celdaSecundaria} text-right whitespace-nowrap`}
+                    >
                       <span className="block font-semibold tabular-nums text-jade">
                         {formatUsd(product.price)}
                       </span>
@@ -199,7 +243,9 @@ export default async function InventoryPage({
                     </TableCell>
 
                     {isAdmin ? (
-                      <TableCell className="text-right tabular-nums whitespace-nowrap">
+                      <TableCell
+                        className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                      >
                         {(() => {
                           const m = marginPct(product.price, product.cost);
                           if (m === null) {
@@ -263,7 +309,7 @@ export default async function InventoryPage({
                       </div>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell className={celdaSecundaria}>
                       {/* Cada estado con su color Y su palabra. El color solo
                           no se ve con daltonismo ni en una impresión. */}
                       <div className="flex flex-wrap gap-1">
@@ -282,7 +328,7 @@ export default async function InventoryPage({
                     </TableCell>
 
                     {isAdmin ? (
-                      <TableCell className="text-right">
+                      <TableCell className={`${celdaSecundaria} text-right`}>
                         <RowActions
                           id={product.id}
                           name={product.name}

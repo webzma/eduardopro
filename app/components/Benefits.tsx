@@ -57,10 +57,10 @@ export default function Benefits() {
           {spec.map((row) => (
             <div
               key={row.key}
-              className="grid gap-x-6 gap-y-1 border-b-2 border-navy py-6 md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_minmax(0,1.3fr)] md:items-baseline"
+              className="grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-1 border-b-2 border-navy py-6 md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_minmax(0,1.3fr)] md:items-baseline"
             >
               <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-navy">{row.key}</dt>
-              <dd className="tabular-nums font-display text-2xl leading-tight uppercase">
+              <dd className="min-w-0 font-display text-xl leading-tight tabular-nums uppercase sm:text-2xl">
                 {row.value}
               </dd>
               <dd className="text-[length:var(--text-base)] leading-relaxed text-coal2">

@@ -429,7 +429,7 @@ export default function PurchaseForm({
                 <IconPackages size={18} stroke={1.75} aria-hidden />
                 1. Añadir al pedido
               </h2>
-              <div className="relative max-w-64 flex-1">
+              <div className="relative basis-full sm:max-w-64 sm:flex-1 sm:basis-auto">
                 <IconSearch
                   size={16}
                   stroke={1.75}
@@ -465,7 +465,7 @@ export default function PurchaseForm({
                 {results.slice(0, 30).map((product) => (
                   <li
                     key={product.id}
-                    className="flex items-center gap-4 px-4 py-2 even:bg-zebra"
+                    className="flex items-center gap-3 p-3 even:bg-zebra sm:gap-4 sm:px-4"
                   >
                     <Image
                       src={imageSrc(product.image)}
@@ -478,22 +478,29 @@ export default function PurchaseForm({
                       <p className="truncate text-sm font-medium">
                         {product.name}
                       </p>
-                      <p className="text-sm text-muted-foreground truncate text-xs tabular-nums">
+                      <p className="truncate text-xs tabular-nums text-muted-foreground">
                         {product.stock} en stock · venta{" "}
                         {formatUsd(product.price)}
                         {product.cost > 0
                           ? ` · último costo ${formatUsd(product.cost)}`
                           : " · sin costo registrado"}
                       </p>
+                      {/* El botón baja bajo el texto: en una sola fila con la
+                          foto no cabe en un teléfono. */}
+                      <div className="mt-2 flex">
+                        <button
+                          type="button"
+                          onClick={() => addExisting(product)}
+                          className={cn(
+                            buttonVariants({ variant: "outline" }),
+                            "ml-auto",
+                          )}
+                        >
+                          <IconPlus size={16} stroke={1.75} />
+                          Añadir
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => addExisting(product)}
-                      className={buttonVariants({ variant: "outline" })}
-                    >
-                      <IconPlus size={16} stroke={1.75} />
-                      Añadir
-                    </button>
                   </li>
                 ))}
               </ul>

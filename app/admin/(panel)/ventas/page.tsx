@@ -28,11 +28,14 @@ import {
 import PeriodFilter from "../PeriodFilter";
 import { isPeriod, periodStart, type Period } from "@/app/lib/period";
 import {
+  celdaSecundaria,
   Chip,
   EmptyState,
   PAYMENT_TONES,
   PageHeader,
   ProductMosaic,
+  RowMeta,
+  RowMetaItem,
   Stat,
 } from "../ui";
 
@@ -46,6 +49,15 @@ const DAY = new Intl.DateTimeFormat("es-VE", {
 });
 
 const TIME = new Intl.DateTimeFormat("es-VE", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "America/Caracas",
+});
+
+/** Fecha y hora en una línea, para el repliegue del teléfono. */
+const SHORT = new Intl.DateTimeFormat("es-VE", {
+  day: "2-digit",
+  month: "short",
   hour: "2-digit",
   minute: "2-digit",
   timeZone: "America/Caracas",
@@ -138,21 +150,29 @@ export default async function SalesPage({
             aria-labelledby="tabla-ventas"
             tabIndex={0}
           >
-            <Table>
+            <Table className="table-fixed lg:table-auto">
               <TableCaption id="tabla-ventas" className="sr-only">
                 Ventas registradas, con su fecha, forma de pago y total
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-28">
+                  <TableHead className="w-24 lg:w-28">
                     <span className="sr-only">Productos</span>
                   </TableHead>
                   <TableHead>Producto / ID</TableHead>
-                  <TableHead>Fecha y hora</TableHead>
-                  <TableHead>Forma de pago</TableHead>
-                  <TableHead className="text-right">Unidades</TableHead>
-                  {isAdmin ? <TableHead>Registrada por</TableHead> : null}
-                  <TableHead className="text-right">Total cobrado</TableHead>
+                  <TableHead className={celdaSecundaria}>Fecha y hora</TableHead>
+                  <TableHead className={celdaSecundaria}>Forma de pago</TableHead>
+                  <TableHead className={`${celdaSecundaria} text-right`}>
+                    Unidades
+                  </TableHead>
+                  {isAdmin ? (
+                    <TableHead className={celdaSecundaria}>
+                      Registrada por
+                    </TableHead>
+                  ) : null}
+                  <TableHead className={`${celdaSecundaria} text-right`}>
+                    Total cobrado
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -168,7 +188,7 @@ export default async function SalesPage({
                             reparte entre ellos: se ve que fueron varios sin
                             leer la lista de nombres. */}
                         <ProductMosaic
-                          className="w-24"
+                          className="w-20 md:w-24"
                           images={sale.lines.map((l) => l.productImage)}
                         />
                       </TableCell>
@@ -178,41 +198,63 @@ export default async function SalesPage({
                           el único enlace de la fila. */}
                       <th
                         scope="row"
-                        className="p-2 text-left align-middle font-normal"
+                        className="w-full p-2 text-left align-middle font-normal"
                       >
-                        <Link
-                          href={`/admin/ventas/${sale.id}`}
-                          aria-label={`Venta ${ref} del ${FULL.format(fecha)}, ${formatUsd(sale.totalUsd)}`}
-                          className="block max-w-64 rounded-sm hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                        >
-                          <span className="block truncate font-medium">
-                            {sale.lines.map((l) => l.productName).join(", ") ||
-                              "Sin renglones"}
+                        <div className="flex items-start justify-between gap-2 lg:block">
+                          <Link
+                            href={`/admin/ventas/${sale.id}`}
+                            aria-label={`Venta ${ref} del ${FULL.format(fecha)}, ${formatUsd(sale.totalUsd)}`}
+                            className="block min-w-0 rounded-sm hover:underline lg:max-w-64 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                          >
+                            <span className="block truncate font-medium">
+                              {sale.lines.map((l) => l.productName).join(", ") ||
+                                "Sin renglones"}
+                            </span>
+                            <span className="mt-0.5 block text-xs font-semibold tracking-[0.04em] text-muted-foreground">
+                              {ref}
+                              {sale.lines.length > 1
+                                ? ` · ${sale.lines.length} productos`
+                                : null}
+                            </span>
+                          </Link>
+                          <span className="shrink-0 text-right lg:hidden">
+                            <span className="block font-semibold tabular-nums text-jade">
+                              {formatUsd(sale.totalUsd)}
+                            </span>
+                            <span className="mt-0.5 block text-[0.6875rem] tabular-nums text-muted-foreground">
+                              {formatBs(sale.totalUsd, sale.rate)}
+                            </span>
                           </span>
-                          <span className="mt-0.5 block text-xs font-semibold tracking-[0.04em] text-muted-foreground">
-                            {ref}
-                            {sale.lines.length > 1
-                              ? ` · ${sale.lines.length} productos`
-                              : null}
-                          </span>
-                        </Link>
+                        </div>
+                        <RowMeta>
+                          <RowMetaItem label="Fecha">
+                            {SHORT.format(fecha)}
+                          </RowMetaItem>
+                          <RowMetaItem label="Uds.">{units}</RowMetaItem>
+                          <Chip tone={PAYMENT_TONES[sale.paymentMethod]}>
+                            {PAYMENT_LABELS[sale.paymentMethod] ??
+                              sale.paymentMethod}
+                          </Chip>
+                        </RowMeta>
                       </th>
 
-                      <TableCell className="whitespace-nowrap">
+                      <TableCell className={`${celdaSecundaria} whitespace-nowrap`}>
                         <span className="block">{DAY.format(fecha)}</span>
                         <span className="mt-0.5 block text-xs text-muted-foreground">
                           {TIME.format(fecha)}
                         </span>
                       </TableCell>
 
-                      <TableCell>
+                      <TableCell className={celdaSecundaria}>
                         <Chip tone={PAYMENT_TONES[sale.paymentMethod]}>
                           {PAYMENT_LABELS[sale.paymentMethod] ??
                             sale.paymentMethod}
                         </Chip>
                       </TableCell>
 
-                      <TableCell className="text-right tabular-nums whitespace-nowrap">
+                      <TableCell
+                        className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                      >
                         {units}
                         <span className="mt-0.5 block text-xs text-muted-foreground">
                           {sale.lines.length}{" "}
@@ -221,12 +263,14 @@ export default async function SalesPage({
                       </TableCell>
 
                       {isAdmin ? (
-                        <TableCell className="whitespace-nowrap">
+                        <TableCell className={`${celdaSecundaria} whitespace-nowrap`}>
                           {sale.sellerRole ? ROLE_LABELS[sale.sellerRole] : "—"}
                         </TableCell>
                       ) : null}
 
-                      <TableCell className="text-right whitespace-nowrap">
+                      <TableCell
+                        className={`${celdaSecundaria} text-right whitespace-nowrap`}
+                      >
                         {/* Verde: en este panel el verde es siempre dinero que
                             entra, aquí y en el Resumen. */}
                         <span className="block font-semibold tabular-nums text-jade">
@@ -234,7 +278,7 @@ export default async function SalesPage({
                         </span>
                         {/* A la tasa guardada con la venta, no a la de hoy: el
                             histórico no se mueve cuando cambia el dólar. */}
-                        <span className="mt-0.5 block text-xs tabular-nums text-muted-foreground">
+                        <span className="mt-0.5 block text-[0.6875rem] tabular-nums text-muted-foreground md:text-xs">
                           {formatBs(sale.totalUsd, sale.rate)}
                         </span>
                       </TableCell>
@@ -245,10 +289,23 @@ export default async function SalesPage({
 
               <TableFooter>
                 <TableRow>
-                  <TableCell colSpan={leading} className="font-medium">
+                  {/* colSpan no entiende de media queries: se pintan dos pies
+                      y cada uno aparece en su tamaño de pantalla. */}
+                  <TableCell colSpan={2} className="font-medium lg:hidden">
+                    Total en pantalla
+                    <span className="ml-2 font-semibold tabular-nums">
+                      {formatUsd(totalUsd)}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    colSpan={leading}
+                    className="hidden font-medium lg:table-cell"
+                  >
                     Total en pantalla
                   </TableCell>
-                  <TableCell className="text-right font-semibold tabular-nums">
+                  <TableCell
+                    className={`${celdaSecundaria} text-right font-semibold tabular-nums`}
+                  >
                     {formatUsd(totalUsd)}
                   </TableCell>
                 </TableRow>

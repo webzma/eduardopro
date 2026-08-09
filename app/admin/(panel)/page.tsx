@@ -19,12 +19,15 @@ import { getMonthSpend } from "../../lib/purchases";
 import { getRate } from "../../lib/rate";
 import { formatBs, formatUsd, PAYMENT_LABELS } from "../../lib/money";
 import {
+  celdaSecundaria,
   Chip,
   EmptyState,
   Notice,
   PAYMENT_TONES,
   PageHeader,
   ProductMosaic,
+  RowMeta,
+  RowMetaItem,
   Stat,
 } from "./ui";
 import { buttonVariants } from "@/app/components/ui/button";
@@ -233,20 +236,24 @@ export default async function DashboardPage() {
               aria-labelledby="tabla-resumen"
               tabIndex={0}
             >
-              <Table>
+              <Table className="table-fixed lg:table-auto">
                 <TableCaption id="tabla-resumen" className="sr-only">
                   Las últimas ventas registradas, con su fecha, forma de pago y
                   total
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-28">
+                    <TableHead className="w-24 lg:w-28">
                       <span className="sr-only">Productos</span>
                     </TableHead>
                     <TableHead>Producto / ID</TableHead>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Forma de pago</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
+                    <TableHead className={celdaSecundaria}>Fecha</TableHead>
+                    <TableHead className={celdaSecundaria}>
+                      Forma de pago
+                    </TableHead>
+                    <TableHead className={`${celdaSecundaria} text-right`}>
+                      Total
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
 
@@ -258,45 +265,69 @@ export default async function DashboardPage() {
                       <TableRow key={sale.id}>
                         <TableCell className="py-3">
                           <ProductMosaic
-                            className="w-24"
+                            className="w-20 lg:w-24"
                             images={sale.lines.map((l) => l.productImage)}
                           />
                         </TableCell>
 
                         <th
                           scope="row"
-                          className="p-2 text-left align-middle font-normal"
+                          className="w-full p-2 text-left align-middle font-normal"
                         >
-                          <Link
-                            href={`/admin/ventas/${sale.id}`}
-                            aria-label={`Venta ${ref}, ${formatUsd(sale.totalUsd)}`}
-                            className="block max-w-64 rounded-sm hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                          >
-                            <span className="block truncate font-medium">
-                              {sale.lines.map((l) => l.productName).join(", ") ||
-                                "Sin renglones"}
+                          <div className="flex items-start justify-between gap-2 lg:block">
+                            <Link
+                              href={`/admin/ventas/${sale.id}`}
+                              aria-label={`Venta ${ref}, ${formatUsd(sale.totalUsd)}`}
+                              className="block min-w-0 rounded-sm hover:underline lg:max-w-64 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                            >
+                              <span className="block truncate font-medium">
+                                {sale.lines
+                                  .map((l) => l.productName)
+                                  .join(", ") || "Sin renglones"}
+                              </span>
+                              <span className="mt-0.5 block text-xs text-muted-foreground">
+                                {ref}
+                                {sale.lines.length > 1
+                                  ? ` · ${sale.lines.length} productos`
+                                  : null}
+                              </span>
+                            </Link>
+                            <span className="shrink-0 text-right lg:hidden">
+                              <span className="block font-semibold tabular-nums text-jade">
+                                {formatUsd(sale.totalUsd)}
+                              </span>
+                              <span className="mt-0.5 block text-[0.6875rem] tabular-nums text-muted-foreground">
+                                {formatBs(sale.totalUsd, sale.rate)}
+                              </span>
                             </span>
-                            <span className="mt-0.5 block text-xs text-muted-foreground">
-                              {ref}
-                              {sale.lines.length > 1
-                                ? ` · ${sale.lines.length} productos`
-                                : null}
-                            </span>
-                          </Link>
+                          </div>
+                          <RowMeta>
+                            <RowMetaItem label="Fecha">
+                              {TIME.format(fecha)}
+                            </RowMetaItem>
+                            <Chip tone={PAYMENT_TONES[sale.paymentMethod]}>
+                              {PAYMENT_LABELS[sale.paymentMethod] ??
+                                sale.paymentMethod}
+                            </Chip>
+                          </RowMeta>
                         </th>
 
-                        <TableCell className="whitespace-nowrap">
+                        <TableCell
+                          className={`${celdaSecundaria} whitespace-nowrap`}
+                        >
                           {TIME.format(fecha)}
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell className={celdaSecundaria}>
                           <Chip tone={PAYMENT_TONES[sale.paymentMethod]}>
                             {PAYMENT_LABELS[sale.paymentMethod] ??
                               sale.paymentMethod}
                           </Chip>
                         </TableCell>
 
-                        <TableCell className="text-right whitespace-nowrap">
+                        <TableCell
+                          className={`${celdaSecundaria} text-right whitespace-nowrap`}
+                        >
                           <span className="block font-semibold tabular-nums text-jade">
                             {formatUsd(sale.totalUsd)}
                           </span>

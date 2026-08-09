@@ -24,6 +24,7 @@ import {
   TableRow,
 } from "@/app/components/ui/table";
 import {
+  celdaSecundaria,
   Chip,
   EmptyState,
   PAYMENT_TONES,
@@ -184,7 +185,9 @@ export default async function CashClosePage({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Método de pago</TableHead>
-                    <TableHead className="text-right">Ventas</TableHead>
+                    <TableHead className={`${celdaSecundaria} text-right`}>
+                      Ventas
+                    </TableHead>
                     <TableHead className="text-right">En dólares</TableHead>
                     <TableHead className="text-right">En bolívares</TableHead>
                   </TableRow>
@@ -199,13 +202,19 @@ export default async function CashClosePage({
                         <Chip tone={PAYMENT_TONES[m.method]}>
                           {PAYMENT_LABELS[m.method] ?? m.method}
                         </Chip>
-                        <span className="block text-xs text-muted-foreground">
+                        <span className="mt-1 block text-xs text-muted-foreground">
                           {PAYS_IN_BS.has(m.method)
                             ? "Se cobró en bolívares"
                             : "Se cobró en dólares"}
+                          <span className="lg:hidden">
+                            {" · "}
+                            {m.count} {m.count === 1 ? "venta" : "ventas"}
+                          </span>
                         </span>
                       </th>
-                      <TableCell className="text-right tabular-nums">
+                      <TableCell
+                        className={`${celdaSecundaria} text-right tabular-nums`}
+                      >
                         {m.count}
                       </TableCell>
                       <TableCell className="text-right font-semibold tabular-nums text-jade">
@@ -224,7 +233,9 @@ export default async function CashClosePage({
                 <TableFooter>
                   <TableRow>
                     <TableCell className="font-medium">Total</TableCell>
-                    <TableCell className="text-right tabular-nums">
+                    <TableCell
+                      className={`${celdaSecundaria} text-right tabular-nums`}
+                    >
                       {close.sales.length}
                     </TableCell>
                     <TableCell className="text-right font-semibold tabular-nums">
