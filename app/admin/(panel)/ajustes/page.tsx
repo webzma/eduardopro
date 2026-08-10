@@ -8,6 +8,7 @@ import { requireAdmin } from "../../../lib/auth";
 import { getSettings } from "../../../lib/settings";
 import { getRate } from "../../../lib/rate";
 import { formatRate } from "../../../lib/money";
+import { formatDateTime } from "../../../lib/dates";
 import { setRateAction } from "../../actions";
 import { PageHeader } from "../ui";
 import { cn } from "@/app/lib/utils";
@@ -17,12 +18,6 @@ import { Input } from "@/app/components/ui/input";
 import { Badge } from "@/app/components/ui/badge";
 
 export const dynamic = "force-dynamic";
-
-const DATE = new Intl.DateTimeFormat("es-VE", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "America/Caracas",
-});
 
 export default async function SettingsPage({
   searchParams,
@@ -78,7 +73,7 @@ export default async function SettingsPage({
                 </p>
                 {rate.updatedAt ? (
                   <p className="mt-0.5 text-sm tabular-nums text-muted-foreground">
-                    Dato del {DATE.format(new Date(rate.updatedAt))}
+                    Dato del {formatDateTime(rate.updatedAt)}
                   </p>
                 ) : null}
               </>
@@ -129,7 +124,7 @@ export default async function SettingsPage({
               />
               {settings.updatedAt ? (
                 <p className="text-sm text-muted-foreground mt-2 text-xs">
-                  Última vez: {DATE.format(new Date(settings.updatedAt))}
+                  Última vez: {formatDateTime(settings.updatedAt)}
                 </p>
               ) : null}
               <button

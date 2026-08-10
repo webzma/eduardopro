@@ -41,17 +41,10 @@ import {
   TableRow,
 } from "@/app/components/ui/table";
 import { getSettings } from "../../lib/settings";
+import { formatDateTime } from "../../lib/dates";
 import Pending from "./Pending";
 
 export const dynamic = "force-dynamic";
-
-const TIME = new Intl.DateTimeFormat("es-VE", {
-  day: "2-digit",
-  month: "short",
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "America/Caracas",
-});
 
 const LOW_STOCK = 3;
 
@@ -303,7 +296,7 @@ export default async function DashboardPage() {
                           </div>
                           <RowMeta>
                             <RowMetaItem label="Fecha">
-                              {TIME.format(fecha)}
+                              {formatDateTime(fecha)}
                             </RowMetaItem>
                             <Chip tone={PAYMENT_TONES[sale.paymentMethod]}>
                               {PAYMENT_LABELS[sale.paymentMethod] ??
@@ -315,7 +308,7 @@ export default async function DashboardPage() {
                         <TableCell
                           className={`${celdaSecundaria} whitespace-nowrap`}
                         >
-                          {TIME.format(fecha)}
+                          {formatDateTime(fecha)}
                         </TableCell>
 
                         <TableCell className={celdaSecundaria}>

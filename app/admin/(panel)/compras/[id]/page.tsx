@@ -11,6 +11,7 @@ import {
   marginPct,
 } from "../../../../lib/money";
 import { imageSrc } from "../../../../lib/images";
+import { formatDateTime } from "../../../../lib/dates";
 import {
   celdaSecundaria,
   Chip,
@@ -35,12 +36,6 @@ import {
 } from "@/app/components/ui/table";
 
 export const dynamic = "force-dynamic";
-
-const DATE = new Intl.DateTimeFormat("es-VE", {
-  dateStyle: "long",
-  timeStyle: "short",
-  timeZone: "America/Caracas",
-});
 
 export default async function PurchaseDetailPage({
   params,
@@ -96,7 +91,7 @@ export default async function PurchaseDetailPage({
               <Facts>
                 <Field
                   label="Fecha"
-                  value={DATE.format(new Date(purchase.boughtAt))}
+                  value={formatDateTime(purchase.boughtAt)}
                 />
                 <Field
                   label="Proveedor"

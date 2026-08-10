@@ -27,6 +27,7 @@ import {
 } from "@/app/components/ui/table";
 import PeriodFilter from "../PeriodFilter";
 import { isPeriod, periodStart, type Period } from "@/app/lib/period";
+import { formatDate, formatDateTime, formatTime } from "@/app/lib/dates";
 import {
   celdaSecundaria,
   Chip,
@@ -40,34 +41,6 @@ import {
 } from "../ui";
 
 export const dynamic = "force-dynamic";
-
-const DAY = new Intl.DateTimeFormat("es-VE", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  timeZone: "America/Caracas",
-});
-
-const TIME = new Intl.DateTimeFormat("es-VE", {
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "America/Caracas",
-});
-
-/** Fecha y hora en una línea, para el repliegue del teléfono. */
-const SHORT = new Intl.DateTimeFormat("es-VE", {
-  day: "2-digit",
-  month: "short",
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "America/Caracas",
-});
-
-const FULL = new Intl.DateTimeFormat("es-VE", {
-  dateStyle: "long",
-  timeStyle: "short",
-  timeZone: "America/Caracas",
-});
 
 export default async function SalesPage({
   searchParams,
@@ -203,7 +176,7 @@ export default async function SalesPage({
                         <div className="flex items-start justify-between gap-2 lg:block">
                           <Link
                             href={`/admin/ventas/${sale.id}`}
-                            aria-label={`Venta ${ref} del ${FULL.format(fecha)}, ${formatUsd(sale.totalUsd)}`}
+                            aria-label={`Venta ${ref} del ${formatDateTime(fecha)}, ${formatUsd(sale.totalUsd)}`}
                             className="block min-w-0 rounded-sm hover:underline lg:max-w-64 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                           >
                             <span className="block truncate font-medium">
@@ -228,7 +201,7 @@ export default async function SalesPage({
                         </div>
                         <RowMeta>
                           <RowMetaItem label="Fecha">
-                            {SHORT.format(fecha)}
+                            {formatDateTime(fecha)}
                           </RowMetaItem>
                           <RowMetaItem label="Uds.">{units}</RowMetaItem>
                           <Chip tone={PAYMENT_TONES[sale.paymentMethod]}>
@@ -239,9 +212,9 @@ export default async function SalesPage({
                       </th>
 
                       <TableCell className={`${celdaSecundaria} whitespace-nowrap`}>
-                        <span className="block">{DAY.format(fecha)}</span>
+                        <span className="block">{formatDate(fecha)}</span>
                         <span className="mt-0.5 block text-xs text-muted-foreground">
-                          {TIME.format(fecha)}
+                          {formatTime(fecha)}
                         </span>
                       </TableCell>
 

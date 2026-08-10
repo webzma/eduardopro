@@ -12,6 +12,7 @@ import {
   ROLE_LABELS,
 } from "../../../../lib/money";
 import { imageSrc } from "../../../../lib/images";
+import { formatDateTime } from "../../../../lib/dates";
 import {
   celdaSecundaria,
   Facts,
@@ -35,12 +36,6 @@ import {
 } from "@/app/components/ui/table";
 
 export const dynamic = "force-dynamic";
-
-const DATE = new Intl.DateTimeFormat("es-VE", {
-  dateStyle: "long",
-  timeStyle: "short",
-  timeZone: "America/Caracas",
-});
 
 export default async function SaleDetailPage({
   params,
@@ -97,7 +92,7 @@ export default async function SaleDetailPage({
           <div className="rounded-lg border bg-card shadow-sm">
             <div className="p-4">
               <Facts>
-                <Field label="Fecha" value={DATE.format(new Date(sale.soldAt))} />
+                <Field label="Fecha" value={formatDateTime(sale.soldAt)} />
                 <Field
                   label="Forma de pago"
                   value={

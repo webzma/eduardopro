@@ -11,6 +11,7 @@ import { requireStaff } from "@/app/lib/auth";
 import { getDayClose } from "@/app/lib/sales";
 import { formatBs, formatUsd, PAYMENT_LABELS, PAYS_IN_BS } from "@/app/lib/money";
 import { veDateKey, veDayFromKey } from "@/app/lib/period";
+import { formatDate, formatTime } from "@/app/lib/dates";
 import { Badge } from "@/app/components/ui/badge";
 import { buttonVariants } from "@/app/components/ui/button";
 import {
@@ -33,20 +34,6 @@ import {
 } from "../ui";
 
 export const dynamic = "force-dynamic";
-
-const LONG = new Intl.DateTimeFormat("es-VE", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "America/Caracas",
-});
-
-const TIME = new Intl.DateTimeFormat("es-VE", {
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "America/Caracas",
-});
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -132,7 +119,7 @@ export default async function CashClosePage({
 
       <p className="mb-6 flex flex-wrap items-center gap-2 text-sm">
         <IconCashRegister size={18} stroke={1.75} aria-hidden />
-        <span className="font-medium capitalize">{LONG.format(day)}</span>
+        <span className="font-medium tabular-nums">{formatDate(day)}</span>
         {esHoy ? <Badge variant="secondary">Hoy</Badge> : null}
       </p>
 
@@ -279,7 +266,7 @@ export default async function CashClosePage({
                           "Sin renglones"}
                       </span>
                       <span className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <span>{TIME.format(new Date(sale.soldAt))}</span>
+                        <span>{formatTime(sale.soldAt)}</span>
                         <span aria-hidden>·</span>
                         <span>
                           {PAYMENT_LABELS[sale.paymentMethod] ??
