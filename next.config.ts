@@ -9,6 +9,19 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   : undefined;
 
 const nextConfig: NextConfig = {
+  /* Las fotos viajan DENTRO de la Server Action que registra la compra o crea
+   * el producto, y el cuerpo de una Server Action está limitado a 1 MB por
+   * defecto: cualquier foto de teléfono lo revienta y la acción muere con un
+   * error del servidor, no con un aviso dentro del formulario.
+   *
+   * 4 MB y no más: la mayoría de plataformas cortan la petición sobre los
+   * 4,5 MB y ahí ya no manda esta línea, sino el proxy. Lo que de verdad
+   * sostiene el margen es que ImagePicker reduce cada foto antes de enviarla
+   * —una compra con tres productos nuevos manda tres— así que este número es
+   * el techo de seguridad, no el tamaño de trabajo. */
+  experimental: {
+    serverActions: { bodySizeLimit: "4mb" },
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

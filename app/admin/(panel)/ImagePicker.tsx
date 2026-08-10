@@ -4,9 +4,57 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { buttonVariants } from "@/app/components/ui/button";
+import { ACCEPTED, MAX_BYTES } from "@/app/lib/images";
 
-const MAX_BYTES = 3 * 1024 * 1024;
-const ACCEPT = "image/jpeg,image/png,image/webp,image/avif";
+const ACCEPT = ACCEPTED.join(",");
+
+/* Una foto de teléfono son 3-8 MB y 4000 px de ancho. El catálogo la muestra a
+ * 400 px, así que subirla entera es pagar por píxeles que nadie va a ver —y,
+ * sobre todo, es lo que reventaba el límite del cuerpo de la Server Action:
+ * la foto viaja dentro del envío del formulario, y una compra con tres
+ * productos nuevos manda tres de golpe.
+ *
+ * Reducirla aquí, antes de enviarla, es lo único que arregla eso de verdad:
+ * subir el límite del servidor no sirve cuando el proxy de la plataforma corta
+ * la petición antes de que Next la vea. */
+const MAX_SIDE = 1600;
+const QUALITY = 0.82;
+/** Por debajo de esto ya está bien: recomprimir solo empeoraría la imagen. */
+const SKIP_UNDER = 600 * 1024;
+/** Tope del original. Alto a propósito: lo que se sube es el resultado. */
+const MAX_ORIGINAL = 20 * 1024 * 1024;
+
+/**
+ * Devuelve la versión reducida, o la original si el navegador no puede con
+ * ella. Nunca lanza: quedarse sin foto por un fallo al optimizar sería peor
+ * que subirla tal cual.
+ */
+async function shrink(file: File): Promise<File> {
+  if (file.size <= SKIP_UNDER) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/webp", QUALITY),
+    );
+    // Si el navegador no sabe hacer WebP devuelve PNG, que puede pesar más que
+    // el JPG de partida. Se queda el más pequeño de los dos.
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.webp`, {
+      type: "image/webp",
+    });
+  } catch {
+    return file;
+  }
+}
 
 export default function ImagePicker({
   current,
@@ -25,6 +73,7 @@ export default function ImagePicker({
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   // Las object URL se retienen hasta que se revocan: sin esto, cada foto
   // elegida deja un blob vivo en memoria hasta recargar la página.
@@ -34,41 +83,62 @@ export default function ImagePicker({
     };
   }, [preview]);
 
-  function accept(file: File | undefined) {
+  async function accept(file: File | undefined) {
     if (!file) return;
-    if (!ACCEPT.split(",").includes(file.type)) {
+    if (!ACCEPTED.includes(file.type)) {
+      reset();
       setError("Formato no admitido. Usa JPG, PNG, WebP o AVIF.");
       return;
     }
-    if (file.size > MAX_BYTES) {
-      setError("La imagen pesa más de 3 MB. Comprímela y vuelve a subirla.");
+    if (file.size > MAX_ORIGINAL) {
+      reset();
+      setError("La imagen pesa demasiado. Comprímela y vuelve a subirla.");
       return;
     }
+
     setError(null);
+    setBusy(true);
+    const small = await shrink(file);
+    setBusy(false);
+
+    // Si ni reducida baja del tope del servidor, se dice aquí: mucho mejor que
+    // enterarse al guardar, con la compra entera ya escrita.
+    if (small.size > MAX_BYTES) {
+      reset();
+      setError("La imagen pesa más de 3 MB y no se pudo reducir. Comprímela y vuelve a subirla.");
+      return;
+    }
+
+    // Lo que viaja en el envío es la versión reducida, no la que se eligió: el
+    // input es el único sitio del que el formulario lee el archivo.
+    if (inputRef.current) {
+      const transfer = new DataTransfer();
+      transfer.items.add(small);
+      inputRef.current.files = transfer.files;
+    }
     setPreview((old) => {
       if (old) URL.revokeObjectURL(old);
-      return URL.createObjectURL(file);
+      return URL.createObjectURL(small);
     });
   }
 
   function onDrop(event: React.DragEvent) {
     event.preventDefault();
     setDragging(false);
-    const file = event.dataTransfer.files?.[0];
-    if (!file || !inputRef.current) return;
-    // Se copia al input para que el archivo viaje en el envío del formulario.
-    const transfer = new DataTransfer();
-    transfer.items.add(file);
-    inputRef.current.files = transfer.files;
-    accept(file);
+    void accept(event.dataTransfer.files?.[0]);
   }
 
-  function clear() {
+  /** Deja el campo vacío sin tocar el error: unas veces hay que decir por qué. */
+  function reset() {
     if (inputRef.current) inputRef.current.value = "";
     setPreview((old) => {
       if (old) URL.revokeObjectURL(old);
       return null;
     });
+  }
+
+  function clear() {
+    reset();
     setError(null);
   }
 
@@ -112,6 +182,7 @@ export default function ImagePicker({
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
+              disabled={busy}
               className={buttonVariants({ variant: "outline" })}
             >
               <IconUpload size={16} stroke={1.75} />
@@ -128,10 +199,12 @@ export default function ImagePicker({
               </button>
             ) : null}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {preview
-              ? "Se subirá al guardar."
-              : "Arrastra una imagen aquí o elígela. JPG, PNG, WebP o AVIF, hasta 3 MB."}
+          <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
+            {busy
+              ? "Optimizando la foto…"
+              : preview
+                ? "Se subirá al guardar, ya optimizada."
+                : "Arrastra una imagen aquí o elígela. JPG, PNG, WebP o AVIF; se reduce sola antes de subirla."}
           </p>
         </div>
       </div>
@@ -142,7 +215,7 @@ export default function ImagePicker({
         name={name}
         accept={ACCEPT}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          accept(e.target.files?.[0])
+          void accept(e.target.files?.[0])
         }
         className="sr-only"
         aria-label={label}
