@@ -4,11 +4,25 @@ import * as React from "react"
 
 import { cn } from "@/app/lib/utils"
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+/* `containerProps` va al div que envuelve la tabla, que es el que tiene el
+ * scroll. Existe porque para que una tabla se desplace por dentro —con la
+ * cabecera pegada arriba— el alto máximo tiene que estar en ESE div, no en un
+ * padre: `position: sticky` se calcula contra el antepasado que se desplaza.
+ * Y por lo mismo van ahí el `tabIndex` y el nombre accesible: quien navega con
+ * teclado tiene que poder recorrer la zona que se mueve. */
+function Table({
+  className,
+  containerProps,
+  ...props
+}: React.ComponentProps<"table"> & {
+  containerProps?: React.ComponentProps<"div">
+}) {
+  const { className: containerClassName, ...container } = containerProps ?? {}
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      className={cn("relative w-full overflow-x-auto", containerClassName)}
+      {...container}
     >
       <table
         data-slot="table"

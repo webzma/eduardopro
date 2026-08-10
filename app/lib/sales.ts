@@ -107,6 +107,128 @@ export async function getSales(
   return (data ?? []).map((row) => toSale(row as SaleRow));
 }
 
+export type SalesFilter = {
+  /** Texto libre. Se busca en el NOMBRE DE PRODUCTO de los renglones. */
+  search?: string;
+  /** ISO desde el que contar (incluido). */
+  sinceIso?: string | null;
+  /** ISO hasta el que contar (excluido). */
+  untilIso?: string | null;
+};
+
+export type SalesPage = {
+  /** Solo las ventas de esta página. */
+  sales: Sale[];
+  /** Ventas que casan con el filtro, no las de esta página. */
+  total: number;
+  totalUsd: number;
+  units: number;
+  /** true si el filtro devuelve más de las que se pueden sumar de una vez. */
+  capped: boolean;
+  page: number;
+  pages: number;
+};
+
+/* Tope de lo que se recorre para contar y sumar. Es un techo alto a propósito:
+ * por debajo, los totales del filtro son EXACTOS; por encima, la pantalla lo
+ * dice en vez de enseñar una suma parcial como si fuera el total. */
+const SCAN_CAP = 2000;
+
+/**
+ * Deja el texto de búsqueda en letras, números y espacios. No es cosmético:
+ * `%` y `_` son comodines de ilike, y las comas y paréntesis rompen el
+ * analizador de filtros de PostgREST. Lo que llega de una barra de búsqueda no
+ * puede entrar tal cual en un filtro.
+ */
+export function cleanSearch(raw: string): string {
+  return raw
+    .replace(/[^\p{L}\p{N} ]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60);
+}
+
+/**
+ * Una página de ventas, con lo que hace falta para paginar de verdad: cuántas
+ * hay en total y cuánto suman TODAS las que casan, no solo las visibles.
+ *
+ * Son dos consultas y no una a propósito. La primera recorre las que casan y
+ * se queda con los identificadores; la segunda trae completas solo las de esta
+ * página. El motivo es la búsqueda por nombre: filtrar por una columna del
+ * renglón obliga a un join interno, y PostgREST devuelve entonces SOLO los
+ * renglones que casan — la venta saldría con dos productos en vez de sus
+ * cinco. Con dos pasos, la fila se pinta con todos sus renglones.
+ */
+export async function getSalesPage(
+  filter: SalesFilter,
+  page: number,
+  perPage: number,
+): Promise<SalesPage> {
+  const supabase = await createClient();
+  const search = cleanSearch(filter.search ?? "");
+
+  // El nombre viaja en el propio renglón (copiado al vender), así que buscar
+  // por producto no depende de que el producto siga en el catálogo.
+  const scanSelect: string = search
+    ? "id, total_usd, sale_items!inner(qty, product_name)"
+    : "id, total_usd, sale_items(qty)";
+
+  let scan = supabase
+    .from("sales")
+    .select(scanSelect, { count: "exact" })
+    .order("sold_at", { ascending: false })
+    .limit(SCAN_CAP);
+  if (filter.sinceIso) scan = scan.gte("sold_at", filter.sinceIso);
+  if (filter.untilIso) scan = scan.lt("sold_at", filter.untilIso);
+  if (search) scan = scan.ilike("sale_items.product_name", `%${search}%`);
+
+  const { data, count, error } = await scan;
+  if (error) fail(error);
+
+  const rows = (data ?? []) as unknown as {
+    id: string;
+    total_usd: number | string;
+    sale_items: { qty: number }[] | null;
+  }[];
+
+  // count es exacto aunque el limit recorte lo devuelto: lo cuenta la base.
+  const total = count ?? rows.length;
+  const pages = Math.max(1, Math.ceil(Math.min(total, SCAN_CAP) / perPage));
+  const current = Math.min(Math.max(1, page), pages);
+  const slice = rows.slice((current - 1) * perPage, current * perPage);
+
+  let totalUsd = 0;
+  let units = 0;
+  for (const row of rows) {
+    totalUsd += Number(row.total_usd);
+    for (const line of row.sale_items ?? []) units += line.qty;
+  }
+
+  let sales: Sale[] = [];
+  if (slice.length > 0) {
+    const { data: full, error: fullError } = await supabase
+      .from("sales")
+      .select(SELECT)
+      .in(
+        "id",
+        slice.map((row) => row.id),
+      )
+      .order("sold_at", { ascending: false });
+    if (fullError) fail(fullError);
+    sales = (full ?? []).map((row) => toSale(row as SaleRow));
+  }
+
+  return {
+    sales,
+    total,
+    totalUsd,
+    units,
+    capped: total > SCAN_CAP,
+    page: current,
+    pages,
+  };
+}
+
 export type MethodTotal = {
   method: string;
   count: number;
