@@ -9,7 +9,10 @@ import {
   requireStaff,
   signIn,
   signOut,
+  verifyPassword,
+  type Role,
 } from "../lib/auth";
+import { createAuthUser, grantStaff, revokeStaff } from "../lib/staff";
 import {
   createProduct,
   updateProduct,
@@ -376,6 +379,84 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
   if (existing) await removeProductImage(existing.image);
   refresh();
   redirect("/admin/inventario?ok=eliminado");
+}
+
+/* ── Equipo ──────────────────────────────────────────────────────────────
+ *
+ * Repartir permisos es lo más delicado que hace este panel, así que las dos
+ * acciones piden la contraseña del propio admin además de su sesión. La sesión
+ * dice quién eres; la contraseña dice que sigues siendo tú y no alguien que se
+ * sentó en tu silla con el panel abierto.
+ *
+ * Ninguna contraseña viaja en un redirect ni se registra en ningún sitio: los
+ * errores salen por ?error= y solo llevan el motivo. */
+
+function staffError(code: string, detalle?: string): never {
+  const extra = detalle ? `&detalle=${encodeURIComponent(detalle)}` : "";
+  redirect(`/admin/ajustes?error=${code}${extra}#equipo`);
+}
+
+export async function createStaffAction(formData: FormData): Promise<void> {
+  const { user } = await requireAdmin();
+
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  const rawRole = String(formData.get("rol") ?? "vendedor");
+  const role: Role = rawRole === "admin" ? "admin" : "vendedor";
+  const confirm = String(formData.get("confirmacion") ?? "");
+
+  if (!email.includes("@")) staffError("correo");
+  if (password.length < 8) staffError("clave");
+  if (!(await verifyPassword(user.email ?? "", confirm))) {
+    staffError("confirmacion");
+  }
+
+  let userId: string;
+  try {
+    userId = await createAuthUser(email, password);
+  } catch (err) {
+    unstable_rethrow(err);
+    staffError("cuenta", (err as Error).message);
+  }
+
+  try {
+    await grantStaff(userId, role, email);
+  } catch (err) {
+    unstable_rethrow(err);
+    // La cuenta quedó creada pero sin rol: no puede entrar a ninguna parte
+    // (RLS depende de staff), y se arregla dándole el rol desde la lista. Se
+    // dice tal cual en vez de fingir que no pasó nada.
+    staffError(
+      "rol",
+      `La cuenta de ${email} se creó, pero no se le pudo dar el rol: ${(err as Error).message}. Dáselo desde la lista del equipo.`,
+    );
+  }
+
+  revalidatePath("/admin/ajustes");
+  redirect("/admin/ajustes?ok=equipo#equipo");
+}
+
+export async function revokeStaffAction(formData: FormData): Promise<void> {
+  const { user } = await requireAdmin();
+
+  const userId = String(formData.get("userId") ?? "");
+  const confirm = String(formData.get("confirmacion") ?? "");
+  if (!userId) staffError("nadie");
+  if (!(await verifyPassword(user.email ?? "", confirm))) {
+    staffError("confirmacion");
+  }
+
+  try {
+    await revokeStaff(userId);
+  } catch (err) {
+    unstable_rethrow(err);
+    staffError("baja", (err as Error).message);
+  }
+
+  revalidatePath("/admin/ajustes");
+  redirect("/admin/ajustes?ok=baja#equipo");
 }
 
 export async function setRateAction(formData: FormData): Promise<void> {

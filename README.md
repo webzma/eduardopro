@@ -50,16 +50,28 @@ autorizada — la base rechaza igual.
    | --- | --- |
    | `NEXT_PUBLIC_SUPABASE_URL` | Project Settings → Data API → Project URL |
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Project Settings → API Keys → publishable (`sb_publishable_…`) |
+   | `SUPABASE_SECRET_KEY` *(opcional)* | Project Settings → API Keys → secret (`sb_secret_…`) |
 
-   Nunca pongas la *secret key* aquí: las variables `NEXT_PUBLIC_` viajan al
+   Nunca pongas la *secret key* en una variable `NEXT_PUBLIC_`: esas viajan al
    navegador, y esa clave se salta RLS. El arranque lo comprueba y falla si la
    detecta.
+
+   `SUPABASE_SECRET_KEY` **sin** el prefijo `NEXT_PUBLIC_` es otra cosa: se
+   queda en el servidor y sirve para una sola función — que Ajustes → Equipo
+   pueda crear la cuenta de un vendedor sin ir a Supabase. Vive en un único
+   archivo ([`app/lib/supabase/admin.ts`](app/lib/supabase/admin.ts), marcado
+   `server-only`) y no se usa para nada más: repartir el rol va por
+   `grant_staff()`, que comprueba `is_admin()` en la base. Si no la defines,
+   el panel funciona igual — solo que dar de alta vuelve a ser un paso manual
+   en Supabase, y la pantalla lo dice.
 3. **Crea tu usuario:** Authentication → Users → Add user. Marca **Auto Confirm
    User** o no podrás entrar hasta verificar el correo.
-4. **Date permiso de admin:** descomenta el bloque final de `supabase/schema.sql`,
-   pon tu correo y ejecútalo. Registrarse no da permisos: solo cuentan las filas
-   de `public.admins`, y ninguna política permite escribir en esa tabla desde la
-   aplicación.
+4. **Date permiso de admin:** descomenta el bloque del paso 6 de
+   `supabase/schema.sql`, pon tu correo y ejecútalo. Registrarse no da permisos:
+   solo cuentan las filas de `public.staff`, y ninguna política permite
+   escribirlas desde la aplicación — la única vía son `grant_staff()` y
+   `revoke_staff()`, que exigen ser admin. Este primer admin sí o sí se da por
+   SQL; a partir de ahí, el resto del equipo se gestiona desde Ajustes → Equipo.
 5. **Cierra el registro público:** Authentication → Providers → Email → desactiva
    *Enable sign-ups*.
 6. Reinicia `npm run dev` después de tocar `.env.local`.

@@ -620,3 +620,97 @@ $$;
 
 revoke all on function public.register_sale(jsonb, text, numeric, text, text) from public;
 grant execute on function public.register_sale(jsonb, text, numeric, text, text) to authenticated;
+
+-- ═════════════════════════════════════════════════════════════════════════
+-- 15 · Dar de alta y de baja desde el panel
+--
+-- Hasta aquí, repartir permisos era un acto manual desde este editor. Esta
+-- sección lo abre a la pantalla de Ajustes, y lo hace en DOS mitades a
+-- propósito:
+--
+--   · Crear la cuenta en auth.users la hace la aplicación con la clave
+--     SECRETA, porque la Admin API de Supabase no acepta otra cosa. Esa clave
+--     se salta RLS entera, así que toca lo mínimo: una llamada, un archivo
+--     (app/lib/supabase/admin.ts) y nada más.
+--   · Repartir el ROL lo hacen estas dos funciones, con la sesión normal de
+--     quien pulsa el botón. Siguen el patrón de register_sale y adjust_stock:
+--     security definer para poder escribir donde nadie tiene permiso, y
+--     is_admin() en la primera línea como única puerta.
+--
+-- Es decir: la tabla staff sigue teniendo a RLS como autoridad. La clave
+-- secreta no la toca.
+-- ═════════════════════════════════════════════════════════════════════════
+
+-- Quién dio de alta a quién. En un sitio donde se reparten permisos, poder
+-- mirar atrás vale mucho más de lo que cuesta la columna.
+alter table public.staff
+  add column if not exists created_by uuid references auth.users(id);
+
+-- El admin necesita ver la plantilla entera para gestionarla. La política de
+-- "cada uno ve su propia ficha" sigue viva: las dos se suman, no se pisan.
+drop policy if exists "el admin ve la plantilla" on public.staff;
+create policy "el admin ve la plantilla" on public.staff
+  for select to authenticated
+  using (public.is_admin());
+
+-- Sigue sin haber política de INSERT, UPDATE ni DELETE sobre staff: la única
+-- vía son estas dos funciones.
+
+create or replace function public.grant_staff(
+  p_user_id uuid,
+  p_role    text,
+  p_email   text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if not public.is_admin() then
+    raise exception 'No autorizado' using errcode = '42501';
+  end if;
+  if p_role not in ('admin', 'vendedor') then
+    raise exception 'Rol inválido';
+  end if;
+  -- Nadie se cambia el rol a sí mismo. Sin esto, un admin puede degradarse
+  -- por error y dejar el negocio sin nadie que pueda arreglarlo.
+  if p_user_id = (select auth.uid()) then
+    raise exception 'No puedes cambiarte el rol a ti mismo';
+  end if;
+  if not exists (select 1 from auth.users where id = p_user_id) then
+    raise exception 'Esa cuenta no existe';
+  end if;
+
+  insert into public.staff (user_id, role, email, created_by)
+  values (p_user_id, p_role, p_email, (select auth.uid()))
+  on conflict (user_id) do update
+    set role  = excluded.role,
+        email = coalesce(excluded.email, public.staff.email);
+end;
+$$;
+
+create or replace function public.revoke_staff(p_user_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if not public.is_admin() then
+    raise exception 'No autorizado' using errcode = '42501';
+  end if;
+  -- Ni darse de baja a uno mismo: es la forma más fácil de quedarse fuera del
+  -- panel sin nadie dentro que te vuelva a meter.
+  if p_user_id = (select auth.uid()) then
+    raise exception 'No puedes darte de baja a ti mismo';
+  end if;
+
+  delete from public.staff where user_id = p_user_id;
+end;
+$$;
+
+revoke all on function public.grant_staff(uuid, text, text) from public;
+revoke all on function public.revoke_staff(uuid)            from public;
+grant execute on function public.grant_staff(uuid, text, text) to authenticated;
+grant execute on function public.revoke_staff(uuid)            to authenticated;
