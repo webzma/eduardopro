@@ -32,6 +32,7 @@ import { cn } from "@/app/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
+import ImagePicker from "../../ImagePicker";
 
 /** Margen por defecto al sugerir precio de venta para algo nuevo. */
 const DEFAULT_MARGIN = 40;
@@ -146,6 +147,7 @@ export default function PurchaseForm({
   }
 
   const payload = lines.map((l) => ({
+    key: l.key,
     isNew: l.isNew,
     productId: l.productId,
     name: l.name,
@@ -275,7 +277,7 @@ export default function PurchaseForm({
                                 className="mb-1 block text-xs"
                               >
                                 Categoría{" "}
-                                <span className="text-sm text-muted-foreground font-normal">
+                                <span className="text-sm font-normal text-muted-foreground">
                                   (opcional)
                                 </span>
                               </Label>
@@ -286,7 +288,24 @@ export default function PurchaseForm({
                                   patch(line.key, { category: e.target.value })
                                 }
                                 placeholder="Ej. Tijera profesional"
-                                
+                              />
+                            </div>
+
+                            {/* El producto se crea AQUÍ, así que aquí tiene que
+                                poder ponérsele foto: si no, nace con el
+                                marcador de posición y hay que ir a Inventario a
+                                arreglarlo, que es justo el viaje que este
+                                formulario existe para evitar. */}
+                            <div className="sm:col-span-2">
+                              <Label className="mb-1 block text-xs">
+                                Foto{" "}
+                                <span className="text-sm font-normal text-muted-foreground">
+                                  (opcional)
+                                </span>
+                              </Label>
+                              <ImagePicker
+                                name={`imagen-${line.key}`}
+                                label={`Foto de ${line.name.trim() || `el producto nuevo del renglón ${index + 1}`}`}
                               />
                             </div>
                           </div>

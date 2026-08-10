@@ -7,7 +7,7 @@ import { getProduct } from "../../../../lib/products";
 import { getRate } from "../../../../lib/rate";
 import { formatBs } from "../../../../lib/money";
 import { updateProductAction } from "../../../actions";
-import ImagePicker from "../ImagePicker";
+import ImagePicker from "../../ImagePicker";
 import { imageSrc } from "../../../../lib/images";
 import { cn } from "@/app/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";

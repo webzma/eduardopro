@@ -176,6 +176,9 @@ export async function registerSaleAction(
 export type PurchaseFormState = { error?: string };
 
 type IncomingLine = {
+  /** Identifica el renglón en el formulario. Es lo que permite emparejar cada
+   *  foto —que viaja como archivo suelto, fuera del JSON— con su producto. */
+  key?: string;
   isNew?: boolean;
   productId?: string;
   name?: string;
@@ -237,13 +240,23 @@ export async function registerPurchaseAction(
       if (item.isNew) {
         const name = String(item.name ?? "").trim();
         if (!name) return { error: "Los productos nuevos necesitan nombre." };
+
+        // La foto es opcional: sin ella el producto nace con el marcador de
+        // posición, igual que antes. Si la subida falla, el catch de abajo
+        // deshace los productos ya creados en esta misma compra.
+        const file = item.key ? formData.get(`imagen-${item.key}`) : null;
+        const image =
+          file instanceof File && file.size > 0
+            ? await uploadProductImage(file, slugify(name))
+            : PLACEHOLDER;
+
         const product = await createProduct({
           name,
           category: String(item.category ?? "").trim(),
           price: salePrice ?? 0,
           cost: unitCost,
           stock: 0, // lo suma la compra, en la misma transacción
-          image: PLACEHOLDER,
+          image,
           active: true,
         });
         created.push(product.id);

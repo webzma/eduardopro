@@ -11,7 +11,7 @@ import { getRate } from "../../../lib/rate";
 import { formatBs, formatPct, formatUsd, marginPct } from "../../../lib/money";
 import { adjustStockAction, createProductAction } from "../../actions";
 import RowActions from "./RowActions";
-import ImagePicker from "./ImagePicker";
+import ImagePicker from "../ImagePicker";
 import { imageSrc } from "../../../lib/images";
 import {
   celdaSecundaria,

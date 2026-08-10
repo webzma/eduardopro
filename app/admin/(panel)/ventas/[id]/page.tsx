@@ -12,7 +12,15 @@ import {
   ROLE_LABELS,
 } from "../../../../lib/money";
 import { imageSrc } from "../../../../lib/images";
-import { Facts, Field, GrandTotal, Notice } from "../../ui";
+import {
+  celdaSecundaria,
+  Facts,
+  Field,
+  GrandTotal,
+  Notice,
+  RowMeta,
+  RowMetaItem,
+} from "../../ui";
 import { cn } from "@/app/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
 import {
@@ -81,7 +89,10 @@ export default async function SaleDetailPage({
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-        <div className="flex flex-col gap-6">
+        {/* min-w-0: sin esto la tabla de renglones ensancha la columna del
+            grid y con ella la página entera, en vez de quedarse dentro de su
+            zona con scroll. */}
+        <div className="flex min-w-0 flex-col gap-6">
           {/* Los datos de cabecera, cada uno con su nombre. */}
           <div className="rounded-lg border bg-card shadow-sm">
             <div className="p-4">
@@ -121,25 +132,31 @@ export default async function SaleDetailPage({
               </span>
             </div>
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="table-fixed lg:table-auto">
                 <TableCaption className="sr-only">
                   Productos incluidos en esta venta
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Producto</TableHead>
-                    <TableHead className="text-right tabular-nums whitespace-nowrap">
+                    <TableHead className="w-full">Producto</TableHead>
+                    <TableHead
+                      className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                    >
                       Cantidad
                     </TableHead>
-                    <TableHead className="text-right tabular-nums whitespace-nowrap">
+                    <TableHead
+                      className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                    >
                       Precio unit.
                     </TableHead>
                     {isAdmin ? (
-                      <TableHead className="text-right tabular-nums whitespace-nowrap">
+                      <TableHead
+                        className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                      >
                         Costo unit.
                       </TableHead>
                     ) : null}
-                    <TableHead className="text-right tabular-nums whitespace-nowrap">
+                    <TableHead className="w-24 text-right tabular-nums whitespace-nowrap lg:w-auto">
                       Subtotal
                     </TableHead>
                   </TableRow>
@@ -151,33 +168,56 @@ export default async function SaleDetailPage({
                         scope="row"
                         className="p-2 text-left align-middle font-normal"
                       >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-start gap-3">
                             <Image
                               src={imageSrc(line.productImage ?? "")}
                               alt=""
                               width={80}
                               height={80}
-                              className="size-20 shrink-0 rounded-md border border-border bg-muted object-cover shadow-sm"
+                              className="size-16 shrink-0 rounded-md border border-border bg-muted object-cover shadow-sm lg:size-20"
                             />
-                            <span className="min-w-0">
+                            <div className="min-w-0">
                               {line.productName}
                               {/* product_id queda en NULL si el producto se
                                   borró: el nombre se copió al vender para que
                                   esto sobreviva. */}
                               {line.productId === null ? (
-                                <span className="text-sm text-muted-foreground block text-xs font-normal">
+                                <span className="block text-xs font-normal text-muted-foreground">
                                   Ya no está en el catálogo
                                 </span>
                               ) : null}
-                            </span>
+                              <RowMeta>
+                                <RowMetaItem label="Cantidad">
+                                  {line.qty}
+                                </RowMetaItem>
+                                <RowMetaItem label="Precio">
+                                  {formatUsd(line.unitPriceUsd)}
+                                </RowMetaItem>
+                                {isAdmin ? (
+                                  <RowMetaItem label="Costo">
+                                    {line.unitCostUsd > 0
+                                      ? formatUsd(line.unitCostUsd)
+                                      : "Sin registrar"}
+                                  </RowMetaItem>
+                                ) : null}
+                              </RowMeta>
+                            </div>
                           </div>
                         </th>
-                      <TableCell className="text-right tabular-nums whitespace-nowrap">{line.qty}</TableCell>
-                      <TableCell className="text-right tabular-nums whitespace-nowrap">
+                      <TableCell
+                        className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                      >
+                        {line.qty}
+                      </TableCell>
+                      <TableCell
+                        className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                      >
                         {formatUsd(line.unitPriceUsd)}
                       </TableCell>
                       {isAdmin ? (
-                        <TableCell className="text-right tabular-nums whitespace-nowrap">
+                        <TableCell
+                          className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                        >
                           {line.unitCostUsd > 0 ? (
                             formatUsd(line.unitCostUsd)
                           ) : (
@@ -193,7 +233,15 @@ export default async function SaleDetailPage({
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                    <TableCell colSpan={isAdmin ? 4 : 3}>Total</TableCell>
+                    {/* colSpan no entiende de media queries: un pie por
+                        tamaño de pantalla, cada uno visible en el suyo. */}
+                    <TableCell className="lg:hidden">Total</TableCell>
+                    <TableCell
+                      colSpan={isAdmin ? 4 : 3}
+                      className="hidden lg:table-cell"
+                    >
+                      Total
+                    </TableCell>
                     <TableCell className="text-right tabular-nums whitespace-nowrap">{formatUsd(sale.totalUsd)}</TableCell>
                   </TableRow>
                 </TableFooter>
@@ -202,7 +250,7 @@ export default async function SaleDetailPage({
           </section>
         </div>
 
-        <section className="flex flex-col gap-4" aria-labelledby="cobro">
+        <section className="flex min-w-0 flex-col gap-4" aria-labelledby="cobro">
           <h2 id="cobro" className="sr-only">
             Cobro
           </h2>

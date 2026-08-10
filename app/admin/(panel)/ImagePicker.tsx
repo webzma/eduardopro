@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { buttonVariants } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
 
 const MAX_BYTES = 3 * 1024 * 1024;
 const ACCEPT = "image/jpeg,image/png,image/webp,image/avif";
@@ -12,10 +11,15 @@ const ACCEPT = "image/jpeg,image/png,image/webp,image/avif";
 export default function ImagePicker({
   current,
   name = "image",
+  label = "Foto del producto",
 }: {
   /** Foto ya guardada, si la hay. */
   current?: string;
   name?: string;
+  /** Nombre accesible del campo. En el formulario de compra hay un selector
+   *  por renglón nuevo: si todos se llamaran igual, un lector de pantalla
+   *  anunciaría tres "Foto del producto" sin decir de cuál. */
+  label?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -79,7 +83,7 @@ export default function ImagePicker({
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        className={`flex items-center gap-4 rounded-md border border-dashed p-4 transition-colors ${
+        className={`flex flex-wrap items-center gap-4 rounded-md border border-dashed p-3 transition-colors sm:p-4 ${
           dragging
             ? "border-primary bg-primary/5"
             : "border-border bg-card"
@@ -103,7 +107,7 @@ export default function ImagePicker({
           )}
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 basis-40">
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
@@ -124,7 +128,7 @@ export default function ImagePicker({
               </button>
             ) : null}
           </div>
-          <p className="text-sm text-muted-foreground mt-1 text-xs">
+          <p className="mt-1 text-xs text-muted-foreground">
             {preview
               ? "Se subirá al guardar."
               : "Arrastra una imagen aquí o elígela. JPG, PNG, WebP o AVIF, hasta 3 MB."}
@@ -132,7 +136,7 @@ export default function ImagePicker({
         </div>
       </div>
 
-      <Input
+      <input
         ref={inputRef}
         type="file"
         name={name}
@@ -141,11 +145,11 @@ export default function ImagePicker({
           accept(e.target.files?.[0])
         }
         className="sr-only"
-        aria-label="Foto del producto"
+        aria-label={label}
       />
 
       {error ? (
-        <p role="alert" className="rounded-md border border-l-4 bg-card px-4 py-2 text-sm border-l-destructive text-destructive mt-2">
+        <p role="alert" className="mt-2 rounded-md border border-l-4 border-l-destructive bg-tintsignal px-4 py-2 text-sm text-destructive">
           {error}
         </p>
       ) : null}

@@ -11,7 +11,16 @@ import {
   marginPct,
 } from "../../../../lib/money";
 import { imageSrc } from "../../../../lib/images";
-import { Facts, Field, GrandTotal, Notice } from "../../ui";
+import {
+  celdaSecundaria,
+  Chip,
+  Facts,
+  Field,
+  GrandTotal,
+  Notice,
+  RowMeta,
+  RowMetaItem,
+} from "../../ui";
 import { cn } from "@/app/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
 import {
@@ -81,7 +90,7 @@ export default async function PurchaseDetailPage({
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <div className="rounded-lg border bg-card shadow-sm">
             <div className="p-4">
               <Facts>
@@ -121,27 +130,35 @@ export default async function PurchaseDetailPage({
               </span>
             </div>
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="table-fixed lg:table-auto">
                 <TableCaption className="sr-only">
                   Productos incluidos en esta compra, con su costo y el precio
                   de venta que quedó fijado
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Producto</TableHead>
-                    <TableHead className="text-right tabular-nums whitespace-nowrap">
+                    <TableHead className="w-full">Producto</TableHead>
+                    <TableHead
+                      className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                    >
                       Cantidad
                     </TableHead>
-                    <TableHead className="text-right tabular-nums whitespace-nowrap">
+                    <TableHead
+                      className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                    >
                       Costo unit.
                     </TableHead>
-                    <TableHead className="text-right tabular-nums whitespace-nowrap">
+                    <TableHead
+                      className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                    >
                       Precio venta
                     </TableHead>
-                    <TableHead className="text-right tabular-nums whitespace-nowrap">
+                    <TableHead
+                      className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                    >
                       Margen
                     </TableHead>
-                    <TableHead className="text-right tabular-nums whitespace-nowrap">
+                    <TableHead className="w-24 text-right tabular-nums whitespace-nowrap lg:w-auto">
                       Subtotal
                     </TableHead>
                   </TableRow>
@@ -158,15 +175,15 @@ export default async function PurchaseDetailPage({
                           scope="row"
                           className="p-2 text-left align-middle font-normal"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-start gap-3">
                             <Image
                               src={imageSrc(line.productImage ?? "")}
                               alt=""
                               width={80}
                               height={80}
-                              className="size-20 shrink-0 rounded-md border border-border bg-muted object-cover shadow-sm"
+                              className="size-16 shrink-0 rounded-md border border-border bg-muted object-cover shadow-sm lg:size-20"
                             />
-                            <span className="min-w-0">
+                            <div className="min-w-0">
                               {line.productId ? (
                                 <Link
                                   href={`/admin/inventario/${line.productId}`}
@@ -177,26 +194,56 @@ export default async function PurchaseDetailPage({
                               ) : (
                                 <>
                                   {line.productName}
-                                  <span className="text-sm text-muted-foreground block text-xs font-normal">
+                                  <span className="block text-xs font-normal text-muted-foreground">
                                     Ya no está en el catálogo
                                   </span>
                                 </>
                               )}
-                            </span>
+                              <RowMeta>
+                                <RowMetaItem label="Cantidad">
+                                  {line.qty}
+                                </RowMetaItem>
+                                <RowMetaItem label="Costo">
+                                  {formatUsd(line.unitCostUsd)}
+                                </RowMetaItem>
+                                <RowMetaItem label="Venta">
+                                  {line.salePriceUsd === null
+                                    ? "—"
+                                    : formatUsd(line.salePriceUsd)}
+                                </RowMetaItem>
+                                {margin === null ? null : margin < 15 ? (
+                                  <Chip tone="amber">
+                                    Margen {formatPct(margin)} · bajo
+                                  </Chip>
+                                ) : (
+                                  <RowMetaItem label="Margen">
+                                    {formatPct(margin)}
+                                  </RowMetaItem>
+                                )}
+                              </RowMeta>
+                            </div>
                           </div>
                         </th>
-                        <TableCell className="text-right tabular-nums whitespace-nowrap">
+                        <TableCell
+                          className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                        >
                           {line.qty}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums whitespace-nowrap">
+                        <TableCell
+                          className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                        >
                           {formatUsd(line.unitCostUsd)}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums whitespace-nowrap">
+                        <TableCell
+                          className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                        >
                           {line.salePriceUsd === null
                             ? "—"
                             : formatUsd(line.salePriceUsd)}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums whitespace-nowrap">
+                        <TableCell
+                          className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
+                        >
                           {margin === null ? (
                             "—"
                           ) : margin < 15 ? (
@@ -219,7 +266,12 @@ export default async function PurchaseDetailPage({
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                    <TableCell colSpan={5}>Total pagado</TableCell>
+                  {/* colSpan no entiende de media queries: se pinta un pie
+                      por tamaño de pantalla y cada uno aparece en el suyo. */}
+                    <TableCell className="lg:hidden">Total pagado</TableCell>
+                    <TableCell colSpan={5} className="hidden lg:table-cell">
+                      Total pagado
+                    </TableCell>
                     <TableCell className="text-right tabular-nums whitespace-nowrap">
                       {formatUsd(purchase.totalUsd)}
                     </TableCell>
@@ -230,7 +282,7 @@ export default async function PurchaseDetailPage({
           </section>
         </div>
 
-        <section className="flex flex-col gap-4" aria-labelledby="pago">
+        <section className="flex min-w-0 flex-col gap-4" aria-labelledby="pago">
           <h2 id="pago" className="sr-only">
             Pago
           </h2>
