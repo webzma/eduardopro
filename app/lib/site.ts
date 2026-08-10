@@ -1,4 +1,18 @@
-export const WHATSAPP_NUMBER = "584120000000";
+/* El WhatsApp de la tienda: +58 412 150 63 83.
+ *
+ * Aquí va en el formato que exige wa.me — solo dígitos, con el código de país
+ * (58) y SIN el +, ni espacios, ni guiones, ni el 0 inicial del número
+ * nacional. Con cualquiera de esas cosas, el enlace abre WhatsApp con un
+ * "número inválido" y el pedido se pierde sin que nadie se entere.
+ *
+ * De esta constante salen TODOS los botones de WhatsApp del sitio: el de la
+ * portada, el del menú, el del pie, el de ubicación, el del formulario de
+ * contacto y el "Pedir" de cada producto y de cada ficha. Cambiar de número es
+ * cambiar esta línea. */
+export const WHATSAPP_NUMBER = "584121506383";
+
+/** Bonito, para enseñárselo a alguien. Nunca para construir un enlace. */
+export const WHATSAPP_DISPLAY = "+58 412 150 63 83";
 
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
