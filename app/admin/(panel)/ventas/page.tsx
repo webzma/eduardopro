@@ -3,8 +3,6 @@ import {
   IconShoppingCartPlus,
   IconReceiptOff,
   IconReceipt,
-  IconPackages,
-  IconCashBanknote,
   IconSearch,
   IconChevronLeft,
   IconChevronRight,
@@ -50,7 +48,6 @@ import {
   ProductMosaic,
   RowMeta,
   RowMetaItem,
-  Stat,
 } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +57,15 @@ export const dynamic = "force-dynamic";
 const PER_PAGE = 25;
 
 const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Cómo se lee cada atajo dentro de una frase. "Todo" a secas, colgando de
+ *  "39 ventas ·", no dice nada. */
+const SCOPE_LABELS: Record<Period, string> = {
+  hoy: "de hoy",
+  "7d": "de los últimos 7 días",
+  mes: "de este mes",
+  todo: "de todo el histórico",
+};
 
 /** Lo que manda el <input type="date">. Si llega otra cosa, no hay filtro: en
  *  una fecha inventada es mejor no recortar nada que recortar por hoy. */
@@ -120,6 +126,26 @@ export default async function SalesPage({
 
   const filtering = Boolean(search || range);
   const pageUsd = sales.reduce((sum, s) => sum + s.totalUsd, 0);
+
+  /* Qué se está mirando, dicho con palabras. Sin esto, las cifras de arriba
+   * son tres números sueltos: 39 ventas ¿de cuándo? */
+  const rango =
+    desde && hasta
+      ? `del ${formatDate(veDayFromKey(desde))} al ${formatDate(veDayFromKey(hasta))}`
+      : desde
+        ? `desde el ${formatDate(veDayFromKey(desde))}`
+        : hasta
+          ? `hasta el ${formatDate(veDayFromKey(hasta))}`
+          : period
+            ? SCOPE_LABELS[period]
+            : "";
+  const alcance = [
+    search ? `«${search}»` : null,
+    rango,
+    capped ? "se suman las 2000 más recientes" : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   // Columnas que preceden a la del total, para el colSpan del pie.
   const leading = isAdmin ? 6 : 5;
 
@@ -154,12 +180,17 @@ export default async function SalesPage({
         }
       />
 
-      <div className="mb-4 flex flex-col gap-3">
-        <PeriodFilter
-          base="/admin/ventas"
-          active={period}
-          keep={{ q: search }}
-        />
+      {/* Los atajos de periodo y el buscador son EL MISMO filtro, así que van
+          en una sola caja. En dos, cada una con su borde, parecían dos cosas
+          distintas y había que mirar las dos para saber qué se está viendo. */}
+      <div className="mb-4 overflow-hidden rounded-lg border bg-card shadow-sm">
+        <div className="border-b border-border p-3">
+          <PeriodFilter
+            base="/admin/ventas"
+            active={period}
+            keep={{ q: search }}
+          />
+        </div>
 
         {/* Un formulario GET de toda la vida: el filtro acaba en la URL, se
             puede compartir y volver atrás, y funciona sin JavaScript. Se envía
@@ -168,7 +199,7 @@ export default async function SalesPage({
         <form
           method="get"
           action="/admin/ventas"
-          className="grid gap-3 rounded-lg border bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto_auto_auto] sm:items-end"
+          className="grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto] sm:items-end"
         >
           {period ? (
             <input type="hidden" name="periodo" value={period} />
@@ -210,54 +241,56 @@ export default async function SalesPage({
             <Input id="hasta" name="hasta" type="date" defaultValue={hasta} />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button type="submit" className={buttonVariants()}>
-              <IconSearch size={16} stroke={1.75} aria-hidden />
-              Filtrar
-            </button>
-            {filtering ? (
-              <Link
-                href="/admin/ventas"
-                className={buttonVariants({ variant: "ghost" })}
-              >
-                <IconFilterOff size={16} stroke={1.75} aria-hidden />
-                Limpiar
-              </Link>
-            ) : null}
-          </div>
+          {/* Contorno, no relleno: el rojo de esta pantalla es de "Registrar
+              venta". Dos botones rojos y ninguno de los dos destaca. */}
+          <button
+            type="submit"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            <IconSearch size={16} stroke={1.75} aria-hidden />
+            Filtrar
+          </button>
         </form>
       </div>
 
+      {/* Antes esto eran tres tarjetas de colores que ocupaban media pantalla
+          y empujaban la tabla —lo que se viene a ver— fuera de la vista. Son
+          tres cifras: caben en una línea, cada una con su palabra al lado.
+          Verde solo en el dinero, que es la regla del panel. */}
       {total > 0 ? (
-        <div className="mb-6 grid gap-4 sm:grid-cols-3">
-          <Stat
-            label={filtering ? "Ventas encontradas" : "Ventas del periodo"}
-            value={String(total)}
-            icon={IconReceipt}
-            tone="navy"
-            sub={
-              pages > 1
-                ? `Página ${page} de ${pages}`
-                : undefined
-            }
-          />
-          <Stat
-            /* Con búsqueda por nombre esto cuenta las unidades DE ESE
-               producto, no las del ticket entero: es lo que se está
-               preguntando, pero hay que decirlo o el número engaña. */
-            label={search ? "Unidades de lo buscado" : "Unidades vendidas"}
-            value={String(units)}
-            icon={IconPackages}
-            tone="amber"
-          />
-          <Stat
-            label="Total facturado"
-            value={formatUsd(totalUsd)}
-            icon={IconCashBanknote}
-            tone="jade"
-            sub={capped ? "Sobre las 2000 más recientes" : undefined}
-          />
-        </div>
+        <p className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm text-muted-foreground">
+          <span>
+            <strong className="text-base font-semibold tabular-nums text-foreground">
+              {total}
+            </strong>{" "}
+            {total === 1 ? "venta" : "ventas"}
+          </span>
+          <span>
+            <strong className="font-semibold tabular-nums text-foreground">
+              {units}
+            </strong>{" "}
+            {/* Con búsqueda por nombre son las unidades DE ESE producto, no
+                las del ticket entero: es lo que se está preguntando, pero hay
+                que decirlo o el número engaña. */}
+            {search ? "unidades de lo buscado" : "unidades"}
+          </span>
+          <span>
+            Facturado{" "}
+            <strong className="font-semibold tabular-nums text-jade">
+              {formatUsd(totalUsd)}
+            </strong>
+          </span>
+          <span className="text-xs">{alcance}</span>
+          {filtering ? (
+            <Link
+              href="/admin/ventas"
+              className="inline-flex items-center gap-1 underline underline-offset-4 hover:text-foreground"
+            >
+              <IconFilterOff size={14} stroke={1.75} aria-hidden />
+              Limpiar filtros
+            </Link>
+          ) : null}
+        </p>
       ) : null}
 
       <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
@@ -285,7 +318,11 @@ export default async function SalesPage({
             <Table
               className="table-fixed lg:table-auto"
               containerProps={{
-                className: "max-h-[34rem] overflow-y-auto overscroll-contain",
+                // Se adapta a la pantalla en vez de ser un alto fijo: en un
+                // portátil no tapa la paginación y en un monitor grande no
+                // deja media pantalla en blanco.
+                className:
+                  "max-h-[clamp(22rem,64vh,50rem)] overflow-y-auto overscroll-contain",
                 role: "region",
                 "aria-labelledby": "tabla-ventas",
                 tabIndex: 0,
@@ -398,11 +435,9 @@ export default async function SalesPage({
                       <TableCell
                         className={`${celdaSecundaria} text-right tabular-nums whitespace-nowrap`}
                       >
+                        {/* Cuántos renglones ya lo dice la celda del producto
+                            ("· 3 productos"): repetirlo aquí era ruido. */}
                         {unidades}
-                        <span className="mt-0.5 block text-xs text-muted-foreground">
-                          {sale.lines.length}{" "}
-                          {sale.lines.length === 1 ? "renglón" : "renglones"}
-                        </span>
                       </TableCell>
 
                       {isAdmin ? (
@@ -461,10 +496,10 @@ export default async function SalesPage({
               aria-label="Paginación de ventas"
               className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-border p-3"
             >
+              {/* Cuántas ventas hay ya lo dice la línea de arriba: aquí solo
+                  dónde estás. */}
               <p className="text-sm text-muted-foreground tabular-nums">
-                Página {page} de {pages} · {total}{" "}
-                {total === 1 ? "venta" : "ventas"}
-                {capped ? " (se muestran las 2000 más recientes)" : ""}
+                Página {page} de {pages}
               </p>
               <div className="flex items-center gap-2">
                 {page > 1 ? (
