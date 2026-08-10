@@ -1,14 +1,19 @@
 import Link from "next/link";
-import { whatsappOrderUrl } from "../lib/site";
 import { getActiveProducts } from "../lib/products";
-import Image from "next/image";
-import { IconScissors, IconBrandWhatsapp } from "@tabler/icons-react";
-import { imageSrc } from "../lib/images";
+import { IconScissors, IconArrowRight } from "@tabler/icons-react";
+import ProductCard from "./ProductCard";
+
+/** Lo que se enseña en la portada. Seis llenan dos filas de tres y se ven
+ *  enteras sin desplazarse hasta el final: la portada es el escaparate, no el
+ *  almacén. El resto vive en /catalogo. */
+const EN_PORTADA = 6;
 
 // F6 · Product card grid — uniform on purpose. The rhythm comes from the
 // products, not from varying the tiles.
 export default async function Products() {
   const products = await getActiveProducts();
+  const shown = products.slice(0, EN_PORTADA);
+  const rest = products.length - shown.length;
 
   return (
     <section id="coleccion" className="bg-paper py-18 md:py-28">
@@ -40,78 +45,32 @@ export default async function Products() {
             </p>
           </div>
         ) : (
-          // Tailwind's grid-cols-N expands to repeat(N, minmax(0,1fr)), so the
-          // image-bearing tracks can't blow out on a long product name.
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => {
-              const soldOut = product.stock <= 0;
-              return (
-                <article
-                  key={product.id}
-                  className={`group/card border-2 border-coal bg-paper shadow-[6px_6px_0_var(--coal)] transition-[transform,box-shadow] duration-[320ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[9px_9px_0_var(--coal)] focus-within:-translate-x-[3px] focus-within:-translate-y-[3px] focus-within:shadow-[9px_9px_0_var(--coal)] motion-reduce:transition-none flex flex-col ${soldOut ? "[&_img]:grayscale [&_img]:opacity-50 hover:translate-x-0 hover:translate-y-0 hover:shadow-[6px_6px_0_var(--coal)]" : ""}`}
-                >
-                  <Link
-                    href={`/producto/${product.id}`}
-                    tabIndex={-1}
-                    aria-hidden
-                    className="halftone relative block aspect-square overflow-hidden border-b-2 border-coal bg-paper2"
-                  >
-                    <Image
-                      src={imageSrc(product.image)}
-                      alt={product.name}
-                      fill
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      className="transition-transform duration-[560ms] group-hover/card:scale-[1.02] motion-reduce:transition-none object-cover"
-                    />
-                    {soldOut ? (
-                      <span className="text-xs font-semibold uppercase tracking-[0.18em] absolute top-0 left-0 border-r-2 border-b-2 border-coal bg-navy px-2 py-1 text-paper">
-                        Agotado
-                      </span>
-                    ) : product.stock <= 3 ? (
-                      <span className="text-xs font-semibold uppercase tracking-[0.18em] tabular-nums absolute top-0 left-0 border-r-2 border-b-2 border-coal bg-signal px-2 py-1 text-paper">
-                        Últimas {product.stock}
-                      </span>
-                    ) : null}
-                  </Link>
+          <>
+            {/* Tailwind's grid-cols-N expands to repeat(N, minmax(0,1fr)), so the
+                image-bearing tracks can't blow out on a long product name. */}
+            <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {shown.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
 
-                  <div className="flex flex-1 flex-col p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-navy">{product.category}</p>
-                    <h3 className="mt-1 font-display text-2xl leading-tight uppercase">
-                      <Link
-                        href={`/producto/${product.id}`}
-                        className="underline-offset-4 hover:underline"
-                      >
-                        {product.name}
-                      </Link>
-                    </h3>
-                    <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t-2 border-navy pt-2">
-                      <span className="tabular-nums font-display text-3xl leading-none text-signal">
-                        ${product.price}
-                      </span>
-                      {soldOut ? (
-                        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-ash">Sin stock</span>
-                      ) : (
-                        <a
-                          href={whatsappOrderUrl(
-                            `Hola, quiero pedir: ${product.name}`,
-                          )}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group/tlink inline-flex items-center gap-[0.4em] font-display font-normal uppercase tracking-[0.04em] whitespace-nowrap text-signal shadow-[inset_0_-2px_0_var(--signal)] transition-shadow duration-[180ms] hover:text-paper hover:shadow-[inset_0_-0.5em_0_var(--signal)] active:text-coal motion-reduce:transition-none text-base"
-                        >
-                          <IconBrandWhatsapp size={18} stroke={1.75} aria-hidden />
-                          Pedir
-                          <span aria-hidden className="transition-transform duration-[180ms] group-hover/tlink:translate-x-[3px] motion-reduce:transition-none">
-                            →
-                          </span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+            {/* El botón dice cuántos faltan. "Ver todo" a secas no da ninguna
+                razón para pulsarlo; "y 19 más" sí. */}
+            <div className="mt-12 flex justify-center">
+              <Link
+                href="/catalogo"
+                className="group/cta inline-flex items-center gap-3 border-2 border-coal bg-signal px-6 py-3 font-display text-lg uppercase leading-none text-paper shadow-[6px_6px_0_var(--coal)] transition-[transform,box-shadow] duration-[320ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[9px_9px_0_var(--coal)] focus-visible:-translate-x-[3px] focus-visible:-translate-y-[3px] focus-visible:shadow-[9px_9px_0_var(--coal)] focus-visible:outline-none motion-reduce:transition-none"
+              >
+                {rest > 0 ? `Ver los ${products.length} productos` : "Ver todo el catálogo"}
+                <IconArrowRight
+                  size={20}
+                  stroke={2}
+                  aria-hidden
+                  className="transition-transform duration-[180ms] group-hover/cta:translate-x-[3px] motion-reduce:transition-none"
+                />
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </section>

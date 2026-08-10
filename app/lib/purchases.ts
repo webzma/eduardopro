@@ -1,5 +1,6 @@
 import { createClient } from "./supabase/server";
 import { fail } from "./supabase/config";
+import { cleanSearch } from "./search";
 
 export type PurchaseLine = {
   id: string;
@@ -81,20 +82,114 @@ const SELECT = "*, purchase_items(*, products(image))";
 /* RLS ya restringe estas lecturas al admin; no hace falta —ni sería fiable—
  * filtrar aquí por rol. */
 
-export async function getPurchases(
-  limit = 100,
-  sinceIso?: string | null,
-): Promise<Purchase[]> {
+/* La lista sin paginar (getPurchases) se fue con esto: al pasar la pantalla a
+ * getPurchasesPage se quedó sin usar, y una función muerta al lado de la viva
+ * es una trampa — antes o después alguien arregla la copia equivocada. */
+
+export type PurchasesFilter = {
+  /** Texto libre. Se busca en el NOMBRE DE PRODUCTO de los renglones. */
+  search?: string;
+  /** ISO desde el que contar (incluido). */
+  sinceIso?: string | null;
+  /** ISO hasta el que contar (excluido). */
+  untilIso?: string | null;
+};
+
+export type PurchasesPage = {
+  /** Solo las compras de esta página. */
+  purchases: Purchase[];
+  /** Compras que casan con el filtro, no las de esta página. */
+  total: number;
+  totalUsd: number;
+  units: number;
+  /** true si el filtro devuelve más de las que se pueden sumar de una vez. */
+  capped: boolean;
+  page: number;
+  pages: number;
+};
+
+/* Tope de lo que se recorre para contar y sumar. Por debajo, los totales del
+ * filtro son EXACTOS; por encima, la pantalla lo dice en vez de enseñar una
+ * suma parcial como si fuera el total. El mismo trato que en Ventas. */
+const SCAN_CAP = 2000;
+
+/**
+ * Una página de compras, con cuántas hay y cuánto suman TODAS las que casan.
+ *
+ * Son dos consultas por lo mismo que en Ventas: buscar por nombre de producto
+ * obliga a un join interno, y entonces PostgREST devuelve solo los renglones
+ * que casan — la compra saldría con un producto en vez de sus cuatro. La
+ * primera consulta se queda con los identificadores; la segunda trae completas
+ * las de esta página.
+ */
+export async function getPurchasesPage(
+  filter: PurchasesFilter,
+  page: number,
+  perPage: number,
+): Promise<PurchasesPage> {
   const supabase = await createClient();
-  let q = supabase
+  const search = cleanSearch(filter.search ?? "");
+
+  // El nombre viaja copiado en el renglón, así que se encuentran también las
+  // compras de productos que ya no están en el catálogo.
+  const scanSelect: string = search
+    ? "id, total_usd, purchase_items!inner(qty, product_name)"
+    : "id, total_usd, purchase_items(qty)";
+
+  let scan = supabase
     .from("purchases")
-    .select(SELECT)
+    .select(scanSelect, { count: "exact" })
     .order("bought_at", { ascending: false })
-    .limit(limit);
-  if (sinceIso) q = q.gte("bought_at", sinceIso);
-  const { data, error } = await q;
+    .limit(SCAN_CAP);
+  if (filter.sinceIso) scan = scan.gte("bought_at", filter.sinceIso);
+  if (filter.untilIso) scan = scan.lt("bought_at", filter.untilIso);
+  if (search) scan = scan.ilike("purchase_items.product_name", `%${search}%`);
+
+  const { data, count, error } = await scan;
   if (error) fail(error);
-  return (data ?? []).map((row) => toPurchase(row as Row));
+
+  const rows = (data ?? []) as unknown as {
+    id: string;
+    total_usd: number | string;
+    purchase_items: { qty: number }[] | null;
+  }[];
+
+  // count es exacto aunque el limit recorte lo devuelto: lo cuenta la base.
+  const total = count ?? rows.length;
+  const pages = Math.max(1, Math.ceil(Math.min(total, SCAN_CAP) / perPage));
+  const current = Math.min(Math.max(1, page), pages);
+  const slice = rows.slice((current - 1) * perPage, current * perPage);
+
+  let totalUsd = 0;
+  let units = 0;
+  for (const row of rows) {
+    totalUsd += Number(row.total_usd);
+    for (const line of row.purchase_items ?? []) units += line.qty;
+  }
+
+  let purchases: Purchase[] = [];
+  if (slice.length > 0) {
+    const { data: full, error: fullError } = await supabase
+      .from("purchases")
+      .select(SELECT)
+      .in(
+        "id",
+        slice.map((row) => row.id),
+      )
+      .order("bought_at", { ascending: false });
+    if (fullError) fail(fullError);
+    purchases = (full ?? []).map((row) => toPurchase(row as Row));
+  }
+
+  return {
+    purchases,
+    total,
+    totalUsd,
+    units,
+    capped: total > SCAN_CAP,
+    page: current,
+    pages,
+  };
 }
 
 export async function getPurchase(id: string): Promise<Purchase | null> {

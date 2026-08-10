@@ -2,6 +2,7 @@ import { createClient } from "./supabase/server";
 import { fail } from "./supabase/config";
 import type { Role } from "./auth";
 import { veStartOfDay, veStartOfMonth, veEndOfDay } from "./period";
+import { cleanSearch } from "./search";
 
 export type SaleLine = {
   id: string;
@@ -133,20 +134,6 @@ export type SalesPage = {
  * por debajo, los totales del filtro son EXACTOS; por encima, la pantalla lo
  * dice en vez de enseñar una suma parcial como si fuera el total. */
 const SCAN_CAP = 2000;
-
-/**
- * Deja el texto de búsqueda en letras, números y espacios. No es cosmético:
- * `%` y `_` son comodines de ilike, y las comas y paréntesis rompen el
- * analizador de filtros de PostgREST. Lo que llega de una barra de búsqueda no
- * puede entrar tal cual en un filtro.
- */
-export function cleanSearch(raw: string): string {
-  return raw
-    .replace(/[^\p{L}\p{N} ]/gu, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 60);
-}
 
 /**
  * Una página de ventas, con lo que hace falta para paginar de verdad: cuántas
