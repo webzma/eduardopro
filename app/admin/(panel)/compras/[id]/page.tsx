@@ -266,7 +266,7 @@ export default async function PurchaseDetailPage({
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                  {/* colSpan no entiende de media queries: se pinta un pie
+                    {/* colSpan no entiende de media queries: se pinta un pie
                       por tamaño de pantalla y cada uno aparece en el suyo. */}
                     <TableCell className="lg:hidden">Total pagado</TableCell>
                     <TableCell colSpan={5} className="hidden lg:table-cell">
