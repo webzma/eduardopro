@@ -8,6 +8,7 @@ import { getRate } from "../../../../lib/rate";
 import { formatBs } from "../../../../lib/money";
 import { updateProductAction } from "../../../actions";
 import ImagePicker from "../../ImagePicker";
+import CategorySelect from "../../CategorySelect";
 import { imageSrc } from "../../../../lib/images";
 import { cn } from "@/app/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
@@ -94,12 +95,10 @@ export default async function EditProductPage({
               <Label htmlFor="category" className="mb-1 block">
                 Categoría
               </Label>
-              <Input
+              <CategorySelect
                 id="category"
                 name="category"
-                type="text"
                 defaultValue={product.category}
-                
               />
             </div>
             <fieldset className="sm:col-span-2">

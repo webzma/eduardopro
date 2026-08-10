@@ -12,6 +12,7 @@ import { formatBs, formatPct, formatUsd, marginPct } from "../../../lib/money";
 import { adjustStockAction, createProductAction } from "../../actions";
 import RowActions from "./RowActions";
 import ImagePicker from "../ImagePicker";
+import CategorySelect from "../CategorySelect";
 import { imageSrc } from "../../../lib/images";
 import {
   celdaSecundaria,
@@ -371,13 +372,7 @@ export default async function InventoryPage({
                 <Label htmlFor="new-category" className="mb-1 block">
                   Categoría
                 </Label>
-                <Input
-                  id="new-category"
-                  name="category"
-                  type="text"
-                  placeholder="Ej. Tijera profesional"
-                  
-                />
+                <CategorySelect id="new-category" name="category" />
               </div>
               <fieldset className="sm:col-span-2">
                 <legend className="mb-1 block">Foto</legend>

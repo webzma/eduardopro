@@ -19,6 +19,7 @@ import {
   slugify,
   type ProductInput,
 } from "../lib/products";
+import { readCategory } from "../lib/categories";
 import { uploadProductImage, removeProductImage } from "../lib/storage";
 import { PLACEHOLDER } from "../lib/images";
 import { registerSale, type CartItem } from "../lib/sales";
@@ -38,10 +39,16 @@ const PAYMENT_METHODS = [
  * la aplicación, no la única: aunque alguien llamara a una de estas saltándose
  * la UI, las políticas RLS de supabase/schema.sql la rechazarían igual. */
 
-function readForm(formData: FormData): Omit<ProductInput, "image"> {
+/* `keepCategory` es la categoría que el producto ya tenía: readCategory la
+ * respeta aunque no esté en la lista, para no borrarle la categoría a los
+ * productos de antes del selector solo por guardar otro campo. */
+function readForm(
+  formData: FormData,
+  keepCategory?: string,
+): Omit<ProductInput, "image"> {
   return {
     name: String(formData.get("name") ?? "").trim(),
-    category: String(formData.get("category") ?? "").trim(),
+    category: readCategory(String(formData.get("category") ?? ""), keepCategory),
     price: Math.max(0, Number(formData.get("price") ?? 0)),
     // Normalmente lo fija cada compra registrada; el campo existe para poder
     // corregirlo a mano y para dar de alta productos que ya tenías.
@@ -252,7 +259,7 @@ export async function registerPurchaseAction(
 
         const product = await createProduct({
           name,
-          category: String(item.category ?? "").trim(),
+          category: readCategory(String(item.category ?? "")),
           price: salePrice ?? 0,
           cost: unitCost,
           stock: 0, // lo suma la compra, en la misma transacción
@@ -330,7 +337,7 @@ export async function updateProductAction(formData: FormData): Promise<void> {
   const id = String(formData.get("id") ?? "");
   const existing = await getProduct(id);
   if (!existing) redirect("/admin/inventario?error=noexiste");
-  const fields = readForm(formData);
+  const fields = readForm(formData, existing?.category);
   if (!fields.name) redirect(`/admin/inventario/${id}?error=nombre`);
 
   let image: string | null;

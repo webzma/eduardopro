@@ -169,11 +169,32 @@ grant execute on function public.adjust_stock(text, integer) to authenticated;
 -- 5 · Datos iniciales (los 4 productos actuales del sitio)
 -- ─────────────────────────────────────────────────────────────────────────
 insert into public.products (id, name, category, price, stock, image, active) values
-  ('maquina-wahl',    'Máquina Wahl',      'MÁQUINA PROFESIONAL', 85,  8, '/products/maquina-wahl.png',    true),
-  ('cera-rolda',      'Cera Rolda',        'CERA DE PEINADO MATE', 12, 24, '/products/cera-rolda.png',      true),
-  ('minoxidil',       'Minoxidil',         'CRECIMIENTO DE BARBA', 18, 15, '/products/minoxidil.png',       true),
-  ('navaja-hojillas', 'Navaja + Hojillas', 'NAVAJA CON HOJILLAS',   9, 30, '/products/navaja-hojillas.png', true)
+  ('maquina-wahl',    'Máquina Wahl',      'Máquinas y cortadoras', 85,  8, '/products/maquina-wahl.png',    true),
+  ('cera-rolda',      'Cera Rolda',        'Ceras y pomadas',       12, 24, '/products/cera-rolda.png',      true),
+  ('minoxidil',       'Minoxidil',         'Cuidado de barba',      18, 15, '/products/minoxidil.png',       true),
+  ('navaja-hojillas', 'Navaja + Hojillas', 'Navajas y afeitado',     9, 30, '/products/navaja-hojillas.png', true)
 on conflict (id) do nothing;
+
+-- Las categorías dejaron de escribirse a mano: ahora salen de una lista
+-- cerrada, la de app/lib/categories.ts. Esto pasa las cuatro de antes —que
+-- eran descripciones del producto, no categorías— a las de esa lista. Es
+-- idempotente: la segunda vez no encuentra ninguna y no toca nada.
+--
+-- Si tienes productos con otras categorías escritas a mano, aquí no se tocan:
+-- se siguen viendo y el selector las ofrece al final, marcadas como están, para
+-- que puedas cambiarlas cuando edites el producto.
+update public.products set category = case category
+  when 'MÁQUINA PROFESIONAL'  then 'Máquinas y cortadoras'
+  when 'CERA DE PEINADO MATE' then 'Ceras y pomadas'
+  when 'CRECIMIENTO DE BARBA' then 'Cuidado de barba'
+  when 'NAVAJA CON HOJILLAS'  then 'Navajas y afeitado'
+end
+where category in (
+  'MÁQUINA PROFESIONAL',
+  'CERA DE PEINADO MATE',
+  'CRECIMIENTO DE BARBA',
+  'NAVAJA CON HOJILLAS'
+);
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- 6 · Dar de alta a alguien

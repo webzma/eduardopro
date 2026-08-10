@@ -33,6 +33,7 @@ import { buttonVariants } from "@/app/components/ui/button";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
 import ImagePicker from "../../ImagePicker";
+import CategorySelect from "../../CategorySelect";
 
 /** Margen por defecto al sugerir precio de venta para algo nuevo. */
 const DEFAULT_MARGIN = 40;
@@ -281,13 +282,12 @@ export default function PurchaseForm({
                                   (opcional)
                                 </span>
                               </Label>
-                              <Input
+                              <CategorySelect
                                 id={id("cat")}
                                 value={line.category}
                                 onChange={(e) =>
                                   patch(line.key, { category: e.target.value })
                                 }
-                                placeholder="Ej. Tijera profesional"
                               />
                             </div>
 
